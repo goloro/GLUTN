@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GLUTN</title>
+
+        <link rel="shortcut icon" href="Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
+
+        <!-- Fuentes y Iconos -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="CSS/home.css">
+    </head>
+    <body>
+        <img id="main-logo" src="Images/Logos/Glutn_Logo.PNG" alt="Logo de GLUTN">
+
+        <div class="scanner">
+            <h1>Escanear Etiqueta</h1>
+            <p>Comprueba instantáneamente<br>si un producto es seguro para ti.</p>
+            
+            <button class="abrir-scanner-btn" onclick="window.location.href='scan.html'">
+                <i class="ph ph-qr-code"></i>
+                Abrir Scanner
+            </button>
+
+            <div class="scanner-icon">
+                <i class="ph ph-barcode"></i>
+            </div>
+        </div>
+
+        <div class="language-selector">
+            <button class="lang-btn">
+                <i class="ph ph-globe"></i>
+                Español
+                <i class="ph ph-caret-down"></i>
+            </button>
+        </div>
+
+        <div class="last-scan">
+            <h2>Último escaneo</h2>
+            <div class="scan-item">
+                <div class="icon-safe"><i class="ph-bold ph-check"></i></div>
+                <div class="info">
+                    <h3>Pasta Barilla</h3>
+                    <span class="status">100% Seguro</span>
+                </div>
+                <div class="time">Hace 10 min</div>
+            </div>
+        </div>
+
+        <div class="nav-bar">
+            <div class="nav-bar-item active" id="home-button">
+                <i class="ph-fill ph-house"></i>
+                <a href="index.html">Inicio</a>
+            </div>
+            <div class="nav-bar-item" id="scan-button">
+                <i class="ph ph-camera"></i>
+                <a href="scan.html">Escanear</a>
+            </div>
+            <div class="nav-bar-item" id="history-button">
+                <i class="ph ph-clock-counter-clockwise"></i>
+                <a href="history.html">Historial</a>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,237 @@
+:root {
+    --bg-color: #FFFFFF;
+    --card-green: #0FA874; 
+    --text-dark: #000000;
+    --text-gray: #6B7280;
+    --safe-green: #0FA874;
+    --nav-bg: #F4EAD4;
+    --nav-active: #E4D5BC;
+    --white: #FFFFFF;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 90px;
+}
+
+/* Header Logo */
+#main-logo {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    background-color: #F4EAD4; /* Fondo si la imagen es transparente */
+}
+
+/* Tarjeta de Escáner */
+.scanner {
+    background-color: var(--card-green);
+    border-radius: 20px;
+    padding: 32px 24px 40px 24px; 
+    width: calc(100% - 48px); /* Márgenes de 24px */
+    max-width: 340px; 
+    text-align: center;
+    color: var(--white);
+    box-shadow: 0 8px 24px rgba(15, 168, 116, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 32px;
+    margin-bottom: 16px; 
+}
+
+.scanner h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.scanner p {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    opacity: 0.95;
+    margin-bottom: 24px;
+}
+
+.abrir-scanner-btn {
+    background: var(--white);
+    color: var(--card-green); 
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px; 
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+    margin-bottom: 32px; 
+}
+
+.abrir-scanner-btn:active {
+    transform: scale(0.97);
+}
+
+.abrir-scanner-btn i {
+    font-size: 18px;
+}
+
+.scanner-icon {
+    width: 72px;
+    height: 72px;
+    background-color: rgba(255, 255, 255, 0.15); 
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scanner-icon i {
+    font-size: 36px;
+    color: var(--white);
+}
+
+/* Selector de Idioma */
+.language-selector {
+    margin-bottom: 48px;
+}
+
+.lang-btn {
+    background: #F3F4F6; 
+    border: 1px solid #E5E7EB;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.lang-btn i {
+    font-size: 16px;
+    color: #6B7280;
+}
+
+/* Sección de Último Escaneo */
+.last-scan {
+    width: calc(100% - 48px);
+    max-width: 340px;
+    text-align: left; 
+}
+
+.last-scan h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+}
+
+.scan-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    gap: 16px;
+}
+
+.icon-safe {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #E6F6F0; 
+    color: var(--safe-green);
+}
+
+.icon-safe i {
+    font-size: 18px;
+}
+
+.info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.info h3 {
+    font-size: 16px;
+    font-weight: 700; 
+    color: #111827;
+    margin-bottom: 2px;
+}
+
+.status {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--safe-green);
+}
+
+.time {
+    font-size: 12px;
+    color: #6B7280;
+    font-weight: 500;
+}
+
+/* Navegación Inferior */
+.nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--nav-bg);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 12px 16px 20px 16px; 
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    z-index: 100;
+}
+
+.nav-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 20px;
+    border-radius: 12px;
+    color: #6D6151; 
+}
+
+.nav-bar-item a {
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    color: inherit;
+}
+
+.nav-bar-item i {
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.nav-bar-item.active {
+    background-color: var(--nav-active);
+    color: #4A3F31; 
+}
