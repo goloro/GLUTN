@@ -67,6 +67,50 @@
         </div>
     </div>
 
+    <!-- Pantalla de Resultados (Oculta por defecto) -->
+    <div class="result-overlay" id="result-screen">
+        <header class="result-header">
+            <img src="../Images/Logos/Glutn_Logo_SinFondo.png" alt="Logo de GLUTN">
+        </header>
+
+        <div class="result-content-wrapper">
+            <!-- Tarjeta de la foto con el veredicto -->
+            <div class="result-card">
+                <img src="../Images/DefaultProduct.jfif" alt="Etiqueta escaneada" class="scanned-image" style="background-color: #e5e5e5; object-fit: cover;">
+                <div class="verdict-banner unsafe">
+                    <i class="ph-fill ph-x-circle"></i> NO APTO
+                </div>
+            </div>
+
+            <!-- Explicación -->
+            <div class="reason-section">
+                <h3>Por qué:</h3>
+                <p>Se ha detectado 'malto d'orzo' (malta de cebada), un ingrediente derivado del trigo.</p>
+            </div>
+
+            <!-- Lista de ingredientes -->
+            <div class="ingredients-box">
+                <h4>Lista de ingredientes</h4>
+                <ul class="ingredients-list">
+                    <li>Harina de arroz</li>
+                    <li>Azúcar</li>
+                    <li>Aceite de oliva</li>
+                    <li>Sal</li>
+                    <li class="unsafe-ingredient">Malta de cebada</li>
+                    <li>Levadura</li>
+                    <li>Lecitina de soja</li>
+                </ul>
+            </div>
+
+            <!-- Botón de nuevo escaneo -->
+            <div class="result-action">
+                <button class="new-scan-btn" onclick="document.getElementById('result-screen').classList.remove('active')">
+                    <i class="ph ph-qr-code"></i> Nuevo escaneo
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Navegación Inferior (Igual que home, pero cambia el activo) -->
     <div class="nav-bar">
         <div class="nav-bar-item" id="home-button" onclick="window.location.href='../index.html'">

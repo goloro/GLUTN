@@ -170,5 +170,187 @@ body.scanner-body .nav-bar-item:not(.active) {
 .loading-logo img {
     width: 100%;
     object-fit: contain;
-    mix-blend-mode: multiply; /* Oculta fondos blancos/beige si el logo no es PNG transparente puro */
+    mix-blend-mode: multiply; 
+}
+
+/* Pantalla de Resultados Flotante */
+.result-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--white);
+    z-index: 250; /* Por encima de la carga y nav-bar */
+    display: none; /* Cambiar a flex cuando esté activo */
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+}
+
+.result-overlay.active {
+    display: flex;
+}
+
+.result-header {
+    width: 100%;
+    background-color: var(--nav-bg); /* Fondo beige del logo */
+    padding: 16px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.result-header img {
+    height: 90px; /* Aumentado drásticamente porque la imagen tiene mucho padding transparente */
+    margin: -24px 0; /* Recortamos el espacio vacío superior/inferior */
+    object-fit: contain;
+    mix-blend-mode: multiply;
+}
+
+.result-content-wrapper {
+    width: 100%;
+    max-width: 600px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Ocupa el resto de la pantalla */
+}
+
+/* Tarjeta de imagen y veredicto */
+.result-card {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    background-color: #F3F4F6;
+}
+
+.scanned-image {
+    width: 100%;
+    height: 200px;
+    display: block;
+}
+
+.verdict-banner {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.verdict-banner.unsafe {
+    background-color: #EF4444; /* Rojo NO APTO */
+    color: var(--white);
+}
+
+.verdict-banner.unsafe i {
+    font-size: 24px;
+}
+
+/* Sección 'Por qué' */
+.reason-section {
+    margin-bottom: 24px;
+}
+
+.reason-section h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 12px;
+}
+
+.reason-section p {
+    font-size: 16px;
+    color: #4B5563;
+    line-height: 1.5;
+}
+
+/* Caja de ingredientes */
+.ingredients-box {
+    background-color: #F8F3E6; /* Beige claro/crema */
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+}
+
+.ingredients-box h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+.ingredients-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ingredients-list li {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    color: #111827;
+    font-weight: 500;
+}
+
+.ingredients-list li::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    background-color: currentColor; /* Hereda el color del li */
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.unsafe-ingredient {
+    background-color: #FEE2E2;
+    color: #DC2626 !important;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-left: -12px; /* Compensar el padding para que el bullet siga alineado */
+    width: fit-content;
+}
+
+/* Botón Nuevo Escaneo */
+.result-action {
+    margin-top: auto; /* Empuja el botón abajo del todo si hay espacio */
+    padding-bottom: 16px;
+    width: 100%;
+}
+
+.new-scan-btn {
+    width: 100%;
+    background-color: #0FA874; /* Fondo verde sólido */
+    border: none;
+    color: #FFFFFF; /* Letras en blanco */
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(15, 168, 116, 0.2); /* Sombra muy sutil */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.new-scan-btn:active {
+    background-color: #0d9667; /* Un poco más oscuro al pulsar */
+    transform: scale(0.98);
+    box-shadow: 0 2px 6px rgba(15, 168, 116, 0.15);
+}
+
+.new-scan-btn i {
+    font-size: 24px;
 }
