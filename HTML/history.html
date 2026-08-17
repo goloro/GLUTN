@@ -24,7 +24,7 @@
 
     <main class="content history-content">
         <div class="history-container">
-            <h1 class="history-title">Historial</h1>
+            <h1 class="history-title" data-i18n="history.title">Historial</h1>
             
             <div class="history-list">
                 <!-- Item Seguro -->
@@ -32,9 +32,9 @@
                     <div class="icon-safe"><i class="ph-bold ph-check"></i></div>
                     <div class="info">
                         <h3>Pasta Barilla</h3>
-                        <span class="status">100% Seguro</span>
+                        <span class="status" data-i18n="status.safe">100% Seguro</span>
                     </div>
-                    <div class="time">Hace 10 min</div>
+                    <div class="time" data-i18n="time.10min">Hace 10 min</div>
                 </div>
 
                 <!-- Item Inseguro -->
@@ -42,9 +42,9 @@
                     <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
                     <div class="info">
                         <h3>Galletas de Cacao</h3>
-                        <span class="status unsafe-text">Contiene cebada</span>
+                        <span class="status unsafe-text" data-i18n="status.unsafe_barley">Contiene cebada</span>
                     </div>
-                    <div class="time">Hace 2 horas</div>
+                    <div class="time" data-i18n="time.2hours">Hace 2 horas</div>
                 </div>
 
                 <!-- Item Inseguro -->
@@ -52,9 +52,9 @@
                     <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
                     <div class="info">
                         <h3>Galletas de Cacao</h3>
-                        <span class="status unsafe-text">Contiene cebada</span>
+                        <span class="status unsafe-text" data-i18n="status.unsafe_barley">Contiene cebada</span>
                     </div>
-                    <div class="time">Hace 2 horas</div>
+                    <div class="time" data-i18n="time.2hours">Hace 2 horas</div>
                 </div>
 
                 <!-- Item Inseguro -->
@@ -62,9 +62,9 @@
                     <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
                     <div class="info">
                         <h3>Galletas de Cacao</h3>
-                        <span class="status unsafe-text">Contiene cebada</span>
+                        <span class="status unsafe-text" data-i18n="status.unsafe_barley">Contiene cebada</span>
                     </div>
-                    <div class="time">Hace 2 horas</div>
+                    <div class="time" data-i18n="time.2hours">Hace 2 horas</div>
                 </div>
 
                 <!-- Item Seguro -->
@@ -72,9 +72,9 @@
                     <div class="icon-safe"><i class="ph-bold ph-check"></i></div>
                     <div class="info">
                         <h3>Salsa de Tomate</h3>
-                        <span class="status">Seguro</span>
+                        <span class="status" data-i18n="status.safe_short">Seguro</span>
                     </div>
-                    <div class="time">Ayer</div>
+                    <div class="time" data-i18n="time.yesterday">Ayer</div>
                 </div>
             </div>
         </div>
@@ -84,7 +84,7 @@
     <div class="delete-container">
         <button class="delete-btn">
             <i class="ph-bold ph-trash"></i>
-            Borrar Historial
+            <span data-i18n="history.delete">Borrar Historial</span>
         </button>
     </div>
 
@@ -105,13 +105,13 @@
 
             <!-- Explicación -->
             <div class="detail-reason">
-                <h3>Por qué:</h3>
+                <h3 data-i18n="scanner.why">Por qué:</h3>
                 <p>Se ha detectado 'malto d'orzo' (malta de cebada), un ingrediente derivado del trigo.</p>
             </div>
 
             <!-- Lista de ingredientes -->
             <div class="detail-ingredients">
-                <h4>Lista de ingredientes</h4>
+                <h4 data-i18n="scanner.ingredients_list">Lista de ingredientes</h4>
                 <ul>
                     <li>Harina de arroz</li>
                     <li>Azúcar</li>
@@ -126,7 +126,7 @@
             <!-- Botón de nuevo escaneo -->
             <div class="detail-action">
                 <button class="detail-new-scan-btn" onclick="window.location.href='scanner.html'">
-                    <i class="ph ph-qr-code"></i> Nuevo escaneo
+                    <i class="ph ph-qr-code"></i> <span data-i18n="scanner.new_scan">Nuevo escaneo</span>
                 </button>
             </div>
         </div>
@@ -136,16 +136,19 @@
     <div class="nav-bar">
         <div class="nav-bar-item" id="home-button" onclick="window.location.href='../index.html'">
             <i class="ph ph-house"></i>
-            <a href="../index.html">Inicio</a>
+            <a href="../index.html" data-i18n="nav.home">Inicio</a>
         </div>
         <div class="nav-bar-item" id="scan-button" onclick="window.location.href='scanner.html'">
             <i class="ph ph-camera"></i>
-            <a href="scanner.html">Escanear</a>
+            <a href="scanner.html" data-i18n="nav.scan">Escanear</a>
         </div>
         <div class="nav-bar-item active" id="history-button" onclick="window.location.href='history.html'">
             <i class="ph-fill ph-clock-counter-clockwise"></i>
-            <a href="history.html">Historial</a>
+            <a href="history.html" data-i18n="nav.history">Historial</a>
         </div>
     </div>
+
+    <!-- Script para traducciones -->
+    <script src="../JS/i18n.js"></script>
 </body>
 </html>

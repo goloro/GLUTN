@@ -21,6 +21,11 @@
 
     <!-- Área de la Cámara (Placeholder visual) -->
     <main class="camera-view">
+        <div class="scanner-header">
+            <a href="../index.html" class="back-btn"><i class="ph ph-arrow-left"></i></a>
+            <span class="instruction-text" data-i18n="scanner.focus">Enfoca la etiqueta de ingredientes</span>
+            <div style="width: 24px;"></div>
+        </div>
         <div class="camera-placeholder">
             <!-- Capa oscura sutil -->
             <div class="camera-overlay"></div>
@@ -50,7 +55,15 @@
         <button class="capture-button" onclick="document.getElementById('loading-screen').classList.add('active'); setTimeout(() => document.getElementById('loading-screen').classList.remove('active'), 3500)">
             <i class="ph-bold ph-camera"></i>
         </button>
-        <p class="instruction-text">APUNTA A LOS INGREDIENTES</p>
+        <div class="scanner-controls">
+            <button class="scan-btn" onclick="document.getElementById('loading-screen').classList.add('active')">
+                <i class="ph ph-qr-code"></i>
+                <span data-i18n="nav.scan">Escanear</span>
+            </button>
+            <button class="cancel-btn" onclick="window.location.href='../index.html'" data-i18n="scanner.cancel">
+                Cancelar
+            </button>
+        </div>
     </div>
 
     <!-- Pantalla de Carga (Oculta por defecto) -->
@@ -59,8 +72,8 @@
             <!-- Círculo brillante animado -->
             <div class="glowing-circle"></div>
         </div>
-        <h2 class="loading-title">Analizando etiqueta...</h2>
-        <p class="loading-subtitle">Traduciendo y buscando alérgenos</p>
+        <h2 class="loading-title" data-i18n="scanner.analyzing">Analizando ingredientes...</h2>
+        <p class="loading-subtitle" data-i18n="scanner.wait">Espera un momento, GLUTN está leyendo la etiqueta.</p>
         
         <div class="loading-logo">
             <img src="../Images/Logos/Glutn_Logo_SinFondo.png" alt="GLUTN">
@@ -78,19 +91,19 @@
             <div class="result-card">
                 <img src="../Images/DefaultProduct.jfif" alt="Etiqueta escaneada" class="scanned-image" style="background-color: #e5e5e5; object-fit: cover;">
                 <div class="verdict-banner unsafe">
-                    <i class="ph-fill ph-x-circle"></i> NO APTO
+                    <i class="ph-fill ph-x-circle"></i> <span data-i18n="scanner.unsafe">NO APTO</span>
                 </div>
             </div>
 
             <!-- Explicación -->
             <div class="reason-section">
-                <h3>Por qué:</h3>
+                <h3 data-i18n="scanner.why">Por qué:</h3>
                 <p>Se ha detectado 'malto d'orzo' (malta de cebada), un ingrediente derivado del trigo.</p>
             </div>
 
             <!-- Lista de ingredientes -->
             <div class="ingredients-box">
-                <h4>Lista de ingredientes</h4>
+                <h4 data-i18n="scanner.ingredients_list">Lista de ingredientes</h4>
                 <ul class="ingredients-list">
                     <li>Harina de arroz</li>
                     <li>Azúcar</li>
@@ -105,7 +118,7 @@
             <!-- Botón de nuevo escaneo -->
             <div class="result-action">
                 <button class="new-scan-btn" onclick="document.getElementById('result-screen').classList.remove('active')">
-                    <i class="ph ph-qr-code"></i> Nuevo escaneo
+                    <i class="ph ph-qr-code"></i> <span data-i18n="scanner.new_scan">Nuevo escaneo</span>
                 </button>
             </div>
         </div>
@@ -115,17 +128,19 @@
     <div class="nav-bar">
         <div class="nav-bar-item" id="home-button" onclick="window.location.href='../index.html'">
             <i class="ph ph-house"></i>
-            <a href="../index.html">Inicio</a>
+            <a href="../index.html" data-i18n="nav.home">Inicio</a>
         </div>
         <div class="nav-bar-item active" id="scan-button" onclick="window.location.href='scanner.html'">
             <i class="ph-fill ph-camera"></i>
-            <a href="scanner.html">Escanear</a>
+            <a href="scanner.html" data-i18n="nav.scan">Escanear</a>
         </div>
         <div class="nav-bar-item" id="history-button" onclick="window.location.href='history.html'">
             <i class="ph ph-clock-counter-clockwise"></i>
-            <a href="history.html">Historial</a>
+            <a href="history.html" data-i18n="nav.history">Historial</a>
         </div>
     </div>
 
+    <!-- Script para traducciones -->
+    <script src="../JS/i18n.js"></script>
 </body>
 </html>

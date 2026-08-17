@@ -20,12 +20,12 @@
         <img id="main-logo" src="Images/Logos/Glutn_Logo.PNG" alt="Logo de GLUTN">
 
         <div class="scanner">
-            <h1>Escanear Etiqueta</h1>
-            <p>Comprueba instantáneamente<br>si un producto es seguro para ti.</p>
+            <h1 data-i18n="home.scan_title">Escanear Etiqueta</h1>
+            <p data-i18n="home.scan_subtitle">Comprueba instantáneamente<br>si un producto es seguro para ti.</p>
             
             <button class="abrir-scanner-btn" onclick="window.location.href='/HTML/scanner.html'">
                 <i class="ph ph-qr-code"></i>
-                Abrir Scanner
+                <span data-i18n="home.open_scanner">Abrir Scanner</span>
             </button>
 
             <div class="scanner-icon" onclick="window.location.href='HTML/scanner.html'" style="cursor: pointer;">
@@ -49,7 +49,7 @@
         </div>
 
         <div class="last-scan">
-            <h2>Último escaneo</h2>
+            <h2 data-i18n="home.last_scan">Último escaneo</h2>
             <!-- Este contenedor se rellenará dinámicamente desde JS -->
             <div id="last-scan-container"></div>
         </div>
@@ -57,19 +57,20 @@
         <div class="nav-bar">
             <div class="nav-bar-item active" id="home-button" onclick="window.location.href='index.html'">
                 <i class="ph-fill ph-house"></i>
-                <a href="index.html">Inicio</a>
+                <a href="index.html" data-i18n="nav.home">Inicio</a>
             </div>
             <div class="nav-bar-item" id="scan-button" onclick="window.location.href='/HTML/scanner.html'">
                 <i class="ph ph-camera"></i>
-                <a href="/HTML/scanner.html">Escanear</a>
+                <a href="/HTML/scanner.html" data-i18n="nav.scan">Escanear</a>
             </div>
             <div class="nav-bar-item" id="history-button" onclick="window.location.href='/HTML/history.html'">
                 <i class="ph ph-clock-counter-clockwise"></i>
-                <a href="/HTML/history.html">Historial</a>
+                <a href="/HTML/history.html" data-i18n="nav.history">Historial</a>
             </div>
         </div>
         
         <!-- Scripts -->
+        <script src="JS/i18n.js"></script>
         <script src="JS/home.js"></script>
     </body>
 </html>

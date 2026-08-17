@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!langBtn || !langDropdown) return; // Salir si no estamos en index.html
 
     // Cargar el idioma guardado al iniciar la página
-    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
+    let userObj = JSON.parse(localStorage.getItem('user')) || {};
     if (userObj.language) {
         selectLang(userObj.language);
     }
@@ -41,10 +41,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Si no hay historial o está vacío
         if (!user.history || user.history.length === 0) {
             container.innerHTML = `
-                <div style="text-align: left; color: #6B7280; font-size: 14px; padding: 12px 0;">
+                <div data-i18n="home.no_scans" style="text-align: left; color: #6B7280; font-size: 14px; padding: 12px 0;">
                     Aún no has escaneado ningún producto. ¡Anímate a probarlo!
                 </div>
             `;
+            if (typeof applyTranslations === 'function') {
+                applyTranslations(user.language || 'Español');
+            }
             return;
         }
 
@@ -63,9 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="${iconClass}"><i class="ph-bold ${iconPh}"></i></div>
                 <div class="info">
                     <h3>${lastScan.name || 'Producto desconocido'}</h3>
-                    <span class="status ${statusClass}">${lastScan.statusText || (lastScan.isSafe ? 'Seguro' : 'NO APTO')}</span>
+                    <span class="status ${statusClass}" data-i18n="${lastScan.isSafe ? 'status.safe_short' : 'scanner.unsafe'}">${lastScan.statusText || (lastScan.isSafe ? 'Seguro' : 'NO APTO')}</span>
                 </div>
-                <div class="time">${lastScan.timeAgo || 'Hace un momento'}</div>
+                <div class="time" data-i18n="time.just_now">${lastScan.timeAgo || 'Hace un momento'}</div>
             </div>
         `;
     }
@@ -89,9 +92,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Guardar en el JSON de usuario en LocalStorage
-        userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
+        userObj = JSON.parse(localStorage.getItem('user')) || {};
         userObj.language = lang;
-        localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
+        localStorage.setItem('user', JSON.stringify(userObj));
+
+        // Aplicar la traducción a la UI si la función existe (i18n.js cargado)
+        if (typeof applyTranslations === 'function') {
+            applyTranslations(lang);
+        }
     }
 
     // Cerrar el menú si el usuario clica fuera de él
