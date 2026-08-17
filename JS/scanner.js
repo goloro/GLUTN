@@ -74,6 +74,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             video.srcObject = stream;
             
+            // Iniciar decodificador continuo en segundo plano
+            codeReader.decodeContinuously(video, (result, err) => {
+                if (result && currentScanMode === 'EAN' && isScanningBarcode) {
+                    isScanningBarcode = false;
+                    handleBarcodeDetected(result.text);
+                }
+            });
+
             // Iniciar interfaz una vez tenemos el stream
             updateScannerUI(currentScanMode);
         } catch (error) {
@@ -90,21 +98,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // === 2. LÓGICA DE BARCODE (ZXING) ===
     function startBarcodeScan() {
-        if (isScanningBarcode || !stream) return;
+        if (!stream) return;
         isScanningBarcode = true;
-        
-        codeReader.decodeFromVideoElement(video, (result, err) => {
-            if (result) {
-                // Código encontrado
-                stopBarcodeScan();
-                handleBarcodeDetected(result.text);
-            }
-        });
     }
 
     function stopBarcodeScan() {
         isScanningBarcode = false;
-        codeReader.reset();
     }
 
     async function handleBarcodeDetected(barcode) {
@@ -293,7 +292,7 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         };
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
