@@ -95,3 +95,80 @@ body.scanner-body .nav-bar {
 body.scanner-body .nav-bar-item:not(.active) {
     color: #8C7B67; /* Un gris/marrón claro para inactivos */
 }
+
+/* Pantalla de Carga Flotante */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #F8F3E6; /* Tono crema suave (basado en el logo pero más claro) */
+    z-index: 200; /* Por encima de todo, incluso nav-bar */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.spinner-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* El círculo central con brillo */
+.glowing-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 1px solid rgba(15, 168, 116, 0.6); /* Verde muy fino */
+    box-shadow: 0 0 40px 15px rgba(15, 168, 116, 0.15), inset 0 0 20px 5px rgba(15, 168, 116, 0.1);
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+    0% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 30px 10px rgba(15, 168, 116, 0.1), inset 0 0 15px 2px rgba(15, 168, 116, 0.05); }
+    50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 60px 25px rgba(15, 168, 116, 0.25), inset 0 0 30px 10px rgba(15, 168, 116, 0.15); }
+    100% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 30px 10px rgba(15, 168, 116, 0.1), inset 0 0 15px 2px rgba(15, 168, 116, 0.05); }
+}
+
+.loading-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.loading-subtitle {
+    font-size: 15px;
+    color: #6B7280;
+    font-weight: 400;
+    text-align: center;
+    max-width: 80%;
+}
+
+.loading-logo {
+    position: absolute;
+    bottom: 40px;
+    width: 140px;
+}
+
+.loading-logo img {
+    width: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply; /* Oculta fondos blancos/beige si el logo no es PNG transparente puro */
+}

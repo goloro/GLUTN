@@ -46,10 +46,25 @@
 
     <!-- Panel Inferior -->
     <div class="bottom-sheet">
-        <button class="capture-button">
+        <!-- Evento onclick temporal para probar la pantalla de carga -->
+        <button class="capture-button" onclick="document.getElementById('loading-screen').classList.add('active'); setTimeout(() => document.getElementById('loading-screen').classList.remove('active'), 3500)">
             <i class="ph-bold ph-camera"></i>
         </button>
         <p class="instruction-text">APUNTA A LOS INGREDIENTES</p>
+    </div>
+
+    <!-- Pantalla de Carga (Oculta por defecto) -->
+    <div class="loading-overlay" id="loading-screen">
+        <div class="spinner-container">
+            <!-- Círculo brillante animado -->
+            <div class="glowing-circle"></div>
+        </div>
+        <h2 class="loading-title">Analizando etiqueta...</h2>
+        <p class="loading-subtitle">Traduciendo y buscando alérgenos</p>
+        
+        <div class="loading-logo">
+            <img src="../Images/Logos/Glutn_Logo_SinFondo.png" alt="GLUTN">
+        </div>
     </div>
 
     <!-- Navegación Inferior (Igual que home, pero cambia el activo) -->
