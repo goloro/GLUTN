@@ -41,7 +41,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (mode === 'EAN') {
             reticleIa.classList.add('reticle-hidden');
             reticleEan.classList.remove('reticle-hidden');
+            instructionText.setAttribute('data-i18n', 'scanner.focus_ean');
             instructionText.innerText = getT('scanner.focus_ean');
+            modeSwitchText.setAttribute('data-i18n', 'scanner.switch_ia');
             modeSwitchText.innerText = getT('scanner.switch_ia');
             modeSwitchIcon.className = "ph-bold ph-scan";
             captureBtn.style.visibility = 'hidden'; // Ocultamos pero mantenemos el espacio
@@ -49,7 +51,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             reticleEan.classList.add('reticle-hidden');
             reticleIa.classList.remove('reticle-hidden');
+            instructionText.setAttribute('data-i18n', 'scanner.focus');
             instructionText.innerText = getT('scanner.focus');
+            modeSwitchText.setAttribute('data-i18n', 'scanner.switch_ean');
             modeSwitchText.innerText = getT('scanner.switch_ean');
             modeSwitchIcon.className = "ph-bold ph-barcode";
             captureBtn.style.visibility = 'visible'; // Restaurar botón
@@ -74,14 +78,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             video.srcObject = stream;
             
-            // Iniciar decodificador continuo en segundo plano usando el método estándar
-            codeReader.decodeFromVideoDevice(null, video, (result, err) => {
-                if (result && currentScanMode === 'EAN' && isScanningBarcode) {
-                    isScanningBarcode = false;
-                    handleBarcodeDetected(result.text);
-                }
-            });
-
             // Iniciar interfaz una vez tenemos el stream
             updateScannerUI(currentScanMode);
         } catch (error) {
@@ -100,10 +96,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     function startBarcodeScan() {
         if (!stream) return;
         isScanningBarcode = true;
+        
+        // Ejecutar escaneo continuo. Si encuentra algo, verificar si estamos en el modo correcto.
+        codeReader.decodeFromVideoElement(video, (result, err) => {
+            if (result && isScanningBarcode && currentScanMode === 'EAN') {
+                isScanningBarcode = false;
+                handleBarcodeDetected(result.text);
+            }
+        });
     }
 
     function stopBarcodeScan() {
         isScanningBarcode = false;
+        // NO llamamos a codeReader.reset() para evitar que se apague la cámara
     }
 
     async function handleBarcodeDetected(barcode) {
@@ -292,7 +297,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         };
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+            // Intentar con la versión estable v1 en lugar de v1beta
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
