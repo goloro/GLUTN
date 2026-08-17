@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLUTN - Historial</title>
+
+    <link rel="shortcut icon" href="../Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
+
+    <!-- Fuentes y Iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS Compartido y Específico -->
+    <link rel="stylesheet" href="../CSS/home.css">
+    <link rel="stylesheet" href="../CSS/history.css">
+</head>
+<body>
+    <header class="header history-header">
+        <img id="main-logo" src="../Images/Logos/Glutn_Logo.PNG" alt="Logo de GLUTN">
+    </header>
+
+    <main class="content history-content">
+        <div class="history-container">
+            <h1 class="history-title">Historial</h1>
+            
+            <div class="history-list">
+                <!-- Item Seguro -->
+                <div class="scan-item history-item">
+                    <div class="icon-safe"><i class="ph-bold ph-check"></i></div>
+                    <div class="info">
+                        <h3>Pasta Barilla</h3>
+                        <span class="status">100% Seguro</span>
+                    </div>
+                    <div class="time">Hace 10 min</div>
+                </div>
+
+                <!-- Item Inseguro -->
+                <div class="scan-item history-item">
+                    <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
+                    <div class="info">
+                        <h3>Galletas de Cacao</h3>
+                        <span class="status unsafe-text">Contiene cebada</span>
+                    </div>
+                    <div class="time">Hace 2 horas</div>
+                </div>
+
+                <!-- Item Inseguro -->
+                <div class="scan-item history-item">
+                    <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
+                    <div class="info">
+                        <h3>Galletas de Cacao</h3>
+                        <span class="status unsafe-text">Contiene cebada</span>
+                    </div>
+                    <div class="time">Hace 2 horas</div>
+                </div>
+
+                <!-- Item Inseguro -->
+                <div class="scan-item history-item">
+                    <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
+                    <div class="info">
+                        <h3>Galletas de Cacao</h3>
+                        <span class="status unsafe-text">Contiene cebada</span>
+                    </div>
+                    <div class="time">Hace 2 horas</div>
+                </div>
+
+                <!-- Item Seguro -->
+                <div class="scan-item history-item no-border">
+                    <div class="icon-safe"><i class="ph-bold ph-check"></i></div>
+                    <div class="info">
+                        <h3>Salsa de Tomate</h3>
+                        <span class="status">Seguro</span>
+                    </div>
+                    <div class="time">Ayer</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Botón Flotante Borrar -->
+    <div class="delete-container">
+        <button class="delete-btn">
+            <i class="ph-bold ph-trash"></i>
+            Borrar Historial
+        </button>
+    </div>
+
+    <!-- Navegación Inferior -->
+    <div class="nav-bar">
+        <div class="nav-bar-item" id="home-button" onclick="window.location.href='../index.html'">
+            <i class="ph ph-house"></i>
+            <a href="../index.html">Inicio</a>
+        </div>
+        <div class="nav-bar-item" id="scan-button" onclick="window.location.href='/scanner.html'">
+            <i class="ph ph-camera"></i>
+            <a href="scanner.html">Escanear</a>
+        </div>
+        <div class="nav-bar-item active" id="history-button" onclick="window.location.href='history.html'">
+            <i class="ph-fill ph-clock-counter-clockwise"></i>
+            <a href="history.html">Historial</a>
+        </div>
+    </div>
+</body>
+</html>
