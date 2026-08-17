@@ -39,16 +39,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Mostrar pantalla de carga
         loadingScreen.classList.add('active');
 
-        // Configurar canvas al tamaño del video
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        // Escalar la imagen para no enviar un payload gigante (máximo 800px)
+        const MAX_WIDTH = 800;
+        let scale = 1;
+        if (video.videoWidth > MAX_WIDTH) {
+            scale = MAX_WIDTH / video.videoWidth;
+        }
+        canvas.width = video.videoWidth * scale;
+        canvas.height = video.videoHeight * scale;
         
-        // Dibujar el frame actual
+        // Dibujar el frame actual escalado
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        // Obtener la imagen en base64 (JPEG)
-        const base64Image = canvas.toDataURL('image/jpeg', 0.8);
-        const base64Data = base64Image.split(',')[1]; // Quitar el 'data:image/jpeg;base64,'
+        // Obtener la imagen en base64 (JPEG) con compresión
+        const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+        const base64Data = base64Image.split(',')[1];
 
         // Poner la foto capturada en el resultado
         document.getElementById('scanner-result-img').src = base64Image;
@@ -73,13 +78,12 @@ Extrae los ingredientes y determina si el producto es seguro para un celíaco (g
 Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
 Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni texto fuera del JSON):
 {
-  "productName": "Nombre del producto (infiere de la imagen o pon 'Producto Escaneado')",
+  "productName": "Nombre del producto",
   "gluten": true (si contiene gluten) o false (si es seguro),
-  "reason": "Explicación breve de por qué es o no seguro",
+  "reason": "Explicación breve",
   "ingredientWithGluten": "El nombre exacto del primer ingrediente detectado con gluten (o null si es seguro)",
   "ingredients": [
-    { "name": "Nombre ingrediente 1" },
-    { "name": "Nombre ingrediente 2" }
+    { "name": "Ingrediente 1" }
   ]
 }
 `;
@@ -97,8 +101,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
                 ]
             }],
             generationConfig: {
-                temperature: 0.1, // Baja temperatura para mayor precisión
-                responseMimeType: "application/json" // Forzar JSON
+                temperature: 0.1,
+                responseMimeType: "application/json"
             }
         };
 
@@ -110,30 +114,26 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             });
 
             if (!response.ok) {
-                throw new Error("Error en la petición a Gemini");
+                const errData = await response.json();
+                throw new Error(errData.error?.message || "Error HTTP " + response.status);
             }
 
             const data = await response.json();
             const textResponse = data.candidates[0].content.parts[0].text;
             
-            // Limpiar markdown residual si Gemini lo envía (```json ... ```)
             const cleanJsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
             const scanResult = JSON.parse(cleanJsonStr);
 
-            // Añadir fecha
             const now = new Date();
             const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            scanResult.date = timeString; // Formato simple por ahora
+            scanResult.date = timeString;
 
-            // Guardar en localStorage
             saveToHistory(scanResult);
-
-            // Mostrar Resultados
             renderResult(scanResult);
 
         } catch (error) {
             console.error("Error procesando imagen:", error);
-            alert("Hubo un error al procesar la imagen con IA.");
+            alert("Error de IA: " + error.message);
             loadingScreen.classList.remove('active');
         }
     }
