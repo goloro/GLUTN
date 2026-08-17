@@ -14,7 +14,7 @@
         <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
         <!-- CSS -->
-        <link rel="stylesheet" href="CSS/home.css">
+        <link rel="stylesheet" href="CSS/home.css?v=2">
     </head>
     <body>
         <img id="main-logo" src="Images/Logos/Glutn_Logo.PNG" alt="Logo de GLUTN">
@@ -28,29 +28,30 @@
                 Abrir Scanner
             </button>
 
-            <div class="scanner-icon">
+            <div class="scanner-icon" onclick="window.location.href='HTML/scanner.html'" style="cursor: pointer;">
                 <i class="ph ph-barcode"></i>
             </div>
         </div>
 
         <div class="language-selector">
-            <button class="lang-btn">
+            <button class="lang-btn" id="lang-btn">
                 <i class="ph ph-globe"></i>
-                Español
+                <span id="current-lang">Español</span>
                 <i class="ph ph-caret-down"></i>
             </button>
+            <div class="lang-dropdown" id="lang-dropdown">
+                <div class="lang-option" data-lang="Español" style="display: none;">Español</div>
+                <div class="lang-option" data-lang="English">English</div>
+                <div class="lang-option" data-lang="Français">Français</div>
+                <div class="lang-option" data-lang="Deutsch">Deutsch</div>
+                <div class="lang-option" data-lang="Italiano">Italiano</div>
+            </div>
         </div>
 
         <div class="last-scan">
             <h2>Último escaneo</h2>
-            <div class="scan-item">
-                <div class="icon-safe"><i class="ph-bold ph-check"></i></div>
-                <div class="info">
-                    <h3>Pasta Barilla</h3>
-                    <span class="status">100% Seguro</span>
-                </div>
-                <div class="time">Hace 10 min</div>
-            </div>
+            <!-- Este contenedor se rellenará dinámicamente desde JS -->
+            <div id="last-scan-container"></div>
         </div>
 
         <div class="nav-bar">
@@ -67,5 +68,8 @@
                 <a href="/HTML/history.html">Historial</a>
             </div>
         </div>
+        
+        <!-- Scripts -->
+        <script src="JS/home.js"></script>
     </body>
 </html>
