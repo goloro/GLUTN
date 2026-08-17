@@ -40,6 +40,21 @@
         </button>
     </div>
 
+    <!-- Modal de Confirmación de Borrado -->
+    <div class="confirm-modal-overlay" id="confirm-modal">
+        <div class="confirm-modal-box">
+            <div class="confirm-icon-wrapper">
+                <i class="ph-fill ph-trash"></i>
+            </div>
+            <h3 data-i18n="history.confirm_title">¿Borrar historial?</h3>
+            <p data-i18n="history.confirm_msg">Esta acción no se puede deshacer.</p>
+            <div class="confirm-modal-actions">
+                <button class="btn-cancel" id="confirm-cancel-btn" data-i18n="history.confirm_no">Cancelar</button>
+                <button class="btn-confirm" id="confirm-yes-btn" data-i18n="history.confirm_yes">Sí, borrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Pantalla de Detalle de Escaneo (Oculta por defecto) -->
     <div class="history-detail-overlay" id="history-detail-screen">
         <header class="detail-header">

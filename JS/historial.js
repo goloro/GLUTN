@@ -105,15 +105,30 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('history-detail-screen').classList.add('active');
     }
 
-    // Botón de borrar historial
+    // Modal de Confirmación
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+    const confirmYesBtn = document.getElementById('confirm-yes-btn');
+
+    // Botón principal de borrar historial
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            // Confirmación simple nativa
-            if(confirm("¿Seguro que quieres vaciar todo el historial de escaneos?")) {
-                userObj.scans = [];
-                localStorage.setItem('user', JSON.stringify(userObj));
-                renderHistory();
-            }
+            if(confirmModal) confirmModal.classList.add('active');
+        });
+    }
+
+    if(confirmCancelBtn) {
+        confirmCancelBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('active');
+        });
+    }
+
+    if(confirmYesBtn) {
+        confirmYesBtn.addEventListener('click', () => {
+            userObj.scans = [];
+            localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
+            renderHistory();
+            confirmModal.classList.remove('active');
         });
     }
 

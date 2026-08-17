@@ -126,6 +126,34 @@ const Translations = {
         [Languages.DE]: "Verlauf löschen",
         [Languages.IT]: "Cancella cronologia"
     },
+    "history.confirm_title": {
+        [Languages.ES]: "¿Borrar historial?",
+        [Languages.EN]: "Clear history?",
+        [Languages.FR]: "Effacer l'historique ?",
+        [Languages.DE]: "Verlauf löschen?",
+        [Languages.IT]: "Cancellare la cronologia?"
+    },
+    "history.confirm_msg": {
+        [Languages.ES]: "Esta acción no se puede deshacer.",
+        [Languages.EN]: "This action cannot be undone.",
+        [Languages.FR]: "Cette action ne peut pas être annulée.",
+        [Languages.DE]: "Diese Aktion kann nicht rückgängig gemacht werden.",
+        [Languages.IT]: "Questa azione non può essere annullata."
+    },
+    "history.confirm_yes": {
+        [Languages.ES]: "Sí, borrar",
+        [Languages.EN]: "Yes, clear",
+        [Languages.FR]: "Oui, effacer",
+        [Languages.DE]: "Ja, löschen",
+        [Languages.IT]: "Sì, cancella"
+    },
+    "history.confirm_no": {
+        [Languages.ES]: "Cancelar",
+        [Languages.EN]: "Cancel",
+        [Languages.FR]: "Annuler",
+        [Languages.DE]: "Abbrechen",
+        [Languages.IT]: "Annulla"
+    },
 
     // ---- Nav Bar ----
     "nav.home": {
@@ -233,7 +261,7 @@ function applyTranslations(langName) {
 
 // Inicializar traducciones automáticamente al cargar el archivo
 document.addEventListener('DOMContentLoaded', () => {
-    const userObj = JSON.parse(localStorage.getItem('user')) || {};
+    const userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
     const lang = userObj.language || Languages.ES;
     applyTranslations(lang);
 });
