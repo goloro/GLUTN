@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLUTN - Escáner</title>
+
+    <link rel="shortcut icon" href="Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
+
+    <!-- Fuentes y Iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- CSS Compartido y Específico -->
+    <link rel="stylesheet" href="../CSS/home.css">
+    <link rel="stylesheet" href="../CSS/scanner.css">
+</head>
+<body class="scanner-body">
+
+    <!-- Área de la Cámara (Placeholder visual) -->
+    <main class="camera-view">
+        <div class="camera-placeholder">
+            <!-- Capa oscura sutil -->
+            <div class="camera-overlay"></div>
+            
+            <!-- Retícula del Escáner (SVG centrado) -->
+            <div class="scanner-reticle">
+                <svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Esquinas -->
+                    <path d="M60 20 H40 C28.9543 20 20 28.9543 20 40 V60" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M180 20 H200 C211.046 20 220 28.9543 220 40 V60" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M60 220 H40 C28.9543 220 20 211.046 20 200 V180" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M180 220 H200 C211.046 220 220 211.046 220 200 V180" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    
+                    <!-- Código de Barras (Píldoras) -->
+                    <rect x="65" y="70" width="14" height="100" rx="7" fill="white"/>
+                    <rect x="92" y="70" width="14" height="100" rx="7" fill="white"/>
+                    <rect x="119" y="70" width="28" height="100" rx="14" fill="white"/>
+                    <rect x="160" y="70" width="14" height="100" rx="7" fill="white"/>
+                </svg>
+            </div>
+        </div>
+    </main>
+
+    <!-- Panel Inferior -->
+    <div class="bottom-sheet">
+        <button class="capture-button">
+            <i class="ph-bold ph-camera"></i>
+        </button>
+        <p class="instruction-text">APUNTA A LOS INGREDIENTES</p>
+    </div>
+
+    <!-- Navegación Inferior (Igual que home, pero cambia el activo) -->
+    <div class="nav-bar">
+        <div class="nav-bar-item" id="home-button" onclick="window.location.href='../index.html'">
+            <i class="ph ph-house"></i>
+            <a href="../index.html">Inicio</a>
+        </div>
+        <div class="nav-bar-item active" id="scan-button" onclick="window.location.href='scanner.html'">
+            <i class="ph-fill ph-camera"></i>
+            <a href="scanner.html">Escanear</a>
+        </div>
+        <div class="nav-bar-item" id="history-button" onclick="window.location.href='history.html'">
+            <i class="ph ph-clock-counter-clockwise"></i>
+            <a href="history.html">Historial</a>
+        </div>
+    </div>
+
+</body>
+</html>

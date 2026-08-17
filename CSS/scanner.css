@@ -1,0 +1,97 @@
+/* Sobrescribir body para el escáner */
+body.scanner-body {
+    background-color: #000000; /* Fondo negro para cuando cargue la cámara */
+    overflow: hidden; /* Evitar scroll */
+    padding-bottom: 0;
+    margin: 0;
+}
+
+/* Vista de cámara (Fondo simulado por ahora) */
+.camera-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #333333; /* Placeholder gris oscuro */
+    /* Para el prototipo, puedes poner una imagen de fondo aquí simulando la cámara */
+    background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('../Scanner.png');
+    background-size: cover;
+    background-position: center;
+    z-index: -2;
+}
+
+/* Retícula de escaneo */
+.scanner-reticle {
+    position: absolute;
+    top: 35%; /* Centrado un poco hacia arriba */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+/* Panel Inferior Beige */
+.bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--nav-bg); /* #F4EAD4 */
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    padding-top: 40px;
+    padding-bottom: 100px; /* Espacio para el nav-bar que va por encima */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Botón de Captura */
+.capture-button {
+    width: 72px;
+    height: 72px;
+    background-color: var(--card-green); /* #0FA874 */
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(15, 168, 116, 0.3);
+    margin-bottom: 24px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.capture-button:active {
+    transform: scale(0.92);
+    background-color: #0c8b60;
+}
+
+.capture-button i {
+    font-size: 28px;
+    color: var(--white);
+}
+
+/* Texto de instrucción */
+.instruction-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: 1.2px;
+}
+
+/* Ajustes específicos para el nav-bar en la página del escáner */
+body.scanner-body .nav-bar {
+    background-color: transparent; /* El fondo lo pone el bottom-sheet */
+    box-shadow: none; /* Quitamos la sombra superior del nav-bar porque la tiene el bottom-sheet */
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* Estado activo para el botón de escanear en esta página */
+body.scanner-body .nav-bar-item:not(.active) {
+    color: #8C7B67; /* Un gris/marrón claro para inactivos */
+}
