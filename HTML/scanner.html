@@ -21,11 +21,6 @@
 
     <!-- Área de la Cámara (Placeholder visual) -->
     <main class="camera-view">
-        <div class="scanner-header">
-            <a href="../index.html" class="back-btn"><i class="ph ph-arrow-left"></i></a>
-            <span class="instruction-text" data-i18n="scanner.focus">Enfoca la etiqueta de ingredientes</span>
-            <div style="width: 24px;"></div>
-        </div>
         <div class="camera-placeholder">
             <!-- Capa oscura sutil -->
             <div class="camera-overlay"></div>
@@ -55,15 +50,7 @@
         <button class="capture-button" onclick="document.getElementById('loading-screen').classList.add('active'); setTimeout(() => document.getElementById('loading-screen').classList.remove('active'), 3500)">
             <i class="ph-bold ph-camera"></i>
         </button>
-        <div class="scanner-controls">
-            <button class="scan-btn" onclick="document.getElementById('loading-screen').classList.add('active')">
-                <i class="ph ph-qr-code"></i>
-                <span data-i18n="nav.scan">Escanear</span>
-            </button>
-            <button class="cancel-btn" onclick="window.location.href='../index.html'" data-i18n="scanner.cancel">
-                Cancelar
-            </button>
-        </div>
+        <p class="instruction-text" data-i18n="scanner.focus">APUNTA A LOS INGREDIENTES</p>
     </div>
 
     <!-- Pantalla de Carga (Oculta por defecto) -->

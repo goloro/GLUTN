@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!langBtn || !langDropdown) return; // Salir si no estamos en index.html
 
     // Cargar el idioma guardado al iniciar la página
-    let userObj = JSON.parse(localStorage.getItem('user')) || {};
+    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
     if (userObj.language) {
         selectLang(userObj.language);
     }
@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Guardar en el JSON de usuario en LocalStorage
-        userObj = JSON.parse(localStorage.getItem('user')) || {};
+        userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
         userObj.language = lang;
-        localStorage.setItem('user', JSON.stringify(userObj));
+        localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
 
         // Aplicar la traducción a la UI si la función existe (i18n.js cargado)
         if (typeof applyTranslations === 'function') {

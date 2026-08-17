@@ -15,7 +15,7 @@ body.scanner-body {
     height: 100vh;
     background-color: #333333; /* Placeholder gris oscuro */
     /* Para el prototipo, puedes poner una imagen de fondo aquí simulando la cámara */
-    background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('../Scanner.png');
+    background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('../Images/ScannerBackground.jpg');
     background-size: cover;
     background-position: center;
     z-index: -2;
@@ -77,10 +77,12 @@ body.scanner-body {
 
 /* Texto de instrucción */
 .instruction-text {
-    font-size: 11px;
-    font-weight: 700;
-    color: #111827;
-    letter-spacing: 1.2px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4B5563; /* Gris más suave y elegante */
+    letter-spacing: 0.3px;
+    text-align: center;
+    margin-top: 8px; /* Espacio extra respecto al botón de cámara */
 }
 
 /* Ajustes específicos para el nav-bar en la página del escáner */
