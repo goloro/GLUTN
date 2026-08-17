@@ -122,7 +122,7 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
 
             // Añadir fecha
             const now = new Date();
-            const timeString = \`\${now.getHours().toString().padStart(2, '0')}:\${now.getMinutes().toString().padStart(2, '0')}\`;
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             scanResult.date = timeString; // Formato simple por ahora
 
             // Guardar en localStorage
@@ -161,11 +161,11 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         
         if (isSafe) {
             badge.className = 'verdict-banner safe';
-            badge.innerHTML = \`<i class="ph-fill ph-check-circle"></i> <span data-i18n="scanner.safe">SEGURO</span>\`;
+            badge.innerHTML = `<i class="ph-fill ph-check-circle"></i> <span data-i18n="scanner.safe">SEGURO</span>`;
             badge.style.backgroundColor = '#0FA874';
         } else {
             badge.className = 'verdict-banner unsafe';
-            badge.innerHTML = \`<i class="ph-fill ph-x-circle"></i> <span data-i18n="scanner.unsafe">No Apto</span>\`;
+            badge.innerHTML = `<i class="ph-fill ph-x-circle"></i> <span data-i18n="scanner.unsafe">No Apto</span>`;
             badge.style.backgroundColor = '#EF4444';
         }
 
