@@ -9,32 +9,213 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ctx = canvas.getContext('2d');
 
     let stream = null;
+    let codeReader = new ZXing.BrowserMultiFormatReader();
+    let isScanningBarcode = false;
+    
+    // Helper de traducciones para JS
+    function getT(key) {
+        const userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
+        const lang = userObj.language || 'Español';
+        if (typeof Translations !== 'undefined' && Translations[key] && Translations[key][lang]) {
+            return Translations[key][lang];
+        }
+        if (typeof Translations !== 'undefined' && Translations[key] && Translations[key]['Español']) {
+            return Translations[key]['Español'];
+        }
+        return key; // Fallback al key
+    }
 
-    // Pedir API Key si no existe
-    let apiKey = localStorage.getItem('gemini_api_key');
-    if (!apiKey) {
-        apiKey = prompt('Para usar el escáner con IA, introduce tu API Key de Gemini:');
-        if (apiKey) {
-            localStorage.setItem('gemini_api_key', apiKey);
+    // === LÓGICA DE MODOS DE ESCANEO ===
+    let currentScanMode = localStorage.getItem('scan_mode') || 'IA';
+    localStorage.removeItem('scan_mode'); // Borrar para no sobrecargar
+    
+    const reticleIa = document.getElementById('reticle-ia');
+    const reticleEan = document.getElementById('reticle-ean');
+    const instructionText = document.getElementById('instruction-text');
+    const modeSwitchBtn = document.getElementById('mode-switch-btn');
+    const modeSwitchText = document.getElementById('mode-switch-text');
+    const modeSwitchIcon = modeSwitchBtn.querySelector('i');
+
+    function updateScannerUI(mode) {
+        currentScanMode = mode;
+        if (mode === 'EAN') {
+            reticleIa.classList.add('reticle-hidden');
+            reticleEan.classList.remove('reticle-hidden');
+            instructionText.innerText = getT('scanner.focus_ean');
+            modeSwitchText.innerText = getT('scanner.switch_ia');
+            modeSwitchIcon.className = "ph-bold ph-scan";
+            captureBtn.style.visibility = 'hidden'; // Ocultamos pero mantenemos el espacio
+            startBarcodeScan();
         } else {
-            alert('Sin API Key no se podrá analizar la imagen, pero puedes probar la captura de todos modos.');
+            reticleEan.classList.add('reticle-hidden');
+            reticleIa.classList.remove('reticle-hidden');
+            instructionText.innerText = getT('scanner.focus');
+            modeSwitchText.innerText = getT('scanner.switch_ean');
+            modeSwitchIcon.className = "ph-bold ph-barcode";
+            captureBtn.style.visibility = 'visible'; // Restaurar botón
+            stopBarcodeScan();
         }
     }
 
+    // Inicializar UI después de definir todo
+    // La primera llamada a updateScannerUI se hará después de inicializar la cámara
+
+    // Botón para alternar modo
+    modeSwitchBtn.addEventListener('click', () => {
+        const newMode = currentScanMode === 'IA' ? 'EAN' : 'IA';
+        updateScannerUI(newMode);
+    });
+
     // 1. Iniciar la cámara
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' } // Preferir cámara trasera
-        });
-        video.srcObject = stream;
-    } catch (err) {
-        console.error("Error accediendo a la cámara:", err);
-        alert("No se pudo acceder a la cámara. Revisa los permisos.");
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' }
+            });
+            video.srcObject = stream;
+            
+            // Iniciar interfaz una vez tenemos el stream
+            updateScannerUI(currentScanMode);
+        } catch (error) {
+            console.error("Error accediendo a la cámara:", error);
+            showCustomDialog({
+                type: 'error',
+                title: getT('modal.error_camera'),
+                message: getT('modal.error_camera_desc')
+            });
+        }
     }
 
-    // 2. Evento del botón de captura
+    startCamera();
+
+    // === 2. LÓGICA DE BARCODE (ZXING) ===
+    function startBarcodeScan() {
+        if (isScanningBarcode || !stream) return;
+        isScanningBarcode = true;
+        
+        codeReader.decodeFromVideoElement(video, (result, err) => {
+            if (result) {
+                // Código encontrado
+                stopBarcodeScan();
+                handleBarcodeDetected(result.text);
+            }
+        });
+    }
+
+    function stopBarcodeScan() {
+        isScanningBarcode = false;
+        codeReader.reset();
+    }
+
+    async function handleBarcodeDetected(barcode) {
+        // Reproducir un pitido o dar feedback háptico si es posible
+        if (navigator.vibrate) navigator.vibrate(100);
+        
+        loadingScreen.classList.add('active');
+        
+        try {
+            await analyzeWithOpenFoodFacts(barcode);
+        } catch (error) {
+            console.error("Error analizando EAN:", error);
+            showCustomDialog({
+                type: 'error',
+                title: getT('modal.error_network'),
+                message: getT('modal.error_network_desc')
+            });
+            loadingScreen.classList.remove('active');
+            startBarcodeScan(); // Reanudar escaneo si falla
+        }
+    }
+
+    async function analyzeWithOpenFoodFacts(barcode) {
+        try {
+            const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+            const data = await response.json();
+
+            if (data.status === 0 || !data.product) {
+                // Producto no encontrado
+                renderResult({
+                    isWarning: true,
+                    reason: getT('result.not_found') + ` (EAN: ${barcode})`,
+                    ingredients: [],
+                    gluten: null
+                });
+                return;
+            }
+
+            const p = data.product;
+            const labels = p.labels_tags || [];
+            const allergens = p.allergens_tags || [];
+            const traces = p.traces_tags || [];
+            const ingredientsText = p.ingredients_text || '';
+
+            // 1. Es seguro si tiene el label explícito
+            if (labels.includes('en:gluten-free') || labels.includes('es:sin-gluten')) {
+                renderResult({
+                    isWarning: false,
+                    gluten: false,
+                    reason: getT('result.safe_cert'),
+                    ingredients: [{name: p.product_name || `Producto ${barcode}`}]
+                });
+                return;
+            }
+
+            // 2. Es peligroso si declara alérgenos de gluten explícitos
+            if (
+                allergens.includes('en:gluten') || 
+                allergens.includes('en:wheat') || 
+                allergens.includes('en:barley') || 
+                allergens.includes('en:oats') || 
+                allergens.includes('en:rye')
+            ) {
+                renderResult({
+                    isWarning: false,
+                    gluten: true,
+                    reason: getT('result.unsafe_allergens'),
+                    ingredientWithGluten: 'Gluten / Cereales',
+                    ingredients: [{name: 'Gluten / Cereales'}, {name: p.product_name || ''}]
+                });
+                return;
+            }
+
+            // 3. Dudoso: Puede tener trazas o no estar certificado
+            let reasonText = getT('result.warning_not_certified');
+            if (traces.includes('en:gluten') || traces.includes('en:wheat')) {
+                reasonText = getT('result.warning_traces');
+            }
+
+            renderResult({
+                isWarning: true,
+                gluten: null,
+                reason: reasonText,
+                ingredients: [{name: p.product_name || `Producto ${barcode}`}]
+            });
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // 2. Evento del botón de captura (Solo IA)
     captureBtn.addEventListener('click', async () => {
         if (!video.videoWidth) return;
+
+        if (currentScanMode === 'IA') {
+            let key = localStorage.getItem('gemini_api_key');
+            if (!key) {
+                key = await showCustomDialog({
+                    type: 'prompt',
+                    title: getT('modal.api_key'),
+                    message: getT('modal.api_key_desc'),
+                    placeholder: 'AIzaSy...'
+                });
+                if (key) {
+                    localStorage.setItem('gemini_api_key', key);
+                } else {
+                    return; // Si cancela, no hacemos nada
+                }
+            }
+        }
 
         // Mostrar pantalla de carga
         loadingScreen.classList.add('active');
@@ -64,10 +245,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Función para llamar a Gemini
     async function analyzeWithGemini(base64Data) {
-        const key = localStorage.getItem('gemini_api_key');
-        if (!key) {
+        let apiKey = localStorage.getItem('gemini_api_key');
+        if (!apiKey) {
             loadingScreen.classList.remove('active');
-            alert("No hay API Key configurada.");
+            showCustomDialog({
+                type: 'error',
+                title: getT('modal.error_api_key'),
+                message: getT('modal.error_api_key_desc')
+            });
             return;
         }
 
@@ -79,7 +264,8 @@ Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza
 Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni texto fuera del JSON):
 {
   "productName": "Nombre del producto",
-  "gluten": true (si contiene gluten) o false (si es seguro),
+  "gluten": true (si contiene gluten explícito) o false (si es seguro),
+  "isWarning": true (si tienes dudas, información ilegible o dice "puede contener trazas de gluten") o false,
   "reason": "Explicación breve",
   "ingredientWithGluten": "El nombre exacto del primer ingrediente detectado con gluten (o null si es seguro)",
   "ingredients": [
@@ -133,7 +319,11 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
 
         } catch (error) {
             console.error("Error procesando imagen:", error);
-            alert("Error de IA: " + error.message);
+            showCustomDialog({
+                type: 'error',
+                title: 'Error de IA',
+                message: error.message || 'Hubo un problema al conectar con el servidor.'
+            });
             loadingScreen.classList.remove('active');
         }
     }
@@ -156,10 +346,21 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
     function renderResult(scan) {
         loadingScreen.classList.remove('active');
 
-        const isSafe = !scan.gluten;
-        const badge = document.getElementById('scanner-result-badge');
+        const isSafe = scan.gluten === false;
+        const isWarning = scan.isWarning;
         
-        if (isSafe) {
+        const badge = document.getElementById('scanner-result-badge');
+        const aiBox = document.getElementById('ai-recommendation-box');
+        
+        // Reset state
+        aiBox.style.display = 'none';
+
+        if (isWarning) {
+            badge.className = 'verdict-banner warning';
+            badge.innerHTML = `<i class="ph-fill ph-warning"></i> <span data-i18n="scanner.warning">Información Dudosa</span>`;
+            badge.style.backgroundColor = '#F59E0B';
+            aiBox.style.display = 'block';
+        } else if (isSafe) {
             badge.className = 'verdict-banner safe';
             badge.innerHTML = `<i class="ph-fill ph-check-circle"></i> <span data-i18n="scanner.safe">SEGURO</span>`;
             badge.style.backgroundColor = '#0FA874';
@@ -188,7 +389,7 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             ul.innerHTML = '<li>Sin información detallada de ingredientes</li>';
         }
 
-        // Aplicar traducciones a los textos nuevos (Seguro / No Apto)
+        // Aplicar traducciones a los textos nuevos
         if (typeof applyTranslations === 'function') {
             const userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
             applyTranslations(userObj.language || 'Español');
@@ -197,4 +398,77 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         // Mostrar pantalla de resultado
         resultScreen.classList.add('active');
     }
+
+    // Botón de Recomendación IA
+    document.getElementById('ai-switch-btn').addEventListener('click', () => {
+        resultScreen.classList.remove('active');
+        updateScannerUI('IA'); // Cambia a modo IA
+    });
+
+    // === 4. MODAL PERSONALIZADO ===
+    function showCustomDialog(options) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('custom-modal');
+            const iconWrapper = document.getElementById('custom-modal-icon');
+            const icon = iconWrapper.querySelector('i');
+            const title = document.getElementById('custom-modal-title');
+            const message = document.getElementById('custom-modal-message');
+            const input = document.getElementById('custom-modal-input');
+            const btnCancel = document.getElementById('custom-modal-cancel');
+            const btnConfirm = document.getElementById('custom-modal-confirm');
+
+            // Reset
+            input.value = '';
+            input.style.display = 'none';
+            btnCancel.style.display = 'none';
+            
+            // Configurar según tipo
+            title.innerText = options.title || 'Aviso';
+            message.innerText = options.message || '';
+
+            if (options.type === 'error') {
+                iconWrapper.className = 'custom-icon-wrapper';
+                icon.className = 'ph-bold ph-warning-circle';
+                btnConfirm.style.backgroundColor = '#DC2626';
+            } else if (options.type === 'prompt') {
+                iconWrapper.className = 'custom-icon-wrapper info';
+                icon.className = 'ph-bold ph-key';
+                btnConfirm.style.backgroundColor = 'var(--card-green)';
+                input.style.display = 'block';
+                input.placeholder = options.placeholder || '';
+                btnCancel.style.display = 'block';
+            } else {
+                iconWrapper.className = 'custom-icon-wrapper info';
+                icon.className = 'ph-bold ph-info';
+                btnConfirm.style.backgroundColor = 'var(--card-green)';
+            }
+
+            // Manejadores
+            const handleConfirm = () => {
+                closeModal();
+                resolve(options.type === 'prompt' ? input.value.trim() : true);
+            };
+
+            const handleCancel = () => {
+                closeModal();
+                resolve(null);
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('active');
+                btnConfirm.removeEventListener('click', handleConfirm);
+                btnCancel.removeEventListener('click', handleCancel);
+            };
+
+            btnConfirm.addEventListener('click', handleConfirm);
+            btnCancel.addEventListener('click', handleCancel);
+
+            // Mostrar modal
+            modal.classList.add('active');
+            if (options.type === 'prompt') {
+                setTimeout(() => input.focus(), 100);
+            }
+        });
+    }
+
 });

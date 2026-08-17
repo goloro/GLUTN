@@ -32,14 +32,45 @@ body.scanner-body {
     z-index: -3; /* Debajo de todo */
 }
 
-/* Retícula de escaneo */
+/* Retícula de escaneo genérica */
 .scanner-reticle {
     position: absolute;
-    top: 35%; /* Centrado un poco hacia arriba */
+    top: 35%; 
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: -1;
     filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.2));
+    transition: opacity 0.3s ease;
+}
+
+.reticle-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Marco EAN y Láser */
+.ean-frame {
+    position: relative;
+    width: 280px;
+    height: 200px;
+    overflow: hidden; /* Para que el láser no salga de los bordes redondeados */
+    border-radius: 20px;
+}
+
+.laser-line {
+    position: absolute;
+    left: 20px;
+    width: 240px; /* Un poco más estrecho que la caja */
+    height: 2px;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.4);
+    animation: laser-scan 2.5s infinite ease-in-out;
+}
+
+@keyframes laser-scan {
+    0% { top: 10%; }
+    50% { top: 90%; }
+    100% { top: 10%; }
 }
 
 /* Panel Inferior Beige */
@@ -48,16 +79,46 @@ body.scanner-body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: var(--nav-bg); /* #F4EAD4 */
+    background-color: var(--nav-bg); 
     border-top-left-radius: 40px;
     border-top-right-radius: 40px;
-    padding-top: 40px;
-    padding-bottom: 100px; /* Espacio para el nav-bar que va por encima */
+    padding-top: 50px; /* Aumentado para acomodar el botón flotante */
+    padding-bottom: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
     z-index: 10;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Botón Flotante para Alternar Modo */
+.mode-switch-btn {
+    position: absolute;
+    top: -24px; /* Flotando mitad dentro mitad fuera del bottom sheet */
+    background-color: rgba(90, 90, 90, 0.85); /* Gris esmerilado como en la captura */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 24px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.mode-switch-btn:active {
+    transform: scale(0.95);
+    background-color: rgba(70, 70, 70, 0.95);
+}
+
+.mode-switch-btn i {
+    font-size: 18px;
 }
 
 /* Botón de Captura */
@@ -257,12 +318,26 @@ body.scanner-body .nav-bar-item:not(.active) {
 }
 
 .verdict-banner.unsafe {
-    background-color: #EF4444; /* Rojo NO APTO */
-    color: var(--white);
+    background-color: #EF4444; /* Rojo por defecto, se sobrescribe por JS */
 }
 
 .verdict-banner.unsafe i {
-    font-size: 24px;
+    animation: pulse-danger 2s infinite;
+}
+
+.verdict-banner.warning {
+    background-color: #F59E0B; /* Ámbar */
+    color: white;
+}
+
+.verdict-banner.warning i {
+    animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 /* Sección 'Por qué' */
@@ -333,6 +408,64 @@ body.scanner-body .nav-bar-item:not(.active) {
     width: fit-content;
 }
 
+/* Bloque Recomendación IA */
+.ai-recommendation-box {
+    background-color: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.ai-warning-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #D97706;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.ai-warning-header i {
+    font-size: 20px;
+}
+
+.ai-warning-text {
+    font-size: 14px;
+    color: #92400E;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+.ai-switch-btn {
+    width: 100%;
+    background-color: #F59E0B;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.ai-switch-btn:active {
+    transform: scale(0.97);
+    background-color: #D97706;
+}
+
+.ai-switch-btn i {
+    font-size: 18px;
+}
+
 /* Botón Nuevo Escaneo */
 .result-action {
     margin-top: auto; /* Empuja el botón abajo del todo si hay espacio */
@@ -366,4 +499,126 @@ body.scanner-body .nav-bar-item:not(.active) {
 
 .new-scan-btn i {
     font-size: 24px;
+}
+/* Modal Personalizado (Alerts y Prompts) */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 300;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 0 24px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.custom-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.custom-modal-box {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 32px 24px 24px 24px;
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.custom-modal-overlay.active .custom-modal-box {
+    transform: scale(1);
+}
+
+.custom-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    background-color: #FEE2E2;
+    color: #DC2626;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 16px auto;
+}
+
+.custom-icon-wrapper.info {
+    background-color: #E0F2FE;
+    color: #0284C7;
+}
+
+.custom-icon-wrapper i {
+    font-size: 28px;
+}
+
+.custom-modal-box h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.custom-modal-box p {
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 24px;
+    line-height: 1.4;
+}
+
+.custom-modal-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 12px;
+    font-size: 14px;
+    margin-bottom: 24px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.custom-modal-input:focus {
+    border-color: var(--card-green);
+}
+
+.custom-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.custom-modal-actions button {
+    flex: 1;
+    padding: 14px 0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.custom-modal-actions .btn-cancel {
+    background-color: #F3F4F6;
+    color: #4B5563;
+}
+
+.custom-modal-actions .btn-cancel:hover {
+    background-color: #E5E7EB;
+}
+
+.custom-modal-actions .btn-confirm {
+    background-color: var(--card-green);
+    color: #FFFFFF;
+}
+
+.custom-modal-actions .btn-confirm:hover {
+    background-color: #0c8b60;
 }

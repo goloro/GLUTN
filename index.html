@@ -18,19 +18,36 @@
         <link rel="stylesheet" href="CSS/history.css">
     </head>
     <body>
-        <img id="main-logo" src="Images/Logos/Glutn_Logo.PNG" alt="Logo de GLUTN">
+        <header class="home-header">
+            <img id="main-logo" src="Images/Logos/Glutn_Logo_SinFondo.png" alt="Logo de GLUTN">
+        </header>
 
-        <div class="scanner">
-            <h1 data-i18n="home.scan_title">Escanear Etiqueta</h1>
-            <p data-i18n="home.scan_subtitle">Comprueba instantáneamente<br>si un producto es seguro para ti.</p>
-            
-            <button class="abrir-scanner-btn" onclick="window.location.href='HTML/scanner.html'">
-                <i class="ph ph-qr-code"></i>
-                <span data-i18n="home.open_scanner">Abrir Scanner</span>
-            </button>
+        <!-- Título de sección sutil -->
+        <div class="section-title">
+            <span data-i18n="home.start_analysis">COMENZAR ANÁLISIS</span>
+        </div>
 
-            <div class="scanner-icon" onclick="window.location.href='HTML/scanner.html'" style="cursor: pointer;">
-                <i class="ph ph-barcode"></i>
+        <div class="scan-options-container">
+            <!-- Opción 1: EAN -->
+            <div class="scan-card" id="scan-ean-card">
+                <div class="scan-icon-wrapper ean-icon">
+                    <i class="ph-bold ph-barcode"></i>
+                </div>
+                <div class="scan-info">
+                    <h2 data-i18n="home.scan_ean">Escaneo Rápido (EAN)</h2>
+                    <p data-i18n="home.scan_ean_desc">Apuntar al código de barras</p>
+                </div>
+            </div>
+
+            <!-- Opción 2: IA -->
+            <div class="scan-card" id="scan-ia-card">
+                <div class="scan-icon-wrapper ia-icon">
+                    <i class="ph-bold ph-scan"></i>
+                </div>
+                <div class="scan-info">
+                    <h2 data-i18n="home.scan_ia">Análisis Profundo (IA)</h2>
+                    <p data-i18n="home.scan_ia_desc">Foto a los ingredientes</p>
+                </div>
             </div>
         </div>
 

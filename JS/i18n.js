@@ -227,6 +227,190 @@ const Translations = {
         [Languages.FR]: "À l'instant",
         [Languages.DE]: "Gerade eben",
         [Languages.IT]: "Poco fa"
+    },
+    
+    // ---- Nuevos Textos (EAN, IA, Modal, Resultados) ----
+    "home.scan_ean": {
+        [Languages.ES]: "Escaneo Rápido (EAN)",
+        [Languages.EN]: "Fast Scan (EAN)",
+        [Languages.FR]: "Scan Rapide (EAN)",
+        [Languages.DE]: "Schnellscan (EAN)",
+        [Languages.IT]: "Scansione Rapida (EAN)"
+    },
+    "home.scan_ean_desc": {
+        [Languages.ES]: "Apuntar al código de barras",
+        [Languages.EN]: "Point at the barcode",
+        [Languages.FR]: "Pointez le code-barres",
+        [Languages.DE]: "Auf den Barcode richten",
+        [Languages.IT]: "Punta al codice a barre"
+    },
+    "home.scan_ia": {
+        [Languages.ES]: "Análisis Profundo (IA)",
+        [Languages.EN]: "Deep Analysis (AI)",
+        [Languages.FR]: "Analyse Profonde (IA)",
+        [Languages.DE]: "Tiefenanalyse (KI)",
+        [Languages.IT]: "Analisi Approfondita (IA)"
+    },
+    "home.scan_ia_desc": {
+        [Languages.ES]: "Foto a los ingredientes",
+        [Languages.EN]: "Photo of ingredients",
+        [Languages.FR]: "Photo des ingrédients",
+        [Languages.DE]: "Foto der Zutaten",
+        [Languages.IT]: "Foto degli ingredienti"
+    },
+    "scanner.focus_ean": {
+        [Languages.ES]: "APUNTA AL CÓDIGO DE BARRAS",
+        [Languages.EN]: "POINT AT THE BARCODE",
+        [Languages.FR]: "POINTEZ LE CODE-BARRES",
+        [Languages.DE]: "AUF DEN BARCODE RICHTEN",
+        [Languages.IT]: "PUNTA AL CODICE A BARRE"
+    },
+    "scanner.switch_ean": {
+        [Languages.ES]: "O: Escanear Código (EAN)",
+        [Languages.EN]: "OR: Scan Barcode (EAN)",
+        [Languages.FR]: "OU: Scanner le Code (EAN)",
+        [Languages.DE]: "ODER: Barcode scannen (EAN)",
+        [Languages.IT]: "O: Scansiona Codice (EAN)"
+    },
+    "scanner.switch_ia": {
+        [Languages.ES]: "O: Escanear Ingredientes (IA)",
+        [Languages.EN]: "OR: Scan Ingredients (AI)",
+        [Languages.FR]: "OU: Scanner Ingrédients (IA)",
+        [Languages.DE]: "ODER: Zutaten scannen (KI)",
+        [Languages.IT]: "O: Scansiona Ingredienti (IA)"
+    },
+    "scanner.warning": {
+        [Languages.ES]: "Información Dudosa",
+        [Languages.EN]: "Doubtful Information",
+        [Languages.FR]: "Information Douteuse",
+        [Languages.DE]: "Zweifelhafte Information",
+        [Languages.IT]: "Informazioni Dubbie"
+    },
+    "scanner.warning_desc": {
+        [Languages.ES]: "No podemos garantizar que este producto sea seguro con los datos actuales. Te recomendamos hacerle una foto a los ingredientes.",
+        [Languages.EN]: "We cannot guarantee this product is safe with current data. We recommend taking a photo of the ingredients.",
+        [Languages.FR]: "Nous ne pouvons garantir que ce produit est sûr avec les données actuelles. Nous recommandons de prendre une photo des ingrédients.",
+        [Languages.DE]: "Wir können die Sicherheit dieses Produkts mit aktuellen Daten nicht garantieren. Wir empfehlen, ein Foto der Zutaten zu machen.",
+        [Languages.IT]: "Non possiamo garantire che questo prodotto sia sicuro con i dati attuali. Ti consigliamo di fare una foto agli ingredienti."
+    },
+    "scanner.analyze_ai": {
+        [Languages.ES]: "Analizar Etiqueta con IA",
+        [Languages.EN]: "Analyze Label with AI",
+        [Languages.FR]: "Analyser l'étiquette avec IA",
+        [Languages.DE]: "Etikett mit KI analysieren",
+        [Languages.IT]: "Analizza Etichetta con IA"
+    },
+    "modal.warning": {
+        [Languages.ES]: "Aviso",
+        [Languages.EN]: "Notice",
+        [Languages.FR]: "Avis",
+        [Languages.DE]: "Hinweis",
+        [Languages.IT]: "Avviso"
+    },
+    "modal.cancel": {
+        [Languages.ES]: "Cancelar",
+        [Languages.EN]: "Cancel",
+        [Languages.FR]: "Annuler",
+        [Languages.DE]: "Abbrechen",
+        [Languages.IT]: "Annulla"
+    },
+    "modal.accept": {
+        [Languages.ES]: "Aceptar",
+        [Languages.EN]: "Accept",
+        [Languages.FR]: "Accepter",
+        [Languages.DE]: "Akzeptieren",
+        [Languages.IT]: "Accetta"
+    },
+    "modal.error_camera": {
+        [Languages.ES]: "Error de Cámara",
+        [Languages.EN]: "Camera Error",
+        [Languages.FR]: "Erreur de Caméra",
+        [Languages.DE]: "Kamerafehler",
+        [Languages.IT]: "Errore Fotocamera"
+    },
+    "modal.error_camera_desc": {
+        [Languages.ES]: "No se pudo acceder a la cámara. Asegúrate de dar permisos.",
+        [Languages.EN]: "Could not access the camera. Make sure to grant permissions.",
+        [Languages.FR]: "Impossible d'accéder à la caméra. Assurez-vous d'accorder les autorisations.",
+        [Languages.DE]: "Zugriff auf Kamera nicht möglich. Bitte Berechtigungen erteilen.",
+        [Languages.IT]: "Impossibile accedere alla fotocamera. Assicurati di concedere le autorizzazioni."
+    },
+    "modal.api_key": {
+        [Languages.ES]: "API Key de Gemini",
+        [Languages.EN]: "Gemini API Key",
+        [Languages.FR]: "Clé API Gemini",
+        [Languages.DE]: "Gemini API-Schlüssel",
+        [Languages.IT]: "Chiave API Gemini"
+    },
+    "modal.api_key_desc": {
+        [Languages.ES]: "Para usar el escáner con IA, introduce tu API Key:",
+        [Languages.EN]: "To use the AI scanner, enter your API Key:",
+        [Languages.FR]: "Pour utiliser le scanner IA, entrez votre clé API:",
+        [Languages.DE]: "Um den KI-Scanner zu nutzen, geben Sie Ihren API-Schlüssel ein:",
+        [Languages.IT]: "Per usare lo scanner IA, inserisci la tua Chiave API:"
+    },
+    "modal.error_api_key": {
+        [Languages.ES]: "Falta API Key",
+        [Languages.EN]: "Missing API Key",
+        [Languages.FR]: "Clé API Manquante",
+        [Languages.DE]: "Fehlender API-Schlüssel",
+        [Languages.IT]: "Chiave API Mancante"
+    },
+    "modal.error_api_key_desc": {
+        [Languages.ES]: "No hay API Key configurada para el modo IA.",
+        [Languages.EN]: "No API Key configured for AI mode.",
+        [Languages.FR]: "Aucune clé API configurée pour le mode IA.",
+        [Languages.DE]: "Kein API-Schlüssel für den KI-Modus konfiguriert.",
+        [Languages.IT]: "Nessuna Chiave API configurata per la modalità IA."
+    },
+    "modal.error_network": {
+        [Languages.ES]: "Error de Red",
+        [Languages.EN]: "Network Error",
+        [Languages.FR]: "Erreur Réseau",
+        [Languages.DE]: "Netzwerkfehler",
+        [Languages.IT]: "Errore di Rete"
+    },
+    "modal.error_network_desc": {
+        [Languages.ES]: "No se pudo conectar con la base de datos de productos.",
+        [Languages.EN]: "Could not connect to the product database.",
+        [Languages.FR]: "Impossible de se connecter à la base de données des produits.",
+        [Languages.DE]: "Verbindung zur Produktdatenbank fehlgeschlagen.",
+        [Languages.IT]: "Impossibile connettersi al database dei prodotti."
+    },
+    "result.safe_cert": {
+        [Languages.ES]: "Certificado oficial Sin Gluten en la etiqueta.",
+        [Languages.EN]: "Official Gluten-Free certified on label.",
+        [Languages.FR]: "Certifié Sans Gluten officiellement sur l'étiquette.",
+        [Languages.DE]: "Offiziell Glutenfrei zertifiziert auf dem Etikett.",
+        [Languages.IT]: "Certificato ufficiale Senza Glutine sull'etichetta."
+    },
+    "result.unsafe_allergens": {
+        [Languages.ES]: "Declara contener gluten, trigo, cebada, avena o centeno como alérgeno.",
+        [Languages.EN]: "Declares containing gluten, wheat, barley, oats or rye as allergen.",
+        [Languages.FR]: "Déclare contenir du gluten, blé, orge, avoine ou seigle comme allergène.",
+        [Languages.DE]: "Deklariert Gluten, Weizen, Gerste, Hafer oder Roggen als Allergen.",
+        [Languages.IT]: "Dichiara di contenere glutine, grano, orzo, avena o segale come allergene."
+    },
+    "result.warning_traces": {
+        [Languages.ES]: "¡Atención! Este producto declara posibles TRAZAS de gluten.",
+        [Languages.EN]: "Attention! This product declares possible TRACES of gluten.",
+        [Languages.FR]: "Attention! Ce produit déclare des TRACES possibles de gluten.",
+        [Languages.DE]: "Achtung! Dieses Produkt deklariert mögliche SPUREN von Gluten.",
+        [Languages.IT]: "Attenzione! Questo prodotto dichiara possibili TRACCE di glutine."
+    },
+    "result.warning_not_certified": {
+        [Languages.ES]: "No está certificado como \"Sin Gluten\" y podría contener trazas o contaminación cruzada.",
+        [Languages.EN]: "Not certified as \"Gluten-Free\" and could contain traces or cross-contamination.",
+        [Languages.FR]: "Non certifié \"Sans Gluten\" et pourrait contenir des traces ou contamination croisée.",
+        [Languages.DE]: "Nicht als \"Glutenfrei\" zertifiziert und könnte Spuren oder Kreuzkontamination enthalten.",
+        [Languages.IT]: "Non certificato come \"Senza Glutine\" e potrebbe contenere tracce o contaminazione incrociata."
+    },
+    "result.not_found": {
+        [Languages.ES]: "Producto no encontrado.",
+        [Languages.EN]: "Product not found.",
+        [Languages.FR]: "Produit introuvable.",
+        [Languages.DE]: "Produkt nicht gefunden.",
+        [Languages.IT]: "Prodotto non trovato."
     }
 };
 

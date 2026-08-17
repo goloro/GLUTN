@@ -145,6 +145,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // === 3. MANEJO DE TARJETAS DE ESCANEO ===
+    const scanEanCard = document.getElementById('scan-ean-card');
+    const scanIaCard = document.getElementById('scan-ia-card');
+
+    if (scanEanCard) {
+        scanEanCard.addEventListener('click', () => {
+            localStorage.setItem('scan_mode', 'EAN');
+            window.location.href = 'HTML/scanner.html';
+        });
+    }
+
+    if (scanIaCard) {
+        scanIaCard.addEventListener('click', () => {
+            localStorage.setItem('scan_mode', 'IA');
+            window.location.href = 'HTML/scanner.html';
+        });
+    }
+
     // Cerrar el menú si el usuario clica fuera de él
     window.addEventListener('click', function(event) {
         if (!event.target.closest('.language-selector')) {
