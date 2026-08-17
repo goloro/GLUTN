@@ -1,0 +1,17 @@
+{
+    "language": "",
+    "scans": [
+        {
+            "id": 1,
+            "productName": "Patatas",
+            "gluten": false,
+            "reason": "",
+            "ingredients": [
+                {
+                    "name": ""
+                }
+            ],
+            "date": ""
+        }
+    ]
+}
