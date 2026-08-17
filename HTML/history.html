@@ -88,13 +88,57 @@
         </button>
     </div>
 
+    <!-- Pantalla de Detalle de Escaneo (Oculta por defecto) -->
+    <div class="history-detail-overlay" id="history-detail-screen">
+        <header class="detail-header">
+            <!-- Cerramos la ventana al hacer click en el logo para poder salir (temporal) -->
+            <img src="../Images/Logos/Glutn_Logo_SinFondo.png" alt="Logo de GLUTN" onclick="document.getElementById('history-detail-screen').classList.remove('active')">
+        </header>
+
+        <div class="detail-content-wrapper">
+            <h1 class="detail-title">Biscotti al<br>Cacao</h1>
+            <span class="detail-time">Ayer, 19:15</span>
+            
+            <div class="detail-badge">
+                <i class="ph-fill ph-x-circle"></i> NO APTO
+            </div>
+
+            <!-- Explicación -->
+            <div class="detail-reason">
+                <h3>Por qué:</h3>
+                <p>Se ha detectado 'malto d'orzo' (malta de cebada), un ingrediente derivado del trigo.</p>
+            </div>
+
+            <!-- Lista de ingredientes -->
+            <div class="detail-ingredients">
+                <h4>Lista de ingredientes</h4>
+                <ul>
+                    <li>Harina de arroz</li>
+                    <li>Azúcar</li>
+                    <li>Aceite de oliva</li>
+                    <li>Sal</li>
+                    <li class="unsafe-item">Malta de cebada</li>
+                    <li>Levadura</li>
+                    <li>Lecitina de soja</li>
+                </ul>
+            </div>
+
+            <!-- Botón de nuevo escaneo -->
+            <div class="detail-action">
+                <button class="detail-new-scan-btn" onclick="window.location.href='scanner.html'">
+                    <i class="ph ph-qr-code"></i> Nuevo escaneo
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Navegación Inferior -->
     <div class="nav-bar">
         <div class="nav-bar-item" id="home-button" onclick="window.location.href='../index.html'">
             <i class="ph ph-house"></i>
             <a href="../index.html">Inicio</a>
         </div>
-        <div class="nav-bar-item" id="scan-button" onclick="window.location.href='/scanner.html'">
+        <div class="nav-bar-item" id="scan-button" onclick="window.location.href='scanner.html'">
             <i class="ph ph-camera"></i>
             <a href="scanner.html">Escanear</a>
         </div>
