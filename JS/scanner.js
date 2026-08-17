@@ -74,8 +74,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             video.srcObject = stream;
             
-            // Iniciar decodificador continuo en segundo plano
-            codeReader.decodeContinuously(video, (result, err) => {
+            // Iniciar decodificador continuo en segundo plano usando el método estándar
+            codeReader.decodeFromVideoDevice(null, video, (result, err) => {
                 if (result && currentScanMode === 'EAN' && isScanningBarcode) {
                     isScanningBarcode = false;
                     handleBarcodeDetected(result.text);
@@ -292,7 +292,7 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         };
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
