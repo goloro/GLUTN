@@ -15,6 +15,7 @@
 
         <!-- CSS -->
         <link rel="stylesheet" href="CSS/home.css?v=2">
+        <link rel="stylesheet" href="CSS/history.css">
     </head>
     <body>
         <img id="main-logo" src="Images/Logos/Glutn_Logo.PNG" alt="Logo de GLUTN">
@@ -52,6 +53,43 @@
             <h2 data-i18n="home.last_scan">Último escaneo</h2>
             <!-- Este contenedor se rellenará dinámicamente desde JS -->
             <div id="last-scan-container"></div>
+        </div>
+
+        <!-- Pantalla de Detalle de Escaneo (Oculta por defecto) -->
+        <div class="history-detail-overlay" id="history-detail-screen">
+            <header class="detail-header">
+                <!-- Cerramos la ventana al hacer click en el logo -->
+                <img src="Images/Logos/Glutn_Logo_SinFondo.png" alt="Logo de GLUTN" onclick="document.getElementById('history-detail-screen').classList.remove('active')">
+            </header>
+
+            <div class="detail-content-wrapper">
+                <h1 class="detail-title" id="detail-title">Producto</h1>
+                <span class="detail-time" id="detail-time">Tiempo</span>
+                
+                <div class="detail-badge" id="detail-badge">
+                    <i class="ph-fill ph-x-circle"></i> No Apto
+                </div>
+
+                <!-- Explicación -->
+                <div class="detail-reason">
+                    <h3 data-i18n="scanner.why">Por qué:</h3>
+                    <p id="detail-reason-text">Razón</p>
+                </div>
+
+                <!-- Lista de ingredientes -->
+                <div class="detail-ingredients">
+                    <h4 data-i18n="scanner.ingredients_list">Lista de ingredientes</h4>
+                    <ul id="detail-ingredients-list">
+                    </ul>
+                </div>
+                
+                <!-- Botón de nuevo escaneo -->
+                <div class="detail-action">
+                    <button class="detail-new-scan-btn" onclick="window.location.href='HTML/scanner.html'">
+                        <i class="ph ph-qr-code"></i> <span data-i18n="scanner.new_scan">Nuevo escaneo</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="nav-bar">

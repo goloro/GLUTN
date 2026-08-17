@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!container) return;
 
         // Si no hay historial o está vacío
-        if (!user.history || user.history.length === 0) {
+        if (!user.scans || user.scans.length === 0) {
             container.innerHTML = `
                 <div data-i18n="home.no_scans" style="text-align: left; color: #6B7280; font-size: 14px; padding: 12px 0;">
                     Aún no has escaneado ningún producto. ¡Anímate a probarlo!
@@ -52,25 +52,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Coger el último escaneo (asumiendo que el último añadido es el último del array)
-        const lastScan = user.history[user.history.length - 1];
+        const lastScan = user.scans[user.scans.length - 1];
         
         // Determinar estilo en base a si es seguro o no
-        const iconClass = lastScan.isSafe ? "icon-safe" : "icon-unsafe";
-        const iconPh = lastScan.isSafe ? "ph-check" : "ph-x";
-        const statusClass = lastScan.isSafe ? "" : "unsafe-text"; 
-        // Nota: en home.css .unsafe-text no existe aún pero icon-unsafe sí. Si no existe, usamos style inline o clases genéricas.
-        // En history.css sí existe. Añadiremos estilos si hace falta o los copiamos luego.
+        const isSafe = !lastScan.gluten;
+        const iconClass = isSafe ? "icon-safe" : "icon-unsafe";
+        const iconPh = isSafe ? "ph-fill ph-check-circle" : "ph-fill ph-x-circle";
+        const statusClass = isSafe ? "" : "unsafe-text"; 
 
         container.innerHTML = `
-            <div class="scan-item">
-                <div class="${iconClass}"><i class="ph-bold ${iconPh}"></i></div>
+            <div class="scan-item" id="last-scan-item" style="cursor: pointer;">
+                <div class="${iconClass}"><i class="${iconPh}"></i></div>
                 <div class="info">
-                    <h3>${lastScan.name || 'Producto desconocido'}</h3>
-                    <span class="status ${statusClass}" data-i18n="${lastScan.isSafe ? 'status.safe_short' : 'scanner.unsafe'}">${lastScan.statusText || (lastScan.isSafe ? 'Seguro' : 'NO APTO')}</span>
+                    <h3>${lastScan.productName || 'Producto desconocido'}</h3>
+                    <span class="status ${statusClass}" data-i18n="${isSafe ? 'status.safe' : 'scanner.unsafe'}">${lastScan.statusText || (isSafe ? '100% Seguro' : 'No Apto')}</span>
                 </div>
-                <div class="time" data-i18n="time.just_now">${lastScan.timeAgo || 'Hace un momento'}</div>
+                <div class="time" data-i18n="time.just_now">${lastScan.date || 'Hace un momento'}</div>
             </div>
         `;
+
+        document.getElementById('last-scan-item').addEventListener('click', () => openDetail(lastScan));
+    }
+
+    function openDetail(scan) {
+        document.getElementById('detail-title').innerText = scan.productName || 'Producto';
+        document.getElementById('detail-time').innerText = scan.date || 'Reciente';
+        
+        const isSafe = !scan.gluten;
+        const badge = document.getElementById('detail-badge');
+        if (isSafe) {
+            badge.innerHTML = `<i class="ph-fill ph-check-circle"></i> <span data-i18n="scanner.safe">SEGURO</span>`;
+            badge.style.backgroundColor = '#0FA874';
+            badge.style.color = '#FFFFFF';
+        } else {
+            badge.innerHTML = `<i class="ph-fill ph-x-circle"></i> <span data-i18n="scanner.unsafe">No Apto</span>`;
+            badge.style.backgroundColor = '#EF4444';
+            badge.style.color = '#FFFFFF';
+        }
+
+        // Explicación
+        document.getElementById('detail-reason-text').innerText = scan.reason || (isSafe ? "Todos los ingredientes son libres de gluten." : "Contiene ingredientes prohibidos.");
+
+        // Lista de Ingredientes
+        const ul = document.getElementById('detail-ingredients-list');
+        ul.innerHTML = '';
+        if (scan.ingredients && scan.ingredients.length > 0) {
+            scan.ingredients.forEach(ing => {
+                const li = document.createElement('li');
+                li.innerText = ing.name;
+                if (ing.name === scan.ingredientWithGluten) {
+                    li.className = 'unsafe-item';
+                }
+                ul.appendChild(li);
+            });
+        } else {
+            ul.innerHTML = '<li>Sin información detallada de ingredientes</li>';
+        }
+
+        if (typeof applyTranslations === 'function') {
+            applyTranslations(userObj.language || 'Español');
+        }
+
+        document.getElementById('history-detail-screen').classList.add('active');
     }
 
     // Función principal para seleccionar el idioma

@@ -3,12 +3,25 @@
     "scans": [
         {
             "id": 1,
-            "productName": "Patatas",
-            "gluten": false,
-            "reason": "",
+            "productName": "Galletas de Chocolate",
+            "gluten": true,
+            "reason": "Tiene cebada",
+            "ingredientWithGluten": "Cebada",
             "ingredients": [
                 {
-                    "name": ""
+                    "name": "Harina"
+                },
+                {
+                    "name": "Sal"
+                },
+                {
+                    "name": "Cebada"
+                },
+                {
+                    "name": "Aceite"
+                },
+                {
+                    "name": "Chocolate"
                 }
             ],
             "date": ""

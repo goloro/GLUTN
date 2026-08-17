@@ -26,63 +26,15 @@
         <div class="history-container">
             <h1 class="history-title" data-i18n="history.title">Historial</h1>
             
-            <div class="history-list">
-                <!-- Item Seguro -->
-                <div class="scan-item history-item">
-                    <div class="icon-safe"><i class="ph-bold ph-check"></i></div>
-                    <div class="info">
-                        <h3>Pasta Barilla</h3>
-                        <span class="status" data-i18n="status.safe">100% Seguro</span>
-                    </div>
-                    <div class="time" data-i18n="time.10min">Hace 10 min</div>
-                </div>
-
-                <!-- Item Inseguro -->
-                <div class="scan-item history-item">
-                    <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
-                    <div class="info">
-                        <h3>Galletas de Cacao</h3>
-                        <span class="status unsafe-text" data-i18n="status.unsafe_barley">Contiene cebada</span>
-                    </div>
-                    <div class="time" data-i18n="time.2hours">Hace 2 horas</div>
-                </div>
-
-                <!-- Item Inseguro -->
-                <div class="scan-item history-item">
-                    <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
-                    <div class="info">
-                        <h3>Galletas de Cacao</h3>
-                        <span class="status unsafe-text" data-i18n="status.unsafe_barley">Contiene cebada</span>
-                    </div>
-                    <div class="time" data-i18n="time.2hours">Hace 2 horas</div>
-                </div>
-
-                <!-- Item Inseguro -->
-                <div class="scan-item history-item">
-                    <div class="icon-unsafe"><i class="ph-bold ph-x"></i></div>
-                    <div class="info">
-                        <h3>Galletas de Cacao</h3>
-                        <span class="status unsafe-text" data-i18n="status.unsafe_barley">Contiene cebada</span>
-                    </div>
-                    <div class="time" data-i18n="time.2hours">Hace 2 horas</div>
-                </div>
-
-                <!-- Item Seguro -->
-                <div class="scan-item history-item no-border">
-                    <div class="icon-safe"><i class="ph-bold ph-check"></i></div>
-                    <div class="info">
-                        <h3>Salsa de Tomate</h3>
-                        <span class="status" data-i18n="status.safe_short">Seguro</span>
-                    </div>
-                    <div class="time" data-i18n="time.yesterday">Ayer</div>
-                </div>
+            <div class="history-list" id="history-list-container">
+                <!-- Se inyectarán dinámicamente desde historial.js -->
             </div>
         </div>
     </main>
 
     <!-- Botón Flotante Borrar -->
-    <div class="delete-container">
-        <button class="delete-btn">
+    <div class="delete-container" id="clear-history-container">
+        <button class="delete-btn" id="clear-history-btn">
             <i class="ph-bold ph-trash"></i>
             <span data-i18n="history.delete">Borrar Historial</span>
         </button>
@@ -96,23 +48,23 @@
         </header>
 
         <div class="detail-content-wrapper">
-            <h1 class="detail-title">Biscotti al<br>Cacao</h1>
-            <span class="detail-time">Ayer, 19:15</span>
+            <h1 class="detail-title" id="detail-title">Biscotti al<br>Cacao</h1>
+            <span class="detail-time" id="detail-time">Ayer, 19:15</span>
             
-            <div class="detail-badge">
+            <div class="detail-badge" id="detail-badge">
                 <i class="ph-fill ph-x-circle"></i> NO APTO
             </div>
 
             <!-- Explicación -->
             <div class="detail-reason">
                 <h3 data-i18n="scanner.why">Por qué:</h3>
-                <p>Se ha detectado 'malto d'orzo' (malta de cebada), un ingrediente derivado del trigo.</p>
+                <p id="detail-reason-text">Se ha detectado 'malto d'orzo' (malta de cebada), un ingrediente derivado del trigo.</p>
             </div>
 
             <!-- Lista de ingredientes -->
             <div class="detail-ingredients">
                 <h4 data-i18n="scanner.ingredients_list">Lista de ingredientes</h4>
-                <ul>
+                <ul id="detail-ingredients-list">
                     <li>Harina de arroz</li>
                     <li>Azúcar</li>
                     <li>Aceite de oliva</li>
@@ -150,5 +102,7 @@
 
     <!-- Script para traducciones -->
     <script src="../JS/i18n.js"></script>
+    <!-- Lógica del Historial -->
+    <script src="../JS/historial.js"></script>
 </body>
 </html>

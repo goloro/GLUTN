@@ -104,11 +104,11 @@ const Translations = {
         [Languages.IT]: "Sicuro"
     },
     "scanner.unsafe": {
-        [Languages.ES]: "NO APTO",
-        [Languages.EN]: "NOT SAFE",
-        [Languages.FR]: "NON ADAPTÉ",
-        [Languages.DE]: "NICHT SICHER",
-        [Languages.IT]: "NON ADATTO"
+        [Languages.ES]: "No Apto",
+        [Languages.EN]: "Not Safe",
+        [Languages.FR]: "Non Adapté",
+        [Languages.DE]: "Nicht Sicher",
+        [Languages.IT]: "Non Adatto"
     },
 
     // ---- history.html ----

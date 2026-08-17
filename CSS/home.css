@@ -219,14 +219,14 @@ body {
 }
 
 .info h3 {
-    font-size: 16px;
+    font-size: 14px; /* Reducido desde 16px */
     font-weight: 700; 
     color: #111827;
     margin-bottom: 2px;
 }
 
 .status {
-    font-size: 14px;
+    font-size: 12px; /* Reducido desde 14px */
     font-weight: 500;
     color: var(--safe-green);
 }
@@ -251,7 +251,7 @@ body {
 }
 
 .time {
-    font-size: 12px;
+    font-size: 11px; /* Reducido desde 12px */
     color: #6B7280;
     font-weight: 500;
 }
