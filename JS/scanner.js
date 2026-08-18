@@ -262,9 +262,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const promptText = `
 Eres un experto nutricionista especializado en intolerancias alimentarias y celiaquía.
-A continuación tienes una imagen de una etiqueta de ingredientes de un producto.
-Extrae los ingredientes y determina si el producto es seguro para un celíaco (gluten-free).
-Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
+A continuación tienes una imagen.
+1. Primero, verifica si en la imagen aparece una lista de ingredientes o etiqueta de un producto alimenticio.
+2. Si NO detectas ninguna etiqueta legible o no parece un alimento, devuelve EXCLUSIVAMENTE este JSON:
+{
+  "error": "no_label_detected",
+  "reason": "No he podido detectar una lista de ingredientes clara. Por favor, asegúrate de enfocar bien la etiqueta y repite la foto."
+}
+3. Si SÍ hay una etiqueta, extrae los ingredientes y determina si el producto es seguro para un celíaco (gluten-free). Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
 Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni texto fuera del JSON):
 {
   "productName": "Nombre del producto",
@@ -297,8 +302,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         };
 
         try {
-            // Intentar con la versión estable v1 en lugar de v1beta
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            // Usar gemini-3.6-flash ya que los modelos 1.5 y 2.0 están deprecados
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
@@ -315,6 +320,16 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             const cleanJsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
             const scanResult = JSON.parse(cleanJsonStr);
 
+            if (scanResult.error === 'no_label_detected') {
+                showCustomDialog({
+                    type: 'error',
+                    title: 'No se detectó etiqueta',
+                    message: scanResult.reason || 'No he podido detectar una lista de ingredientes clara. Por favor, asegúrate de enfocar bien la etiqueta y repite la foto.'
+                });
+                loadingScreen.classList.remove('active');
+                return;
+            }
+
             const now = new Date();
             const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             scanResult.date = timeString;
@@ -326,8 +341,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             console.error("Error procesando imagen:", error);
             showCustomDialog({
                 type: 'error',
-                title: 'Error de IA',
-                message: error.message || 'Hubo un problema al conectar con el servidor.'
+                title: 'Error en el análisis',
+                message: 'No pudimos procesar la imagen correctamente. Asegúrate de que la foto se vea nítida e inténtalo de nuevo.'
             });
             loadingScreen.classList.remove('active');
         }
