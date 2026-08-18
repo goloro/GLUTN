@@ -423,10 +423,6 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
                 return;
             }
 
-            const now = new Date();
-            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            scanResult.date = timeString;
-
             renderResult(scanResult);
 
         } catch (error) {
@@ -467,7 +463,12 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         // Solo guardar en historial si aún no se ha guardado en esta instancia
         if (!scan.date) {
             const now = new Date();
-            scan.date = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const day = now.getDate().toString().padStart(2, '0');
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            scan.date = `${day}/${month}/${year} ${hours}:${minutes}`;
             saveToHistory(scan);
         }
 

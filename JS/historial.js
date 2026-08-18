@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${scan.statusText || (isSafe ? '100% Seguro' : 'No Apto')}
                     </span>
                 </div>
-                <div class="time" data-i18n="time.just_now">${scan.date || 'Hace un momento'}</div>
+                <div class="time">${scan.date || 'Hace un momento'}</div>
             `;
 
             // Evento click para abrir el detalle

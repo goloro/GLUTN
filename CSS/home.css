@@ -36,6 +36,8 @@ body {
     justify-content: center;
     align-items: center;
     box-shadow: none;
+    position: relative;
+    z-index: 1;
 }
 
 /* Header Logo */
