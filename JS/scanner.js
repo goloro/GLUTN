@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             modeSwitchText.setAttribute('data-i18n', 'home.scan_ia');
             modeSwitchText.innerText = getT('home.scan_ia');
             modeSwitchIcon.className = "ph-bold ph-scan";
-            captureBtn.style.visibility = 'hidden'; // Ocultamos pero mantenemos el espacio
+            captureBtn.style.display = 'none'; // Ocultar por completo para que el panel se encoja
             startBarcodeScan();
         } else {
             reticleEan.classList.add('reticle-hidden');
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             modeSwitchText.setAttribute('data-i18n', 'home.scan_ean');
             modeSwitchText.innerText = getT('home.scan_ean');
             modeSwitchIcon.className = "ph-bold ph-barcode";
-            captureBtn.style.visibility = 'visible'; // Restaurar botón
+            captureBtn.style.display = 'flex'; // Restaurar botón
             stopBarcodeScan();
         }
     }
