@@ -92,6 +92,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     startCamera();
 
+    // Asegurar que la cámara se libera cuando el usuario sale de la página
+    window.addEventListener('beforeunload', () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    });
+
     // === 2. LÓGICA DE BARCODE (ZXING) ===
     let isDecoding = false;
     
@@ -103,23 +110,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!isScanningBarcode || currentScanMode !== 'EAN' || isDecoding) return;
             
             isDecoding = true;
-            codeReader.decodeFromVideoElement(video)
-                .then(result => {
-                    isDecoding = false;
-                    if (result && isScanningBarcode) {
-                        isScanningBarcode = false;
-                        handleBarcodeDetected(result.text);
-                    } else if (isScanningBarcode) {
-                        setTimeout(scan, 100);
-                    }
-                })
-                .catch(err => {
-                    isDecoding = false;
-                    if (isScanningBarcode) {
-                        // Reintentar cada 200ms si no detecta nada
-                        setTimeout(scan, 200);
-                    }
-                });
+            try {
+                codeReader.decodeFromVideoElement(video)
+                    .then(result => {
+                        isDecoding = false;
+                        if (result && isScanningBarcode) {
+                            isScanningBarcode = false;
+                            handleBarcodeDetected(result.text);
+                        } else if (isScanningBarcode) {
+                            setTimeout(scan, 100);
+                        }
+                    })
+                    .catch(err => {
+                        isDecoding = false;
+                        if (isScanningBarcode) {
+                            // Reintentar cada 200ms si no detecta nada
+                            setTimeout(scan, 200);
+                        }
+                    });
+            } catch (err) {
+                console.error("ZXing synchronous error:", err);
+                isDecoding = false;
+                if (isScanningBarcode) {
+                    setTimeout(scan, 200);
+                }
+            }
         }
         
         scan();
