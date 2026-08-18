@@ -284,23 +284,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     captureBtn.addEventListener('click', async () => {
         if (!video.videoWidth) return;
 
-        if (currentScanMode === 'IA') {
-            let key = localStorage.getItem('gemini_api_key');
-            if (!key) {
-                key = await showCustomDialog({
-                    type: 'prompt',
-                    title: getT('modal.api_key'),
-                    message: getT('modal.api_key_desc'),
-                    placeholder: 'AIzaSy...'
-                });
-                if (key) {
-                    localStorage.setItem('gemini_api_key', key);
-                } else {
-                    return; // Si cancela, no hacemos nada
-                }
-            }
-        }
-
         // Mostrar pantalla de carga
         loadingScreen.classList.add('active');
 
@@ -351,16 +334,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Función para llamar a Gemini
     async function analyzeWithGemini(base64Data) {
-        let apiKey = localStorage.getItem('gemini_api_key');
-        if (!apiKey) {
-            loadingScreen.classList.remove('active');
-            showCustomDialog({
-                type: 'error',
-                title: getT('modal.error_api_key'),
-                message: getT('modal.error_api_key_desc')
-            });
-            return;
-        }
 
         let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
         let userLang = userObj.language || 'Español';
@@ -409,8 +382,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         };
 
         try {
-            // Usar gemini-3.6-flash ya que los modelos 1.5 y 2.0 están deprecados
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
+            // Llamada al endpoint backend de Vercel
+            const response = await fetch(`/api/analyze`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
