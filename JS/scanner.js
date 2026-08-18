@@ -348,16 +348,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
+        let userLang = userObj.language || 'Español';
+
         const promptText = `
 Eres un experto nutricionista especializado en intolerancias alimentarias y celiaquía.
-A continuación tienes una imagen.
+A continuación tienes una imagen de una etiqueta. 
+IMPORTANTE: El idioma principal del usuario es ${userLang}. Debes TRADUCIR todos los nombres de los ingredientes, el nombre del producto y la explicación al ${userLang}, independientemente del idioma en el que esté escrita la etiqueta original.
+
 1. Primero, verifica si en la imagen aparece una lista de ingredientes o etiqueta de un producto alimenticio.
 2. Si NO detectas ninguna etiqueta legible o no parece un alimento, devuelve EXCLUSIVAMENTE este JSON:
 {
   "error": "no_label_detected",
   "reason": "No he podido detectar una lista de ingredientes clara. Por favor, asegúrate de enfocar bien la etiqueta y repite la foto."
 }
-3. Si SÍ hay una etiqueta, extrae los ingredientes y determina si el producto es seguro para un celíaco (gluten-free). Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
+3. Si SÍ hay una etiqueta, extrae los ingredientes (traducidos al ${userLang}) y determina si el producto es seguro para un celíaco (gluten-free). Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
 Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni texto fuera del JSON):
 {
   "productName": "Nombre del producto - Nombre de la marca (si no logras deducir la marca de la foto, pon solo el nombre del producto. Si no ves ninguno, pon 'Producto detectado')",
