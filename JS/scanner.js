@@ -43,8 +43,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             reticleEan.classList.remove('reticle-hidden');
             instructionText.setAttribute('data-i18n', 'scanner.focus_ean');
             instructionText.innerText = getT('scanner.focus_ean');
-            modeSwitchText.setAttribute('data-i18n', 'scanner.switch_ia');
-            modeSwitchText.innerText = getT('scanner.switch_ia');
+            modeSwitchText.setAttribute('data-i18n', 'home.scan_ia');
+            modeSwitchText.innerText = getT('home.scan_ia');
             modeSwitchIcon.className = "ph-bold ph-scan";
             captureBtn.style.visibility = 'hidden'; // Ocultamos pero mantenemos el espacio
             startBarcodeScan();
@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             reticleIa.classList.remove('reticle-hidden');
             instructionText.setAttribute('data-i18n', 'scanner.focus');
             instructionText.innerText = getT('scanner.focus');
-            modeSwitchText.setAttribute('data-i18n', 'scanner.switch_ean');
-            modeSwitchText.innerText = getT('scanner.switch_ean');
+            modeSwitchText.setAttribute('data-i18n', 'home.scan_ean');
+            modeSwitchText.innerText = getT('home.scan_ean');
             modeSwitchIcon.className = "ph-bold ph-barcode";
             captureBtn.style.visibility = 'visible'; // Restaurar botón
             stopBarcodeScan();
@@ -127,7 +127,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function stopBarcodeScan() {
         isScanningBarcode = false;
-        isDecoding = false;
     }
 
     async function handleBarcodeDetected(barcode) {
