@@ -591,8 +591,14 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             modal.classList.add('active');
             if (options.type === 'prompt') {
                 setTimeout(() => input.focus(), 100);
-            }
         });
     }
+
+    // Exponer resetScanner globalmente para los botones HTML
+    window.resetScanner = function(mode) {
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('scanner-screen').style.display = 'flex'; // scanner-screen usa flex
+        updateScannerUI(mode);
+    };
 
 });
