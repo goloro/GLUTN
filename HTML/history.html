@@ -17,6 +17,43 @@
     <link rel="stylesheet" href="../CSS/home.css?v=8">
     <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=8">
     <link rel="stylesheet" href="../CSS/history.css?v=8">
+
+    <style>
+        /* Bloquear scroll en la pantalla completa y ajustar al tamaño del móvil */
+        body {
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+        /* Evitar que el header se encoja por el contenido */
+        .home-header {
+            flex-shrink: 0;
+        }
+        /* Hacer que el contenido principal ocupe el espacio restante */
+        .history-content {
+            flex-grow: 1;
+            overflow: hidden;
+            padding-bottom: 0 !important;
+            display: flex;
+            flex-direction: column;
+        }
+        .history-container {
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Título fijo */
+        .history-title {
+            flex-shrink: 0;
+        }
+        /* Permitir scroll solo en la lista */
+        .history-list {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-bottom: 160px; /* Para que el botón de borrar no tape el último elemento */
+        }
+    </style>
 </head>
 <body>
     <header class="home-header">
