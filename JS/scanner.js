@@ -165,11 +165,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const traces = p.traces_tags || [];
             const ingredientsText = p.ingredients_text || '';
             const analysisTags = p.ingredients_analysis_tags || [];
+            const categories = p.categories_tags || [];
+            const productName = (p.product_name || '').toLowerCase();
 
             // 1. Es seguro si tiene el label explícito o el análisis de OFF dice que es gluten-free
-            const hasGlutenFreeLabel = labels.some(l => l.toLowerCase().includes('gluten-free') || l.toLowerCase().includes('sin-gluten') || l.toLowerCase().includes('sans-gluten'));
+            // Ampliamos la búsqueda a categorías, nombre y texto de ingredientes por si la base de datos está incompleta
+            const allTags = [...labels, ...categories, ...analysisTags].map(t => t.toLowerCase());
             
-            if (hasGlutenFreeLabel || analysisTags.includes('en:gluten-free')) {
+            const isExplicitlySafe = allTags.some(t => 
+                t.includes('gluten-free') || 
+                t.includes('sin-gluten') || 
+                t.includes('sans-gluten') ||
+                t.includes('sin-tacc') ||
+                t.includes('no-gluten')
+            ) || productName.includes('sin gluten') || ingredientsText.toLowerCase().includes('sin gluten');
+            
+            if (isExplicitlySafe) {
                 renderResult({
                     isWarning: false,
                     gluten: false,
