@@ -161,7 +161,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     isWarning: true,
                     reason: getT('result.not_found') + ` (EAN: ${barcode})`,
                     ingredients: [],
-                    gluten: null
+                    gluten: null,
+                    productName: `Producto ${barcode}`
                 });
                 return;
             }
@@ -174,6 +175,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const analysisTags = p.ingredients_analysis_tags || [];
             const categories = p.categories_tags || [];
             const productName = (p.product_name || '').toLowerCase();
+            
+            const rawProductName = p.product_name || '';
+            const rawBrand = p.brands || '';
+            let displayName = '';
+            if (rawProductName && rawBrand) {
+                displayName = `${rawProductName} - ${rawBrand}`;
+            } else if (rawProductName) {
+                displayName = rawProductName;
+            } else if (rawBrand) {
+                displayName = rawBrand;
+            } else {
+                displayName = `Producto ${barcode}`;
+            }
 
             // Extraer lista real de ingredientes
             let mappedIngredients = [];
@@ -182,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (ingredientsText) {
                 mappedIngredients = ingredientsText.split(',').map(i => ({ name: i.trim() }));
             } else {
-                mappedIngredients = [{ name: p.product_name || `Producto ${barcode}` }];
+                mappedIngredients = [{ name: displayName }];
             }
 
             // 1. Es seguro si tiene el label explícito o el análisis de OFF dice que es gluten-free
@@ -204,7 +218,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     reason: getT('result.safe_cert'),
                     ingredients: mappedIngredients,
                     imageUrl: p.image_url || p.image_front_url || null,
-                    barcode: barcode
+                    barcode: barcode,
+                    productName: displayName
                 });
                 return;
             }
@@ -224,7 +239,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ingredientWithGluten: 'Gluten / Cereales',
                     ingredients: mappedIngredients,
                     imageUrl: p.image_url || p.image_front_url || null,
-                    barcode: barcode
+                    barcode: barcode,
+                    productName: displayName
                 });
                 return;
             }
@@ -241,7 +257,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 reason: reasonText,
                 ingredients: mappedIngredients,
                 imageUrl: p.image_url || p.image_front_url || null,
-                barcode: barcode
+                barcode: barcode,
+                productName: displayName
             });
 
         } catch (error) {
@@ -343,7 +360,7 @@ A continuación tienes una imagen.
 3. Si SÍ hay una etiqueta, extrae los ingredientes y determina si el producto es seguro para un celíaco (gluten-free). Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
 Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni texto fuera del JSON):
 {
-  "productName": "Nombre del producto",
+  "productName": "Nombre del producto - Nombre de la marca (si no logras deducir la marca de la foto, pon solo el nombre del producto. Si no ves ninguno, pon 'Producto detectado')",
   "gluten": true (si contiene gluten explícito) o false (si es seguro),
   "isWarning": true (si tienes dudas, información ilegible o dice "puede contener trazas de gluten") o false,
   "reason": "Explicación breve",
