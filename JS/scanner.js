@@ -164,14 +164,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const allergens = p.allergens_tags || [];
             const traces = p.traces_tags || [];
             const ingredientsText = p.ingredients_text || '';
+            const analysisTags = p.ingredients_analysis_tags || [];
 
-            // 1. Es seguro si tiene el label explícito
-            if (labels.includes('en:gluten-free') || labels.includes('es:sin-gluten')) {
+            // 1. Es seguro si tiene el label explícito o el análisis de OFF dice que es gluten-free
+            const hasGlutenFreeLabel = labels.some(l => l.toLowerCase().includes('gluten-free') || l.toLowerCase().includes('sin-gluten') || l.toLowerCase().includes('sans-gluten'));
+            
+            if (hasGlutenFreeLabel || analysisTags.includes('en:gluten-free')) {
                 renderResult({
                     isWarning: false,
                     gluten: false,
                     reason: getT('result.safe_cert'),
-                    ingredients: [{name: p.product_name || `Producto ${barcode}`}]
+                    ingredients: [{name: p.product_name || `Producto ${barcode}`}],
+                    imageUrl: p.image_url || p.image_front_url || null
                 });
                 return;
             }
@@ -189,7 +193,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     gluten: true,
                     reason: getT('result.unsafe_allergens'),
                     ingredientWithGluten: 'Gluten / Cereales',
-                    ingredients: [{name: 'Gluten / Cereales'}, {name: p.product_name || ''}]
+                    ingredients: [{name: 'Gluten / Cereales'}, {name: p.product_name || ''}],
+                    imageUrl: p.image_url || p.image_front_url || null
                 });
                 return;
             }
@@ -204,7 +209,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isWarning: true,
                 gluten: null,
                 reason: reasonText,
-                ingredients: [{name: p.product_name || `Producto ${barcode}`}]
+                ingredients: [{name: p.product_name || `Producto ${barcode}`}],
+                imageUrl: p.image_url || p.image_front_url || null
             });
 
         } catch (error) {
@@ -236,17 +242,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Mostrar pantalla de carga
         loadingScreen.classList.add('active');
 
-        // Escalar la imagen para no enviar un payload gigante (máximo 800px)
+        // Calcular el recorte exacto para que coincida con lo que se ve en pantalla (object-fit: cover)
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+        const cw = video.clientWidth;
+        const ch = video.clientHeight;
+
+        const videoRatio = vw / vh;
+        const screenRatio = cw / ch;
+
+        let sourceX = 0, sourceY = 0, sourceWidth = vw, sourceHeight = vh;
+
+        if (screenRatio > videoRatio) {
+            // La pantalla es más ancha que el vídeo (recortar arriba y abajo)
+            sourceHeight = vw / screenRatio;
+            sourceY = (vh - sourceHeight) / 2;
+        } else {
+            // La pantalla es más alta que el vídeo (recortar a los lados)
+            sourceWidth = vh * screenRatio;
+            sourceX = (vw - sourceWidth) / 2;
+        }
+
+        // Escalar para no enviar un payload gigante (máximo 800px)
         const MAX_WIDTH = 800;
         let scale = 1;
-        if (video.videoWidth > MAX_WIDTH) {
-            scale = MAX_WIDTH / video.videoWidth;
+        if (sourceWidth > MAX_WIDTH) {
+            scale = MAX_WIDTH / sourceWidth;
         }
-        canvas.width = video.videoWidth * scale;
-        canvas.height = video.videoHeight * scale;
         
-        // Dibujar el frame actual escalado
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.width = sourceWidth * scale;
+        canvas.height = sourceHeight * scale;
+        
+        // Dibujar el frame actual escalado y recortado
+        ctx.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
         
         // Obtener la imagen en base64 (JPEG) con compresión
         const base64Image = canvas.toDataURL('image/jpeg', 0.7);
@@ -377,6 +405,14 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
     // 5. Renderizar Resultado en Pantalla
     function renderResult(scan) {
         loadingScreen.classList.remove('active');
+
+        // Si tenemos una URL de imagen (OpenFoodFacts) la ponemos
+        if (scan.imageUrl) {
+            document.getElementById('scanner-result-img').src = scan.imageUrl;
+        } else if (currentScanMode === 'EAN' && !document.getElementById('scanner-result-img').src.startsWith('data:')) {
+            // Si es EAN pero no hay foto, ponemos una por defecto (y evitamos pisar la de IA si ya estaba)
+            document.getElementById('scanner-result-img').src = '../ASSETS/logo.png';
+        }
 
         const isSafe = scan.gluten === false;
         const isWarning = scan.isWarning;
