@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (ingredientsText) {
                 mappedIngredients = ingredientsText.split(',').map(i => ({ name: i.trim() }));
             } else {
-                mappedIngredients = [{ name: displayName }];
+                mappedIngredients = [{ name: 'Ingredientes no detallados en la base de datos' }];
             }
 
             // 1. Es seguro si tiene el label explícito o el análisis de OFF dice que es gluten-free
