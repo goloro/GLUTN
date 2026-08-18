@@ -377,6 +377,27 @@ const Translations = {
         [Languages.DE]: "Verbindung zur Produktdatenbank fehlgeschlagen.",
         [Languages.IT]: "Impossibile connettersi al database dei prodotti."
     },
+    "modal.disclaimer_title": {
+        [Languages.ES]: "Aviso Importante",
+        [Languages.EN]: "Important Notice",
+        [Languages.FR]: "Avis Important",
+        [Languages.DE]: "Wichtiger Hinweis",
+        [Languages.IT]: "Avviso Importante"
+    },
+    "modal.disclaimer_msg": {
+        [Languages.ES]: "Esta aplicación utiliza Inteligencia Artificial y la base de datos abierta OpenFoodFacts.<br><br><strong>La información no es infalible</strong> y requiere supervisión humana. No es recomendable fiarse a ciegas. Verifica siempre la etiqueta física si tienes dudas.",
+        [Languages.EN]: "This app uses Artificial Intelligence and the OpenFoodFacts open database.<br><br><strong>The information is not infallible</strong> and requires human supervision. Do not rely blindly on it. Always check the physical label if in doubt.",
+        [Languages.FR]: "Cette application utilise l'Intelligence Artificielle et la base de données ouverte OpenFoodFacts.<br><br><strong>Les informations ne sont pas infaillibles</strong> et nécessitent une supervision humaine. Ne vous y fiez pas aveuglément. Vérifiez toujours l'étiquette physique en cas de doute.",
+        [Languages.DE]: "Diese App verwendet Künstliche Intelligenz und die offene Datenbank OpenFoodFacts.<br><br><strong>Die Informationen sind nicht unfehlbar</strong> und erfordern menschliche Aufsicht. Verlassen Sie sich nicht blind darauf. Überprüfen Sie im Zweifelsfall immer das physische Etikett.",
+        [Languages.IT]: "Questa app utilizza l'Intelligenza Artificiale e il database aperto OpenFoodFacts.<br><br><strong>Le informazioni non sono infallibili</strong> e richiedono supervisione umana. Non fidarti ciecamente. Controlla sempre l'etichetta fisica in caso di dubbio."
+    },
+    "modal.disclaimer_accept": {
+        [Languages.ES]: "He leído y entiendo",
+        [Languages.EN]: "I have read and understand",
+        [Languages.FR]: "J'ai lu et compris",
+        [Languages.DE]: "Ich habe gelesen und verstanden",
+        [Languages.IT]: "Ho letto e compreso"
+    },
     "result.safe_cert": {
         [Languages.ES]: "Certificado oficial Sin Gluten en la etiqueta.",
         [Languages.EN]: "Official Gluten-Free certified on label.",
@@ -445,7 +466,28 @@ function applyTranslations(langName) {
 
 // Inicializar traducciones automáticamente al cargar el archivo
 document.addEventListener('DOMContentLoaded', () => {
-    const userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-    const lang = userObj.language || Languages.ES;
+    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
+    let lang = userObj.language;
+
+    if (!lang) {
+        const browserLang = (navigator.language || navigator.userLanguage || "en").split('-')[0].toLowerCase();
+        const langMap = {
+            'es': Languages.ES,
+            'en': Languages.EN,
+            'fr': Languages.FR,
+            'de': Languages.DE,
+            'it': Languages.IT
+        };
+        lang = langMap[browserLang] || Languages.EN;
+        userObj.language = lang;
+        localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
+    }
+
     applyTranslations(lang);
+
+    // Actualizar el texto del selector de idiomas en el menú (si existe en la vista actual)
+    const currentLangText = document.getElementById('current-lang');
+    if (currentLangText) {
+        currentLangText.innerText = lang;
+    }
 });

@@ -171,4 +171,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // === 4. DISCLAIMER MODAL ===
+    const disclaimerModal = document.getElementById('disclaimer-modal');
+    const disclaimerAcceptBtn = document.getElementById('disclaimer-accept-btn');
+    
+    if (disclaimerModal && disclaimerAcceptBtn) {
+        // Mostrar modal si es la primera vez
+        if (!userObj.hasSeenDisclaimer) {
+            setTimeout(() => {
+                disclaimerModal.classList.add('active');
+            }, 300);
+        }
+
+        disclaimerAcceptBtn.addEventListener('click', () => {
+            disclaimerModal.classList.remove('active');
+            userObj.hasSeenDisclaimer = true;
+            localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
+        });
+    }
 });
