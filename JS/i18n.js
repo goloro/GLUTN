@@ -231,11 +231,11 @@ const Translations = {
     
     // ---- Nuevos Textos (EAN, IA, Modal, Resultados) ----
     "home.scan_ean": {
-        [Languages.ES]: "Escaneo Rápido (EAN)",
-        [Languages.EN]: "Fast Scan (EAN)",
-        [Languages.FR]: "Scan Rapide (EAN)",
-        [Languages.DE]: "Schnellscan (EAN)",
-        [Languages.IT]: "Scansione Rapida (EAN)"
+        [Languages.ES]: "Scanner",
+        [Languages.EN]: "Scanner",
+        [Languages.FR]: "Scanner",
+        [Languages.DE]: "Scanner",
+        [Languages.IT]: "Scanner"
     },
     "home.scan_ean_desc": {
         [Languages.ES]: "Apuntar al código de barras",
@@ -245,11 +245,11 @@ const Translations = {
         [Languages.IT]: "Punta al codice a barre"
     },
     "home.scan_ia": {
-        [Languages.ES]: "Análisis Profundo (IA)",
-        [Languages.EN]: "Deep Analysis (AI)",
-        [Languages.FR]: "Analyse Profonde (IA)",
-        [Languages.DE]: "Tiefenanalyse (KI)",
-        [Languages.IT]: "Analisi Approfondita (IA)"
+        [Languages.ES]: "Análisis Etiqueta",
+        [Languages.EN]: "Label Analysis",
+        [Languages.FR]: "Analyse Étiquette",
+        [Languages.DE]: "Etikettenanalyse",
+        [Languages.IT]: "Analisi Etichetta"
     },
     "home.scan_ia_desc": {
         [Languages.ES]: "Foto a los ingredientes",

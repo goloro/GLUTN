@@ -268,7 +268,7 @@ body.scanner-body .nav-bar-item:not(.active) {
 
 .result-header {
     width: 100%;
-    background-color: var(--nav-bg); /* Fondo beige del logo */
+    background-color: transparent;
     padding: 16px 0;
     display: flex;
     justify-content: center;
@@ -277,7 +277,7 @@ body.scanner-body .nav-bar-item:not(.active) {
 
 .result-header img {
     height: 90px; /* Aumentado drásticamente porque la imagen tiene mucho padding transparente */
-    margin: -24px 0; /* Recortamos el espacio vacío superior/inferior */
+    margin: 0 0 -24px 0; /* Recortamos el espacio vacío inferior */
     object-fit: contain;
     mix-blend-mode: multiply;
 }

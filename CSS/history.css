@@ -239,7 +239,7 @@
 
 .detail-header {
     width: 100%;
-    background-color: var(--nav-bg);
+    background-color: transparent;
     padding: 16px 0;
     display: flex;
     justify-content: center;
@@ -251,7 +251,7 @@
 
 .detail-header img {
     height: 90px; /* Igual que en escáner */
-    margin: -24px 0;
+    margin: 0 0 -24px 0;
     object-fit: contain;
     mix-blend-mode: multiply;
 }
