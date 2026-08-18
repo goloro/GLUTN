@@ -317,8 +317,14 @@ body.scanner-body .nav-bar-item:not(.active) {
     letter-spacing: 0.5px;
 }
 
+.verdict-banner.safe {
+    background-color: #0FA874; /* Verde */
+    color: white;
+}
+
 .verdict-banner.unsafe {
     background-color: #EF4444; /* Rojo por defecto, se sobrescribe por JS */
+    color: white;
 }
 
 .verdict-banner.unsafe i {

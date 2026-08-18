@@ -93,21 +93,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     startCamera();
 
     // === 2. LÓGICA DE BARCODE (ZXING) ===
+    let isDecoding = false;
+    
     function startBarcodeScan() {
         if (!stream) return;
         isScanningBarcode = true;
         
         function scan() {
-            if (!isScanningBarcode || currentScanMode !== 'EAN') return;
+            if (!isScanningBarcode || currentScanMode !== 'EAN' || isDecoding) return;
             
+            isDecoding = true;
             codeReader.decodeFromVideoElement(video)
                 .then(result => {
+                    isDecoding = false;
                     if (result && isScanningBarcode) {
                         isScanningBarcode = false;
                         handleBarcodeDetected(result.text);
+                    } else if (isScanningBarcode) {
+                        setTimeout(scan, 100);
                     }
                 })
                 .catch(err => {
+                    isDecoding = false;
                     if (isScanningBarcode) {
                         // Reintentar cada 200ms si no detecta nada
                         setTimeout(scan, 200);
@@ -120,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function stopBarcodeScan() {
         isScanningBarcode = false;
-        // NO llamamos a codeReader.reset() para evitar que se apague la cámara
+        isDecoding = false;
     }
 
     async function handleBarcodeDetected(barcode) {
@@ -168,6 +175,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             const categories = p.categories_tags || [];
             const productName = (p.product_name || '').toLowerCase();
 
+            // Extraer lista real de ingredientes
+            let mappedIngredients = [];
+            if (p.ingredients && p.ingredients.length > 0) {
+                mappedIngredients = p.ingredients.map(ing => ({ name: ing.text || ing.id }));
+            } else if (ingredientsText) {
+                mappedIngredients = ingredientsText.split(',').map(i => ({ name: i.trim() }));
+            } else {
+                mappedIngredients = [{ name: p.product_name || `Producto ${barcode}` }];
+            }
+
             // 1. Es seguro si tiene el label explícito o el análisis de OFF dice que es gluten-free
             // Ampliamos la búsqueda a categorías, nombre y texto de ingredientes por si la base de datos está incompleta
             const allTags = [...labels, ...categories, ...analysisTags].map(t => t.toLowerCase());
@@ -185,8 +202,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     isWarning: false,
                     gluten: false,
                     reason: getT('result.safe_cert'),
-                    ingredients: [{name: p.product_name || `Producto ${barcode}`}],
-                    imageUrl: p.image_url || p.image_front_url || null
+                    ingredients: mappedIngredients,
+                    imageUrl: p.image_url || p.image_front_url || null,
+                    barcode: barcode
                 });
                 return;
             }
@@ -204,8 +222,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     gluten: true,
                     reason: getT('result.unsafe_allergens'),
                     ingredientWithGluten: 'Gluten / Cereales',
-                    ingredients: [{name: 'Gluten / Cereales'}, {name: p.product_name || ''}],
-                    imageUrl: p.image_url || p.image_front_url || null
+                    ingredients: mappedIngredients,
+                    imageUrl: p.image_url || p.image_front_url || null,
+                    barcode: barcode
                 });
                 return;
             }
@@ -220,8 +239,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isWarning: true,
                 gluten: null,
                 reason: reasonText,
-                ingredients: [{name: p.product_name || `Producto ${barcode}`}],
-                imageUrl: p.image_url || p.image_front_url || null
+                ingredients: mappedIngredients,
+                imageUrl: p.image_url || p.image_front_url || null,
+                barcode: barcode
             });
 
         } catch (error) {
@@ -385,7 +405,6 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             scanResult.date = timeString;
 
-            saveToHistory(scanResult);
             renderResult(scanResult);
 
         } catch (error) {
@@ -410,12 +429,25 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         scanResult.id = userObj.scans.length > 0 ? userObj.scans[userObj.scans.length - 1].id + 1 : 1;
         
         userObj.scans.push(scanResult);
+        
+        // Limitar a máximo 10 escaneos (borra los más viejos)
+        if (userObj.scans.length > 10) {
+            userObj.scans = userObj.scans.slice(-10);
+        }
+        
         localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
     }
 
     // 5. Renderizar Resultado en Pantalla
     function renderResult(scan) {
         loadingScreen.classList.remove('active');
+
+        // Solo guardar en historial si aún no se ha guardado en esta instancia
+        if (!scan.date) {
+            const now = new Date();
+            scan.date = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            saveToHistory(scan);
+        }
 
         // Si tenemos una URL de imagen (OpenFoodFacts) la ponemos
         if (scan.imageUrl) {
@@ -430,15 +462,28 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         
         const badge = document.getElementById('scanner-result-badge');
         const aiBox = document.getElementById('ai-recommendation-box');
+        const offEditBox = document.getElementById('off-edit-box');
+        const offEditBtn = document.getElementById('off-edit-btn');
         
         // Reset state
         aiBox.style.display = 'none';
+        if (offEditBox) offEditBox.style.display = 'none';
 
         if (isWarning) {
             badge.className = 'verdict-banner warning';
             badge.innerHTML = `<i class="ph-fill ph-warning"></i> <span data-i18n="scanner.warning">Información Dudosa</span>`;
             badge.style.backgroundColor = '#F59E0B';
+            
+            // Mostrar sugerencia de usar IA
             aiBox.style.display = 'block';
+            
+            // Mostrar botón para corregir en OpenFoodFacts si tenemos EAN
+            if (currentScanMode === 'EAN' && scan.barcode && offEditBox) {
+                offEditBox.style.display = 'block';
+                offEditBtn.onclick = () => {
+                    window.open(`https://world.openfoodfacts.org/cgi/product.pl?type=edit&code=${scan.barcode}`, '_blank');
+                };
+            }
         } else if (isSafe) {
             badge.className = 'verdict-banner safe';
             badge.innerHTML = `<i class="ph-fill ph-check-circle"></i> <span data-i18n="scanner.safe">SEGURO</span>`;

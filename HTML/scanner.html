@@ -131,27 +131,36 @@
                 <h4 data-i18n="scanner.ingredients_list">Lista de ingredientes</h4>
                 <ul class="ingredients-list" id="scanner-result-ingredients">
                 </ul>
+            </div>
 
-                <!-- Bloque de Advertencia / Recomendación IA (Oculto por defecto) -->
-                <div class="ai-recommendation-box" id="ai-recommendation-box" style="display: none;">
-                    <div class="ai-warning-header">
-                        <i class="ph-bold ph-warning"></i>
-                        <span data-i18n="scanner.warning">Información Dudosa</span>
-                    </div>
-                    <p class="ai-warning-text" data-i18n="scanner.warning_desc">No podemos garantizar que este producto sea seguro con los datos actuales. Te recomendamos hacerle una foto a los ingredientes.</p>
-                    <button class="ai-switch-btn" id="ai-switch-btn">
-                        <i class="ph-bold ph-camera"></i>
-                        <span data-i18n="scanner.analyze_ai">Analizar Etiqueta con IA</span>
-                    </button>
+            <!-- Bloque de Advertencia / Recomendación IA (Oculto por defecto) -->
+            <div class="ai-recommendation-box" id="ai-recommendation-box" style="display: none;">
+                <div class="ai-warning-header">
+                    <i class="ph-bold ph-warning"></i>
+                    <span data-i18n="scanner.warning">Información Dudosa</span>
                 </div>
+                <p class="ai-warning-text" data-i18n="scanner.warning_desc">No podemos garantizar que este producto sea seguro con los datos actuales. Te recomendamos hacerle una foto a los ingredientes.</p>
+                <button class="ai-switch-btn" id="ai-switch-btn">
+                    <i class="ph-bold ph-camera"></i>
+                    <span data-i18n="scanner.analyze_ai">Analizar Etiqueta con IA</span>
+                </button>
+            </div>
 
-                <!-- Botón de nuevo escaneo -->
-                <div class="result-action">
-                    <button class="new-scan-btn" onclick="location.reload()">
-                        <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                        <span data-i18n="scanner.new_scan">Nuevo Escaneo</span>
-                    </button>
-                </div>
+            <!-- Bloque para editar en OpenFoodFacts -->
+            <div class="off-edit-box" id="off-edit-box" style="display: none; margin-top: 1rem;">
+                <button class="ai-switch-btn" id="off-edit-btn" style="background-color: #3b82f6; border-color: #3b82f6;">
+                    <i class="ph-bold ph-pencil-simple"></i>
+                    <span>Aportar a OpenFoodFacts</span>
+                </button>
+                <p style="font-size: 0.8rem; text-align: center; color: #64748B; margin-top: 0.5rem; line-height: 1.2;">Al pulsar se abrirá la web para que añadas la etiqueta 'Sin Gluten' y ayudes a la comunidad.</p>
+            </div>
+
+            <!-- Botón de nuevo escaneo -->
+            <div class="result-action">
+                <button class="new-scan-btn" onclick="location.reload()">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                    <span data-i18n="scanner.new_scan">Nuevo Escaneo</span>
+                </button>
             </div>
         </div>
     </div>
