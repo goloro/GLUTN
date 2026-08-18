@@ -97,13 +97,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!stream) return;
         isScanningBarcode = true;
         
-        // Ejecutar escaneo continuo. Si encuentra algo, verificar si estamos en el modo correcto.
-        codeReader.decodeFromVideoElement(video, (result, err) => {
-            if (result && isScanningBarcode && currentScanMode === 'EAN') {
-                isScanningBarcode = false;
-                handleBarcodeDetected(result.text);
-            }
-        });
+        function scan() {
+            if (!isScanningBarcode || currentScanMode !== 'EAN') return;
+            
+            codeReader.decodeFromVideoElement(video)
+                .then(result => {
+                    if (result && isScanningBarcode) {
+                        isScanningBarcode = false;
+                        handleBarcodeDetected(result.text);
+                    }
+                })
+                .catch(err => {
+                    if (isScanningBarcode) {
+                        // Reintentar cada 200ms si no detecta nada
+                        setTimeout(scan, 200);
+                    }
+                });
+        }
+        
+        scan();
     }
 
     function stopBarcodeScan() {
