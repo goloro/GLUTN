@@ -1,0 +1,117 @@
+/* home_responsive.css - Contiene todas las reglas de media queries para la Home y estilos globales */
+
+/* Bloqueador Desktop/iPad */
+#desktop-blocker {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-color, #FFFFFF);
+    z-index: 9999999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+#desktop-blocker h2 {
+    font-size: 24px;
+    color: var(--text-dark, #000000);
+    margin-bottom: 12px;
+}
+
+#desktop-blocker p {
+    font-size: 16px;
+    color: var(--text-gray, #6B7280);
+    line-height: 1.5;
+}
+
+@media (min-width: 600px) {
+    #desktop-blocker {
+        display: flex;
+    }
+    body {
+        overflow: hidden !important;
+    }
+    body > *:not(#desktop-blocker):not(script) {
+        display: none !important;
+    }
+}
+
+/* Pantallas pequeñas (menor altura) para evitar scroll en la Home */
+@media (max-height: 750px) {
+    /* Reducir márgenes y paddings globales para comprimir la UI */
+    #main-logo {
+        height: 70px;
+        margin: -16px 0;
+    }
+    .home-header {
+        padding: 12px 0;
+    }
+    .section-title {
+        margin-top: 16px;
+        margin-bottom: 16px;
+    }
+    .scan-options-container {
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .scan-card {
+        padding: 16px;
+    }
+    .scan-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+    .scan-info h2 {
+        font-size: 15px;
+    }
+    .scan-info p {
+        font-size: 12px;
+    }
+    .language-selector {
+        margin-bottom: 24px;
+    }
+    .last-scan h2 {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    .scan-item {
+        padding: 6px 0;
+    }
+}
+
+@media (max-height: 650px) {
+    /* Pantallas extra pequeñas (e.g. iPhone SE antiguo) */
+    #main-logo {
+        height: 60px;
+        margin: -10px 0;
+    }
+    .home-header {
+        padding: 8px 0;
+    }
+    .section-title {
+        margin-top: 8px;
+        margin-bottom: 12px;
+    }
+    .scan-options-container {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .scan-card {
+        padding: 12px;
+    }
+    .language-selector {
+        margin-bottom: 12px;
+        transform: scale(0.9);
+    }
+    .last-scan h2 {
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+}

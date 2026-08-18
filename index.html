@@ -14,8 +14,26 @@
         <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
         <!-- CSS -->
-        <link rel="stylesheet" href="CSS/home.css?v=6">
-        <link rel="stylesheet" href="CSS/history.css?v=6">
+        <link rel="stylesheet" href="CSS/home.css?v=8">
+        <link rel="stylesheet" href="CSS/Responsive/home_responsive.css?v=8">
+        <link rel="stylesheet" href="CSS/history.css?v=8">
+        <style>
+            /* Bloquear scroll en la home y ajustar al tamaño del móvil */
+            body {
+                height: 100vh;
+                height: 100dvh;
+                overflow: hidden;
+            }
+            /* Hacer que el contenedor de 'último escaneo' ocupe el espacio restante sin scrollear */
+            .last-scan {
+                flex-grow: 1;
+                width: 100%;
+                padding-bottom: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+        </style>
     </head>
     <body>
         <header class="home-header">
@@ -135,7 +153,7 @@
         </div>
         
         <!-- Funcionalidad -->
-        <script src="JS/i18n.js?v=4"></script>
-        <script src="JS/home.js?v=4"></script>
+        <script src="JS/i18n.js?v=8"></script>
+        <script src="JS/home.js?v=8"></script>
     </body>
 </html>

@@ -444,7 +444,7 @@ function applyTranslations(langName) {
     let selectedLang = Languages.ES;
     for (const key in Languages) {
         if (Languages[key] === langName) {
-            selectedLang = langName;
+            selectedLang = Languages[key];
             break;
         }
     }
@@ -466,6 +466,18 @@ function applyTranslations(langName) {
 
 // Inicializar traducciones automáticamente al cargar el archivo
 document.addEventListener('DOMContentLoaded', () => {
+    // Inyectar el Desktop Blocker dinámicamente si no existe
+    if (!document.getElementById('desktop-blocker')) {
+        const blocker = document.createElement('div');
+        blocker.id = 'desktop-blocker';
+        blocker.innerHTML = `
+            <i class="ph-bold ph-device-mobile" style="font-size: 64px; color: var(--card-green, #0FA874); margin-bottom: 20px;"></i>
+            <h2 data-i18n="blocker.title">Solo para móviles</h2>
+            <p data-i18n="blocker.desc">Esta App está diseñada exclusivamente para teléfonos móviles. Por favor, accede desde tu smartphone.</p>
+        `;
+        document.body.appendChild(blocker);
+    }
+
     let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
     let lang = userObj.language;
 
