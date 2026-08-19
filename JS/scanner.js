@@ -36,7 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modeSwitchText = document.getElementById('mode-switch-text');
     const modeSwitchIcon = modeSwitchBtn.querySelector('i');
 
-    function updateScannerUI(mode) {
+    function updateScannerUI(mode, keepBarcode = false) {
+        if (!keepBarcode) {
+            lastScannedBarcode = null;
+        }
+
         currentScanMode = mode;
         if (mode === 'EAN') {
             reticleIa.classList.add('reticle-hidden');
@@ -74,11 +78,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function startCamera() {
         try {
             stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' }
+                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
             });
+            video.setAttribute('playsinline', 'true'); // Asegurar para iOS
             video.srcObject = stream;
             
-            // Iniciar interfaz una vez tenemos el stream
+            // Esperar a que el vídeo esté listo antes de permitir escaneos
+            await new Promise((resolve) => {
+                if (video.readyState >= 2) {
+                    video.play().then(resolve).catch(resolve);
+                } else {
+                    video.onloadedmetadata = () => {
+                        video.play().then(resolve).catch(resolve);
+                    };
+                }
+            });
+            
+            // Iniciar interfaz una vez tenemos el stream y está reproduciendo
             updateScannerUI(currentScanMode);
         } catch (error) {
             console.error("Error accediendo a la cámara:", error);
@@ -101,6 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // === 2. LÓGICA DE BARCODE (ZXING) ===
     let isDecoding = false;
+    let lastScannedBarcode = null;
     
     function startBarcodeScan() {
         if (!stream) return;
@@ -145,6 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function handleBarcodeDetected(barcode) {
+        lastScannedBarcode = barcode;
         // Reproducir un pitido o dar feedback háptico si es posible
         if (navigator.vibrate) navigator.vibrate(100);
         
@@ -172,7 +190,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data.status === 0 || !data.product) {
                 // Producto no encontrado
                 renderResult({
+                    isNotFound: true,
                     isWarning: true,
+                    barcode: barcode,
                     reason: getT('result.not_found') + ` (EAN: ${barcode})`,
                     ingredients: [],
                     gluten: null,
@@ -400,6 +420,11 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             const cleanJsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
             const scanResult = JSON.parse(cleanJsonStr);
 
+            // Inyectar el barcode si venimos de un EAN no encontrado/dudoso
+            if (lastScannedBarcode) {
+                scanResult.barcode = lastScannedBarcode;
+            }
+
             if (scanResult.error === 'no_label_detected') {
                 showCustomDialog({
                     type: 'error',
@@ -467,33 +492,43 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             document.getElementById('scanner-result-img').src = '../ASSETS/logo.png';
         }
 
+        const isNotFound = scan.isNotFound === true;
         const isSafe = scan.gluten === false;
-        const isWarning = scan.isWarning;
+        const isWarning = scan.isWarning && !isNotFound;
         
         const badge = document.getElementById('scanner-result-badge');
         const aiBox = document.getElementById('ai-recommendation-box');
         const offEditBox = document.getElementById('off-edit-box');
         const offEditBtn = document.getElementById('off-edit-btn');
+        const aiWarningHeader = aiBox.querySelector('.ai-warning-header');
+        const aiWarningText = aiBox.querySelector('.ai-warning-text');
         
         // Reset state
         aiBox.style.display = 'none';
         if (offEditBox) offEditBox.style.display = 'none';
 
-        if (isWarning) {
+        if (isNotFound) {
+            badge.className = 'verdict-banner';
+            badge.innerHTML = `<i class="ph-bold ph-question"></i> <span data-i18n="result.not_found">Producto no encontrado</span>`;
+            badge.style.backgroundColor = '#6B7280'; // Gris
+            
+            // Sugerir escanear con IA
+            aiBox.style.display = 'block';
+            aiWarningHeader.innerHTML = `<i class="ph-bold ph-magnifying-glass"></i> <span data-i18n="scanner.not_found_title">Producto Desconocido</span>`;
+            aiWarningText.setAttribute('data-i18n', 'scanner.not_found_desc');
+            aiWarningText.innerText = getT('scanner.not_found_desc');
+            
+        } else if (isWarning) {
             badge.className = 'verdict-banner warning';
             badge.innerHTML = `<i class="ph-fill ph-warning"></i> <span data-i18n="scanner.warning">Información Dudosa</span>`;
             badge.style.backgroundColor = '#F59E0B';
             
             // Mostrar sugerencia de usar IA
             aiBox.style.display = 'block';
+            aiWarningHeader.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="scanner.warning">Información Dudosa</span>`;
+            aiWarningText.setAttribute('data-i18n', 'scanner.warning_desc');
+            aiWarningText.innerText = getT('scanner.warning_desc');
             
-            // Mostrar botón para corregir en OpenFoodFacts si tenemos EAN
-            if (currentScanMode === 'EAN' && scan.barcode && offEditBox) {
-                offEditBox.style.display = 'block';
-                offEditBtn.onclick = () => {
-                    window.open(`https://world.openfoodfacts.org/cgi/product.pl?type=edit&code=${scan.barcode}`, '_blank');
-                };
-            }
         } else if (isSafe) {
             badge.className = 'verdict-banner safe';
             badge.innerHTML = `<i class="ph-fill ph-check-circle"></i> <span data-i18n="scanner.safe">SEGURO</span>`;
@@ -502,6 +537,23 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             badge.className = 'verdict-banner unsafe';
             badge.innerHTML = `<i class="ph-fill ph-x-circle"></i> <span data-i18n="scanner.unsafe">No Apto</span>`;
             badge.style.backgroundColor = '#EF4444';
+        }
+
+        // Lógica para mostrar el botón de aportar a OpenFoodFacts
+        if (scan.barcode && offEditBox) {
+            // Si no fue encontrado (estado EAN inicial), no lo mostramos. Lo mostraremos tras la IA
+            if (!isNotFound && (currentScanMode === 'IA' || currentScanMode === 'EAN')) {
+                offEditBox.style.display = 'block';
+                const offEditBtnText = offEditBox.querySelector('span');
+                if (currentScanMode === 'IA') {
+                    offEditBtnText.innerText = "Añadir a OpenFoodFacts";
+                } else {
+                    offEditBtnText.innerText = "Aportar a OpenFoodFacts";
+                }
+                offEditBtn.onclick = () => {
+                    window.open(`https://world.openfoodfacts.org/cgi/product.pl?type=edit&code=${scan.barcode}`, '_blank');
+                };
+            }
         }
 
         // Razón
@@ -536,7 +588,7 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
     // Botón de Recomendación IA
     document.getElementById('ai-switch-btn').addEventListener('click', () => {
         resultScreen.classList.remove('active');
-        updateScannerUI('IA'); // Cambia a modo IA
+        updateScannerUI('IA', true); // Cambia a modo IA y mantiene el barcode
     });
 
     // === 4. MODAL PERSONALIZADO ===

@@ -432,6 +432,20 @@ const Translations = {
         [Languages.FR]: "Produit introuvable.",
         [Languages.DE]: "Produkt nicht gefunden.",
         [Languages.IT]: "Prodotto non trovato."
+    },
+    "scanner.not_found_desc": {
+        [Languages.ES]: "Este producto no está en la base de datos. Puedes escanear los ingredientes con IA para comprobar si es seguro.",
+        [Languages.EN]: "This product is not in the database. You can scan the ingredients with AI to check if it's safe.",
+        [Languages.FR]: "Ce produit n'est pas dans la base de données. Vous pouvez scanner les ingrédients avec l'IA pour vérifier s'il est sûr.",
+        [Languages.DE]: "Dieses Produkt ist nicht in der Datenbank. Sie können die Zutaten mit KI scannen, um zu prüfen, ob es sicher ist.",
+        [Languages.IT]: "Questo prodotto non è nel database. Puoi scansionare gli ingredienti con l'IA per verificare se è sicuro."
+    },
+    "scanner.not_found_title": {
+        [Languages.ES]: "Producto Desconocido",
+        [Languages.EN]: "Unknown Product",
+        [Languages.FR]: "Produit Inconnu",
+        [Languages.DE]: "Unbekanntes Produkt",
+        [Languages.IT]: "Prodotto Sconosciuto"
     }
 };
 
