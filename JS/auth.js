@@ -43,6 +43,11 @@ window.switchTab = (mode) => {
     }
 };
 
+// Limpiamos la clase por defecto
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.remove('no-scroll');
+});
+
 window.togglePassword = (inputId) => {
     const input = document.getElementById(inputId);
     const icon = input.nextElementSibling;

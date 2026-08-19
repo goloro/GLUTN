@@ -18,93 +18,101 @@
 </head>
 <body>
 
-    <!-- Logo Superior -->
-    <div class="logo-box">
-        <img src="../Images/Logos/Glutn_Logo_SinFondo.png" alt="GLUTN Logo">
-    </div>
+    <!-- Fondo curvo decorativo (completamente por detrás) -->
+    <div class="auth-bg-shape"></div>
 
-    <!-- Tarjeta de Autenticación -->
-    <div class="auth-card" id="auth-card">
+    <!-- Contenedor principal para el layout -->
+    <div class="content-wrapper">
         
-        <!-- Tabs -->
-        <div class="auth-tabs">
-            <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</div>
-            <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
+        <!-- Logo -->
+        <div class="logo-box">
+            <img src="../Images/Logos/Glutn_Logo_SinFondo.png" alt="GLUTN Logo">
         </div>
 
-        <form id="auth-form" onsubmit="handleAuth(event)">
-            
-            <!-- Nombre (Solo Sign Up) -->
-            <div class="form-group signup-only">
-                <div class="form-header">
-                    <label for="name">Nombre</label>
-                </div>
-                <div class="input-wrapper">
-                    <i class="ph ph-user input-icon"></i>
-                    <input type="text" id="name" placeholder="Tu nombre">
-                </div>
+        <!-- Tarjeta de Autenticación -->
+        <div class="auth-card" id="auth-card">
+        
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</div>
+                <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
             </div>
 
-            <!-- Email (Ambos) -->
-            <div class="form-group">
-                <div class="form-header">
-                    <label for="email">Email</label>
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                
+                <!-- Nombre (Solo Sign Up) -->
+                <div class="form-group signup-only">
+                    <div class="form-header">
+                        <label for="name">Nombre</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-user input-icon"></i>
+                        <input type="text" id="name" placeholder="Tu nombre">
+                    </div>
                 </div>
-                <div class="input-wrapper">
-                    <i class="ph ph-envelope-simple input-icon"></i>
-                    <input type="email" id="email" placeholder="hello@sintrazas.com" required>
+
+                <!-- Email (Ambos) -->
+                <div class="form-group">
+                    <div class="form-header">
+                        <label for="email">Email</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-envelope-simple input-icon"></i>
+                        <input type="email" id="email" placeholder="glutn@gmail.com" required>
+                    </div>
                 </div>
+
+                <!-- Contraseña (Ambos) -->
+                <div class="form-group">
+                    <div class="form-header">
+                        <label for="password">Contraseña</label>
+                        <a href="#" class="forgot-password login-only">Contraseña olvidada?</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock input-icon"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                        <i class="ph ph-eye input-icon-right" onclick="togglePassword('password')"></i>
+                    </div>
+                </div>
+
+                <!-- Repetir Contraseña (Solo Sign Up) -->
+                <div class="form-group signup-only">
+                    <div class="form-header">
+                        <label for="confirm-password">Repetir Contraseña</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock input-icon"></i>
+                        <input type="password" id="confirm-password" placeholder="••••••••">
+                        <i class="ph ph-eye input-icon-right" onclick="togglePassword('confirm-password')"></i>
+                    </div>
+                </div>
+
+                <!-- Botón Principal -->
+                <button type="submit" class="auth-btn" id="submit-btn">Log In</button>
+
+                <!-- Error Message -->
+                <div id="error-msg" class="error-msg"></div>
+
+            </form>
+
+            <div class="divider">
+                <span>O CONTINUA CON</span>
             </div>
 
-            <!-- Contraseña (Ambos) -->
-            <div class="form-group">
-                <div class="form-header">
-                    <label for="password">Contraseña</label>
-                    <a href="#" class="forgot-password login-only">Contraseña olvidada?</a>
-                </div>
-                <div class="input-wrapper">
-                    <i class="ph ph-lock input-icon"></i>
-                    <input type="password" id="password" placeholder="••••••••" required>
-                    <i class="ph ph-eye input-icon-right" onclick="togglePassword('password')"></i>
-                </div>
-            </div>
+            <button class="social-btn" type="button" onclick="handleGoogleLogin()">
+                <!-- SVG de Google simple -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+                Google
+            </button>
 
-            <!-- Repetir Contraseña (Solo Sign Up) -->
-            <div class="form-group signup-only">
-                <div class="form-header">
-                    <label for="confirm-password">Repetir Contraseña</label>
-                </div>
-                <div class="input-wrapper">
-                    <i class="ph ph-lock input-icon"></i>
-                    <input type="password" id="confirm-password" placeholder="••••••••">
-                    <i class="ph ph-eye input-icon-right" onclick="togglePassword('confirm-password')"></i>
-                </div>
-            </div>
+        </div> <!-- Fin auth-card -->
 
-            <!-- Botón Principal -->
-            <button type="submit" class="auth-btn" id="submit-btn">Log In</button>
-
-            <!-- Error Message -->
-            <div id="error-msg" class="error-msg"></div>
-
-        </form>
-
-        <div class="divider">
-            <span>O CONTINUA CON</span>
+        <!-- Footer -->
+        <div class="auth-footer">
+            By continuing, you agree to our <a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a>.
         </div>
 
-        <button class="social-btn" type="button" onclick="handleGoogleLogin()">
-            <!-- SVG de Google simple -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
-            Google
-        </button>
-
-    </div>
-
-    <!-- Footer -->
-    <div class="auth-footer">
-        By continuing, you agree to our <a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a>.
-    </div>
+    </div> <!-- Fin content-wrapper -->
 
     <!-- Lógica de Auth -->
     <script type="module" src="../JS/auth.js"></script>
