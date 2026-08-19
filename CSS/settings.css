@@ -1,0 +1,196 @@
+/* settings.css */
+
+.settings-content {
+    width: 100%;
+    padding: min(10px, 1vh) 24px min(30px, 4vh) 24px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Profile Card */
+.profile-card {
+    width: 100%;
+    max-width: 400px;
+    background-color: var(--white);
+    border: 1px solid #F0E8DD;
+    border-radius: min(24px, 3vh);
+    padding: min(32px, 4vh) 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 12px 36px rgba(181, 163, 142, 0.08);
+    margin-bottom: min(32px, 4vh);
+}
+
+.profile-avatar {
+    width: min(80px, 10vh);
+    height: min(80px, 10vh);
+    background-color: #F3E5D4;
+    border-radius: min(24px, 3vh);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: min(32px, 4vh);
+    font-weight: 500;
+    color: #4A443C;
+    margin-bottom: min(20px, 2.5vh);
+}
+
+.profile-name {
+    font-size: min(22px, 2.8vh);
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: min(6px, 0.8vh);
+}
+
+.profile-email {
+    font-size: min(14px, 1.8vh);
+    color: #716960;
+    margin-bottom: min(24px, 3vh);
+}
+
+.btn-outline {
+    width: 100%;
+    padding: min(14px, 1.8vh);
+    border: 1px solid #2C2C2C;
+    background-color: transparent;
+    border-radius: min(12px, 1.5vh);
+    font-size: min(14px, 1.8vh);
+    font-weight: 500;
+    color: #2C2C2C;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-outline:active {
+    background-color: #F8F6F4;
+    transform: scale(0.98);
+}
+
+/* Settings Sections */
+.settings-section {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: min(28px, 3.5vh);
+}
+
+.section-title {
+    font-size: min(11px, 1.4vh);
+    letter-spacing: 1.5px;
+    color: #4A443C;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: min(12px, 1.5vh);
+    margin-left: 4px;
+}
+
+.settings-list {
+    background-color: var(--white);
+    border: 1px solid #F0E8DD;
+    border-radius: min(20px, 2.5vh);
+    overflow: visible;
+    box-shadow: 0 4px 16px rgba(181, 163, 142, 0.04);
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: min(18px, 2.2vh) 20px;
+    background-color: var(--white);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.settings-item:first-child {
+    border-top-left-radius: min(20px, 2.5vh);
+    border-top-right-radius: min(20px, 2.5vh);
+}
+
+.settings-item:last-child {
+    border-bottom-left-radius: min(20px, 2.5vh);
+    border-bottom-right-radius: min(20px, 2.5vh);
+}
+
+.settings-item:not(:last-child) {
+    border-bottom: 1px solid #F0E8DD;
+}
+
+.settings-item:active {
+    background-color: #F8F6F4;
+}
+
+.item-left {
+    display: flex;
+    align-items: center;
+    gap: min(14px, 1.8vh);
+    font-size: min(15px, 1.9vh);
+    font-weight: 500;
+    color: #2C2C2C;
+}
+
+.item-left i {
+    font-size: min(22px, 2.8vh);
+    color: #4A443C;
+}
+
+.item-right {
+    display: flex;
+    align-items: center;
+    color: #716960;
+    font-size: min(14px, 1.8vh);
+}
+
+.item-right i {
+    font-size: min(18px, 2.2vh);
+    color: #A39B92;
+}
+
+/* Logout Button */
+.logout-container {
+    width: 100%;
+    max-width: 400px;
+    margin-top: auto;
+    margin-bottom: min(20px, 2.5vh);
+    display: flex;
+    justify-content: center;
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: min(10px, 1.2vh);
+    padding: min(14px, 1.8vh) min(28px, 3.5vh);
+    border: 1.5px solid #FCA5A5;
+    background-color: transparent;
+    border-radius: min(14px, 1.8vh);
+    font-size: min(15px, 1.9vh);
+    font-weight: 500;
+    color: #EF4444;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s, transform 0.1s;
+    width: fit-content;
+    min-width: 200px;
+}
+
+.btn-logout:active {
+    background-color: #FEF2F2;
+    transform: scale(0.98);
+}
+
+/* ========================================= */
+/*   RESPONSIVIDAD FLUIDA: Ajuste del Logo   */
+/* ========================================= */
+.home-header {
+    padding: min(16px, 2vh) 0;
+    margin-bottom: min(10px, 1vh);
+}
+
+#main-logo {
+    height: min(150px, 18vh);
+    width: auto;
+}

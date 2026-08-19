@@ -2,36 +2,15 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Referencias a elementos del DOM
-    const langBtn = document.getElementById('lang-btn');
-    const langDropdown = document.getElementById('lang-dropdown');
     const currentLangText = document.getElementById('current-lang');
-    const langOptions = document.querySelectorAll('.lang-option');
-
-    if (!langBtn || !langDropdown) return; // Salir si no estamos en index.html
 
     // Cargar el idioma guardado al iniciar la página
     let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-    if (userObj.language) {
-        selectLang(userObj.language);
-    }
     
     // Cargar el último escaneo
     loadLastScan(userObj);
 
-    // Toggle del menú al hacer click en el botón
-    langBtn.addEventListener('click', function(e) {
-        langDropdown.classList.toggle('show');
-        e.stopPropagation(); // Evitar que el evento llegue a window
-    });
-
-    // Añadir eventos a las opciones
-    langOptions.forEach(option => {
-        option.addEventListener('click', function(e) {
-            const lang = this.getAttribute('data-lang');
-            selectLang(lang);
-            e.stopPropagation();
-        });
-    });
+    // Toggle del menú al hacer click en el botón (ELIMINADO)
 
     // Función para renderizar el último escaneo
     function loadLastScan(user) {
@@ -116,33 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('history-detail-screen').classList.add('active');
     }
 
-    // Función principal para seleccionar el idioma
-    function selectLang(lang) {
-        if (!currentLangText) return;
-        
-        // Cambiar el texto del botón
-        currentLangText.innerText = lang;
-        // Cerrar el desplegable
-        langDropdown.classList.remove('show');
-        
-        // Ocultar la opción del idioma actual y mostrar las demás
-        langOptions.forEach(opt => {
-            if (opt.getAttribute('data-lang') === lang) {
-                opt.style.display = 'none';
-            } else {
-                opt.style.display = 'block';
-            }
-        });
-
-        // Guardar en el JSON de usuario en LocalStorage
-        userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-        userObj.language = lang;
-        localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
-
-        // Aplicar la traducción a la UI si la función existe (i18n.js cargado)
-        if (typeof applyTranslations === 'function') {
-            applyTranslations(lang);
-        }
+    if (userObj.language && typeof applyTranslations === 'function') {
+        applyTranslations(userObj.language);
     }
 
     // === 3. MANEJO DE TARJETAS DE ESCANEO ===
@@ -163,14 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Cerrar el menú si el usuario clica fuera de él
-    window.addEventListener('click', function(event) {
-        if (!event.target.closest('.language-selector')) {
-            if (langDropdown.classList.contains('show')) {
-                langDropdown.classList.remove('show');
-            }
-        }
-    });
+
 
     // === 4. DISCLAIMER MODAL ===
     const disclaimerModal = document.getElementById('disclaimer-modal');
