@@ -1,5 +1,6 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import { auth } from "./firebase-config.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const userNameEl = document.getElementById('user-name');
@@ -8,19 +9,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
 
     // Escuchar cambios en la autenticación
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             // Usuario logueado
-            const displayName = user.displayName || 'Usuario';
-            const email = user.email || 'Sin email';
+            let displayName = user.displayName || 'Usuario';
+            let email = user.email || 'Sin email';
+            
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    if (data.username) {
+                        displayName = '@' + data.username;
+                    }
+                }
+            } catch(e) {
+                console.error("Error fetching user data", e);
+            }
 
             userNameEl.innerText = displayName;
             userEmailEl.innerText = email;
 
             // Obtener inicial para el avatar
             let initial = 'U';
-            if (displayName && displayName !== 'Usuario') {
-                initial = displayName.charAt(0).toUpperCase();
+            if (displayName && displayName !== 'Usuario' && displayName !== '@Usuario') {
+                initial = displayName.startsWith('@') ? displayName.charAt(1).toUpperCase() : displayName.charAt(0).toUpperCase();
             } else if (email && email !== 'Sin email') {
                 initial = email.charAt(0).toUpperCase();
             }

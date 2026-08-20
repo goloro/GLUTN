@@ -15,58 +15,58 @@
     background-color: var(--white);
     border: 1px solid #F0E8DD;
     border-radius: min(24px, 3vh);
-    padding: min(32px, 4vh) 24px;
+    padding: min(16px, 2vh) min(20px, 2.5vh);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     box-shadow: 0 12px 36px rgba(181, 163, 142, 0.08);
     margin-bottom: min(32px, 4vh);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.profile-card:active {
+    background-color: #F8F6F4;
 }
 
 .profile-avatar {
-    width: min(80px, 10vh);
-    height: min(80px, 10vh);
+    width: min(64px, 8vh);
+    height: min(64px, 8vh);
     background-color: #F3E5D4;
-    border-radius: min(24px, 3vh);
+    border-radius: min(16px, 2vh);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: min(32px, 4vh);
+    font-size: min(24px, 3vh);
     font-weight: 500;
-    color: #4A443C;
-    margin-bottom: min(20px, 2.5vh);
+    color: #5B7553;
+    margin-right: 16px;
+    margin-bottom: 0;
+}
+
+.profile-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .profile-name {
-    font-size: min(22px, 2.8vh);
+    font-size: min(18px, 2.2vh);
     font-weight: 600;
     color: var(--text-dark);
-    margin-bottom: min(6px, 0.8vh);
+    margin-bottom: min(4px, 0.5vh);
 }
 
 .profile-email {
-    font-size: min(14px, 1.8vh);
+    font-size: min(13px, 1.6vh);
     color: #716960;
-    margin-bottom: min(24px, 3vh);
+    margin-bottom: 0;
 }
 
-.btn-outline {
-    width: 100%;
-    padding: min(14px, 1.8vh);
-    border: 1px solid #2C2C2C;
-    background-color: transparent;
-    border-radius: min(12px, 1.5vh);
-    font-size: min(14px, 1.8vh);
-    font-weight: 500;
-    color: #2C2C2C;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.btn-outline:active {
-    background-color: #F8F6F4;
-    transform: scale(0.98);
+.profile-arrow {
+    font-size: min(20px, 2.5vh);
+    color: #716960;
 }
 
 /* Settings Sections */

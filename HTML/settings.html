@@ -45,11 +45,13 @@
         </header>
 
         <!-- Profile Card -->
-        <div class="profile-card">
+        <div class="profile-card" onclick="window.location.href='edit-profile.html'">
             <div class="profile-avatar" id="user-avatar">A</div>
-            <h2 class="profile-name" id="user-name">Usuario</h2>
-            <p class="profile-email" id="user-email">cargando...</p>
-            <button class="btn-outline" id="edit-name-btn" data-i18n="settings.edit_name">Editar Nombre</button>
+            <div class="profile-info">
+                <h2 class="profile-name" id="user-name">Usuario</h2>
+                <p class="profile-email" id="user-email">cargando...</p>
+            </div>
+            <i class="ph ph-caret-right profile-arrow"></i>
         </div>
 
         <!-- Section: CUENTA -->

@@ -40,6 +40,17 @@
 
             <form id="auth-form" onsubmit="handleAuth(event)">
                 
+                <!-- Username (Solo Sign Up) -->
+                <div class="form-group signup-only">
+                    <div class="form-header">
+                        <label for="username">Nombre de usuario</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-at input-icon"></i>
+                        <input type="text" id="username" placeholder="Tu nombre de usuario">
+                    </div>
+                </div>
+
                 <!-- Nombre (Solo Sign Up) -->
                 <div class="form-group signup-only">
                     <div class="form-header">
@@ -51,14 +62,14 @@
                     </div>
                 </div>
 
-                <!-- Email (Ambos) -->
+                <!-- Email / Username (Ambos) -->
                 <div class="form-group">
                     <div class="form-header">
-                        <label for="email">Email</label>
+                        <label for="email" id="email-label">Email o Nombre de usuario</label>
                     </div>
                     <div class="input-wrapper">
                         <i class="ph ph-envelope-simple input-icon"></i>
-                        <input type="email" id="email" placeholder="glutn@gmail.com" required>
+                        <input type="text" id="email" placeholder="glutn@gmail.com o @usuario" required>
                     </div>
                 </div>
 
@@ -109,7 +120,7 @@
 
         <!-- Footer -->
         <div class="auth-footer">
-            By continuing, you agree to our <a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a>.
+            Al continuar, aceptas nuestros <a href="terminos.html" data-i18n="auth.terms">Términos y Condiciones</a> y <a href="#" data-i18n="auth.privacy">Política de Privacidad</a>.
         </div>
 
     </div> <!-- Fin content-wrapper -->
