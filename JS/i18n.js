@@ -482,10 +482,41 @@ function applyTranslations(langName) {
 document.addEventListener('DOMContentLoaded', () => {
     // Inyectar el Desktop Blocker dinámicamente si no existe
     if (!document.getElementById('desktop-blocker')) {
+        // Añadir el estilo global
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #desktop-blocker {
+                display: none;
+            }
+            @media (min-width: 600px) {
+                #desktop-blocker {
+                    display: flex !important;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: #FAFAF9;
+                    z-index: 999999;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                    padding: 24px;
+                    color: #2C2C2C;
+                    font-family: 'Inter', sans-serif;
+                }
+                body > *:not(#desktop-blocker) {
+                    display: none !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
         const blocker = document.createElement('div');
         blocker.id = 'desktop-blocker';
         blocker.innerHTML = `
-            <i class="ph-bold ph-device-mobile" style="font-size: 64px; color: var(--card-green, #0FA874); margin-bottom: 20px;"></i>
+            <i class="ph-bold ph-device-mobile" style="font-size: 64px; color: var(--card-green, #5B7553); margin-bottom: 20px;"></i>
             <h2 data-i18n="blocker.title">Solo para móviles</h2>
             <p data-i18n="blocker.desc">Esta App está diseñada exclusivamente para teléfonos móviles. Por favor, accede desde tu smartphone.</p>
         `;
