@@ -1,4 +1,5 @@
-// Lógica del Escáner (Cámara + Gemini AI)
+import { auth, db } from "./firebase-config.js";
+import { doc, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     const video = document.getElementById('camera-stream');
@@ -11,11 +12,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     let stream = null;
     let codeReader = new ZXing.BrowserMultiFormatReader();
     let isScanningBarcode = false;
+    let currentUserLang = 'Español'; // Default, will update if user is logged in
     
+    // Obtener idioma del usuario de Firestore de forma asíncrona (opcional para no bloquear)
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const docSnap = await getDoc(doc(db, "users", user.uid));
+            if (docSnap.exists() && docSnap.data().language) {
+                currentUserLang = docSnap.data().language;
+            }
+        }
+    });
+
     // Helper de traducciones para JS
     function getT(key) {
-        const userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-        const lang = userObj.language || 'Español';
+        const lang = currentUserLang;
         if (typeof Translations !== 'undefined' && Translations[key] && Translations[key][lang]) {
             return Translations[key][lang];
         }
@@ -26,8 +37,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // === LÓGICA DE MODOS DE ESCANEO ===
-    let currentScanMode = localStorage.getItem('scan_mode') || 'IA';
-    localStorage.removeItem('scan_mode'); // Borrar para no sobrecargar
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentScanMode = urlParams.get('mode') || 'IA';
     
     const reticleIa = document.getElementById('reticle-ia');
     const reticleEan = document.getElementById('reticle-ean');
@@ -449,23 +460,24 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
     }
 
     // 4. Guardar en Historial
-    function saveToHistory(scanResult) {
-        let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-        if (!userObj.scans) {
-            userObj.scans = [];
+    async function saveToHistory(scanResult) {
+        if (!auth.currentUser) return; // Si no hay usuario, no guardar
+
+        // Asignar ID basado en timestamp
+        scanResult.id = Date.now();
+        
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userRef, {
+                scans: arrayUnion(scanResult)
+            });
+            
+            // Opcional: si queremos limitar a 10 escaneos, tendríamos que leer, truncar y guardar, 
+            // pero para esta versión básica dejaremos que arrayUnion añada indefinidamente 
+            // o lo gestionamos en la pantalla de historial.
+        } catch (error) {
+            console.error("Error guardando en historial:", error);
         }
-        
-        // Asignar ID
-        scanResult.id = userObj.scans.length > 0 ? userObj.scans[userObj.scans.length - 1].id + 1 : 1;
-        
-        userObj.scans.push(scanResult);
-        
-        // Limitar a máximo 10 escaneos (borra los más viejos)
-        if (userObj.scans.length > 10) {
-            userObj.scans = userObj.scans.slice(-10);
-        }
-        
-        localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
     }
 
     // 5. Renderizar Resultado en Pantalla
@@ -576,9 +588,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
         }
 
         // Aplicar traducciones a los textos nuevos
-        if (typeof applyTranslations === 'function') {
-            const userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-            applyTranslations(userObj.language || 'Español');
+        if (typeof window.applyTranslations === 'function') {
+            window.applyTranslations(currentUserLang || 'Español');
         }
 
         // Mostrar pantalla de resultado

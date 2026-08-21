@@ -1,5 +1,5 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import { auth, db } from "./firebase-config.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,12 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const userAvatarEl = document.getElementById('user-avatar');
     const logoutBtn = document.getElementById('logout-btn');
 
+    let currentUid = null;
+
     // Escuchar cambios en la autenticación
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // Usuario logueado
+            currentUid = user.uid;
             let displayName = user.displayName || 'Usuario';
             let email = user.email || 'Sin email';
+            let userLang = 'Español';
             
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -21,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const data = userDoc.data();
                     if (data.username) {
                         displayName = '@' + data.username;
+                    }
+                    if (data.language) {
+                        userLang = data.language;
                     }
                 }
             } catch(e) {
@@ -30,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
             userNameEl.innerText = displayName;
             userEmailEl.innerText = email;
 
-            // Obtener inicial para el avatar
             let initial = 'U';
             if (displayName && displayName !== 'Usuario' && displayName !== '@Usuario') {
                 initial = displayName.startsWith('@') ? displayName.charAt(1).toUpperCase() : displayName.charAt(0).toUpperCase();
@@ -38,9 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 initial = email.charAt(0).toUpperCase();
             }
             userAvatarEl.innerText = initial;
+
+            // Actualizar selector de idioma
+            updateLanguageSelector(userLang);
+            if (typeof window.applyTranslations === 'function') {
+                window.applyTranslations(userLang);
+            }
             
         } else {
-            // No hay usuario, opcionalmente redirigir a auth
             userNameEl.innerText = 'Invitado';
             userEmailEl.innerText = 'Inicia sesión para guardar datos';
             userAvatarEl.innerText = '?';
@@ -52,9 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                // Borrar datos locales si los hubiera
-                localStorage.removeItem('GLUTN_UserInfo');
-                // Redirigir a login
                 window.location.href = 'auth.html';
             } catch (error) {
                 console.error("Error cerrando sesión: ", error);
@@ -69,18 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentLangText = document.getElementById('current-lang-text');
     const langOptions = document.querySelectorAll('.lang-option');
 
-    // Cargar idioma actual
-    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-    if (userObj.language && currentLangText) {
-        currentLangText.innerText = userObj.language;
-        // Ocultar opción actual
-        langOptions.forEach(opt => {
-            if (opt.getAttribute('data-lang') === userObj.language) {
-                opt.style.display = 'none';
-            } else {
-                opt.style.display = 'block';
-            }
-        });
+    function updateLanguageSelector(lang) {
+        if (currentLangText) {
+            currentLangText.innerText = lang;
+            langOptions.forEach(opt => {
+                if (opt.getAttribute('data-lang') === lang) {
+                    opt.style.display = 'none';
+                } else {
+                    opt.style.display = 'block';
+                }
+            });
+        }
     }
 
     if (langItem && langDropdown) {
@@ -90,31 +96,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         langOptions.forEach(option => {
-            option.addEventListener('click', function(e) {
+            option.addEventListener('click', async function(e) {
+                e.stopPropagation();
                 const lang = this.getAttribute('data-lang');
                 
-                // Actualizar UI
-                currentLangText.innerText = lang;
+                updateLanguageSelector(lang);
                 langDropdown.classList.remove('show');
-                
-                langOptions.forEach(opt => {
-                    if (opt.getAttribute('data-lang') === lang) {
-                        opt.style.display = 'none';
-                    } else {
-                        opt.style.display = 'block';
-                    }
-                });
-
-                // Guardar
-                userObj.language = lang;
-                localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
 
                 // Aplicar traducción si está disponible
-                if (typeof applyTranslations === 'function') {
-                    applyTranslations(lang);
+                if (typeof window.applyTranslations === 'function') {
+                    window.applyTranslations(lang);
                 }
-                
-                e.stopPropagation();
+
+                // Guardar en Firestore
+                if (currentUid) {
+                    try {
+                        const docRef = doc(db, "users", currentUid);
+                        await updateDoc(docRef, { language: lang });
+                    } catch (error) {
+                        console.error("Error guardando idioma:", error);
+                    }
+                }
             });
         });
 

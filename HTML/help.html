@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GLUTN - Help & Contact</title>
+
+    <link rel="shortcut icon" href="Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../CSS/edit-profile.css">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <link rel="stylesheet" href="../CSS/help.css">
+</head>
+<body>
+
+    <header class="edit-header">
+        <a href="settings.html" class="back-btn"><i class="ph ph-caret-left"></i></a>
+        <h1 class="header-title" data-i18n="help.title">Ayuda y Contacto</h1>
+    </header>
+
+    <main class="edit-content">
+        <p class="help-desc" data-i18n="help.desc">¿Tienes algún problema con la aplicación, alguna sugerencia o has encontrado un error? Escríbenos y te responderemos lo antes posible.</p>
+
+        <form class="edit-form" id="contact-form">
+            <!-- Email del usuario -->
+            <div class="form-group">
+                <label for="contact-email" data-i18n="help.email">Tu Email</label>
+                <input type="email" id="contact-email" disabled>
+            </div>
+
+                        <!-- Asunto -->
+            <div class="form-group custom-select-wrapper" id="subject-wrapper">
+                <label for="contact-subject" data-i18n="help.subject">Asunto</label>
+                
+                <!-- Select nativo oculto para lgica -->
+                <select id="contact-subject" required style="display: none;">
+                    <option value="" disabled selected>Selecciona un motivo</option>
+                    <option value="Problema técnico">Problema técnico / Error</option>
+                    <option value="Sugerencia">Sugerencia de mejora</option>
+                    <option value="Duda sobre ingredientes">Duda sobre un escaneo</option>
+                    <option value="Otro">Otro</option>
+                </select>
+
+                <!-- Select Custom UI -->
+                <div class="custom-select" id="custom-select">
+                    <span class="custom-select-text" id="custom-select-text" data-i18n="help.subject_placeholder" style="color: #9CA3AF;">Selecciona un motivo</span>
+                    <i class="ph ph-caret-down"></i>
+                </div>
+                <div class="custom-select-options" id="custom-select-options">
+                    <div class="custom-option" data-value="Problema técnico" data-i18n="help.subject_tech">Problema técnico / Error</div>
+                    <div class="custom-option" data-value="Sugerencia" data-i18n="help.subject_suggestion">Sugerencia de mejora</div>
+                    <div class="custom-option" data-value="Duda sobre ingredientes" data-i18n="help.subject_doubt">Duda sobre un escaneo</div>
+                    <div class="custom-option" data-value="Otro" data-i18n="help.subject_other">Otro</div>
+                </div>
+            </div>
+
+            <!-- Mensaje -->
+            <div class="form-group">
+                <label for="contact-msg" data-i18n="help.message">Mensaje</label>
+                <textarea id="contact-msg" placeholder="Explícanos en detalle..." required data-i18n="help.message_placeholder"></textarea>
+            </div>
+
+            <div class="save-btn-container">
+                <button type="submit" class="btn-save" id="submit-btn" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="ph ph-paper-plane-tilt"></i> 
+                    <span data-i18n="help.send">Enviar Mensaje</span>
+                </button>
+            </div>
+
+            <div id="status-msg" class="status-msg"></div>
+        </form>
+    </main>
+
+    <!-- Scripts -->
+    <script type="module" src="../JS/firebase-config.js"></script>
+    <script type="module" src="../JS/help.js"></script>
+    <script src="../JS/i18n.js"></script>
+
+</body>
+</html>
+
+
+
+
+

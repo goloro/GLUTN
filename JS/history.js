@@ -1,9 +1,33 @@
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('history-list-container');
     const clearBtn = document.getElementById('clear-history-btn');
     const clearContainer = document.getElementById('clear-history-container');
     
-    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
+    let userObj = {};
+    let currentUid = null;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUid = user.uid;
+            await loadUserData();
+        } else {
+            renderHistory(); // Renderizará el estado vacío
+        }
+    });
+
+    async function loadUserData() {
+        if (!currentUid) return;
+        const docRef = doc(db, "users", currentUid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            userObj = docSnap.data();
+            renderHistory();
+        }
+    }
     
     function renderHistory() {
         if (!userObj.scans || userObj.scans.length === 0) {
@@ -14,8 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             if (clearContainer) clearContainer.style.display = 'none';
-            if (typeof applyTranslations === 'function') {
-                applyTranslations(userObj.language || 'Español');
+            if (typeof window.applyTranslations === 'function') {
+                window.applyTranslations(userObj.language || 'Español');
             }
             return;
         }
@@ -30,12 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const iconPh = isSafe ? "ph-fill ph-check-circle" : "ph-fill ph-x-circle";
             const statusClass = isSafe ? "" : "unsafe-text";
             
-            // Creamos el div
             const itemDiv = document.createElement('div');
             itemDiv.className = 'scan-item history-item';
-            itemDiv.style.cursor = 'pointer'; // Indicador visual de que es clicable
+            itemDiv.style.cursor = 'pointer'; 
             
-            // Último elemento sin borde
             if (index === userObj.scans.length - 1) {
                 itemDiv.classList.add('no-border');
             }
@@ -51,14 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="time">${scan.date || 'Hace un momento'}</div>
             `;
 
-            // Evento click para abrir el detalle
             itemDiv.addEventListener('click', () => openDetail(scan));
-            
             container.appendChild(itemDiv);
         });
 
-        if (typeof applyTranslations === 'function') {
-            applyTranslations(userObj.language || 'Español');
+        if (typeof window.applyTranslations === 'function') {
+            window.applyTranslations(userObj.language || 'Español');
         }
     }
 
@@ -78,10 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
             badge.style.color = '#FFFFFF';
         }
 
-        // Explicación
         document.getElementById('detail-reason-text').innerText = scan.reason || (isSafe ? "Todos los ingredientes son libres de gluten." : "Contiene ingredientes prohibidos.");
 
-        // Lista de Ingredientes
         const ul = document.getElementById('detail-ingredients-list');
         ul.innerHTML = '';
         if (scan.ingredients && scan.ingredients.length > 0) {
@@ -97,9 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ul.innerHTML = '<li>Sin información detallada de ingredientes</li>';
         }
 
-        // Aplicar traducciones a los badges que acabamos de inyectar
-        if (typeof applyTranslations === 'function') {
-            applyTranslations(userObj.language || 'Español');
+        if (typeof window.applyTranslations === 'function') {
+            window.applyTranslations(userObj.language || 'Español');
         }
 
         document.getElementById('history-detail-screen').classList.add('active');
@@ -110,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
     const confirmYesBtn = document.getElementById('confirm-yes-btn');
 
-    // Botón principal de borrar historial
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
             if(confirmModal) confirmModal.classList.add('active');
@@ -124,14 +140,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if(confirmYesBtn) {
-        confirmYesBtn.addEventListener('click', () => {
-            userObj.scans = [];
-            localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
-            renderHistory();
+        confirmYesBtn.addEventListener('click', async () => {
+            if (currentUid) {
+                try {
+                    const docRef = doc(db, "users", currentUid);
+                    await updateDoc(docRef, { scans: [] });
+                    userObj.scans = [];
+                    renderHistory();
+                } catch (error) {
+                    console.error("Error limpiando historial:", error);
+                }
+            }
             confirmModal.classList.remove('active');
         });
     }
-
-    // Inicializar
-    renderHistory();
 });

@@ -1,39 +1,84 @@
-// Lógica para el botón de idiomas en la pantalla de inicio
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Referencias a elementos del DOM
-    const currentLangText = document.getElementById('current-lang');
-
-    // Cargar el idioma guardado al iniciar la página
-    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
     
-    // Cargar el último escaneo
-    loadLastScan(userObj);
+    // Variables globales para la página
+    let currentUserDoc = null;
+    let currentUid = null;
 
-    // Toggle del menú al hacer click en el botón (ELIMINADO)
+    // Escuchar estado de autenticación
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUid = user.uid;
+            
+            // Traer documento de usuario desde Firestore
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
 
-    // Función para renderizar el último escaneo
-    function loadLastScan(user) {
+            if (docSnap.exists()) {
+                currentUserDoc = docSnap.data();
+
+                // 1. Aplicar idioma guardado si existe
+                if (currentUserDoc.language && typeof window.applyTranslations === 'function') {
+                    window.applyTranslations(currentUserDoc.language);
+                }
+
+                // 2. Mostrar modal de disclaimer si no lo ha visto
+                checkDisclaimer(currentUserDoc);
+
+                // 3. Cargar el último escaneo
+                loadLastScan(currentUserDoc);
+            } else {
+                loadLastScan({});
+            }
+        } else {
+            // No logueado
+            loadLastScan({});
+        }
+    });
+
+    function checkDisclaimer(userDoc) {
+        const disclaimerModal = document.getElementById('disclaimer-modal');
+        const disclaimerAcceptBtn = document.getElementById('disclaimer-accept-btn');
+        
+        if (disclaimerModal && disclaimerAcceptBtn) {
+            if (!userDoc.hasSeenDisclaimer) {
+                setTimeout(() => {
+                    disclaimerModal.classList.add('active');
+                }, 300);
+            }
+
+            disclaimerAcceptBtn.addEventListener('click', async () => {
+                disclaimerModal.classList.remove('active');
+                
+                // Actualizar Firestore
+                if (currentUid) {
+                    const docRef = doc(db, "users", currentUid);
+                    await updateDoc(docRef, { hasSeenDisclaimer: true });
+                }
+            });
+        }
+    }
+
+    function loadLastScan(userDoc) {
         const container = document.getElementById('last-scan-container');
         if (!container) return;
 
-        // Si no hay historial o está vacío
-        if (!user.scans || user.scans.length === 0) {
+        if (!userDoc.scans || userDoc.scans.length === 0) {
             container.innerHTML = `
                 <div data-i18n="home.no_scans" style="text-align: left; color: #6B7280; font-size: 14px; padding: 12px 0;">
                     Aún no has escaneado ningún producto. ¡Anímate a probarlo!
                 </div>
             `;
-            if (typeof applyTranslations === 'function') {
-                applyTranslations(user.language || 'Español');
+            if (typeof window.applyTranslations === 'function') {
+                window.applyTranslations(userDoc.language || 'Español');
             }
             return;
         }
 
-        // Coger el último escaneo (asumiendo que el último añadido es el último del array)
-        const lastScan = user.scans[user.scans.length - 1];
-        
-        // Determinar estilo en base a si es seguro o no
+        const lastScan = userDoc.scans[userDoc.scans.length - 1];
         const isSafe = !lastScan.gluten;
         const iconClass = isSafe ? "icon-safe" : "icon-unsafe";
         const iconPh = isSafe ? "ph-fill ph-check-circle" : "ph-fill ph-x-circle";
@@ -50,10 +95,10 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-        document.getElementById('last-scan-item').addEventListener('click', () => openDetail(lastScan));
+        document.getElementById('last-scan-item').addEventListener('click', () => openDetail(lastScan, userDoc));
     }
 
-    function openDetail(scan) {
+    function openDetail(scan, userDoc) {
         document.getElementById('detail-title').innerText = scan.productName || 'Producto';
         document.getElementById('detail-time').innerText = scan.date || 'Reciente';
         
@@ -69,10 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
             badge.style.color = '#FFFFFF';
         }
 
-        // Explicación
         document.getElementById('detail-reason-text').innerText = scan.reason || (isSafe ? "Todos los ingredientes son libres de gluten." : "Contiene ingredientes prohibidos.");
 
-        // Lista de Ingredientes
         const ul = document.getElementById('detail-ingredients-list');
         ul.innerHTML = '';
         if (scan.ingredients && scan.ingredients.length > 0) {
@@ -88,53 +131,26 @@ document.addEventListener('DOMContentLoaded', function() {
             ul.innerHTML = '<li>Sin información detallada de ingredientes</li>';
         }
 
-        if (typeof applyTranslations === 'function') {
-            applyTranslations(userObj.language || 'Español');
+        if (typeof window.applyTranslations === 'function') {
+            window.applyTranslations(userDoc.language || 'Español');
         }
 
         document.getElementById('history-detail-screen').classList.add('active');
     }
 
-    if (userObj.language && typeof applyTranslations === 'function') {
-        applyTranslations(userObj.language);
-    }
-
-    // === 3. MANEJO DE TARJETAS DE ESCANEO ===
+    // === MANEJO DE TARJETAS DE ESCANEO ===
     const scanEanCard = document.getElementById('scan-ean-card');
     const scanIaCard = document.getElementById('scan-ia-card');
 
     if (scanEanCard) {
         scanEanCard.addEventListener('click', () => {
-            localStorage.setItem('scan_mode', 'EAN');
-            window.location.href = 'HTML/scanner.html';
+            window.location.href = 'HTML/scanner.html?mode=EAN';
         });
     }
 
     if (scanIaCard) {
         scanIaCard.addEventListener('click', () => {
-            localStorage.setItem('scan_mode', 'IA');
-            window.location.href = 'HTML/scanner.html';
-        });
-    }
-
-
-
-    // === 4. DISCLAIMER MODAL ===
-    const disclaimerModal = document.getElementById('disclaimer-modal');
-    const disclaimerAcceptBtn = document.getElementById('disclaimer-accept-btn');
-    
-    if (disclaimerModal && disclaimerAcceptBtn) {
-        // Mostrar modal si es la primera vez
-        if (!userObj.hasSeenDisclaimer) {
-            setTimeout(() => {
-                disclaimerModal.classList.add('active');
-            }, 300);
-        }
-
-        disclaimerAcceptBtn.addEventListener('click', () => {
-            disclaimerModal.classList.remove('active');
-            userObj.hasSeenDisclaimer = true;
-            localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
+            window.location.href = 'HTML/scanner.html?mode=IA';
         });
     }
 });

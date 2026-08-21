@@ -23,7 +23,8 @@ export const db = getFirestore(app);
 window.firebaseAuth = auth;
 window.firebaseDb = db;
 
-// Global Route Protection
+// Global Route Protection (DESHABILITADO TEMPORALMENTE A PETICIÓN DEL USUARIO)
+/*
 onAuthStateChanged(auth, (user) => {
     const currentPath = window.location.pathname;
     
@@ -44,3 +45,4 @@ onAuthStateChanged(auth, (user) => {
         window.location.href = '../index.html';
     }
 });
+*/

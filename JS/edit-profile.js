@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import { updateProfile, updatePassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,9 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusMsg = document.getElementById('status-msg');
 
     let currentUserId = null;
-
-    // Load initial data from local storage to display quickly
-    const userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
     
     // Auth State Observer
     onAuthStateChanged(auth, async (user) => {
@@ -44,10 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error("Error loading user data:", error);
+                alert("Error cargando perfil: " + error.message + "\n(Probablemente las reglas de Firestore no estén publicadas correctamente)");
+                
+                // Fallback to Auth data on error so they at least see something
+                nameInput.value = user.displayName || '';
+                if (user.displayName) avatar.innerText = user.displayName.charAt(0).toUpperCase();
             }
         } else {
-            // Not logged in, redirect to auth
-            window.location.href = 'auth.html';
+            // Not logged in, redirect to auth (DESHABILITADO TEMPORALMENTE)
+            // window.location.href = 'auth.html';
         }
     });
 
@@ -84,19 +86,15 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMsg.innerText = '';
 
         try {
-            // Update Firestore with username only
-            await updateDoc(doc(db, "users", currentUserId), {
+            // Update Firestore with username only, using setDoc to create if it doesn't exist
+            await setDoc(doc(db, "users", currentUserId), {
                 username: newUsername
-            });
+            }, { merge: true });
 
             // If user wants to change password
             if (newPassword && auth.currentUser) {
                 await updatePassword(auth.currentUser, newPassword);
             }
-
-            // Update LocalStorage
-            userObj.username = newUsername;
-            localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
 
             // Update Avatar visually
             if (newUsername) {

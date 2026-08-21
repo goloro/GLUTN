@@ -34,8 +34,8 @@
         
             <!-- Tabs -->
             <div class="auth-tabs">
-                <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</div>
-                <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
+                <div class="auth-tab active" id="tab-login" onclick="switchTab('login')" data-i18n="auth.login_tab">Log In</div>
+                <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')" data-i18n="auth.signup_tab">Sign Up</div>
             </div>
 
             <form id="auth-form" onsubmit="handleAuth(event)">
@@ -43,29 +43,40 @@
                 <!-- Username (Solo Sign Up) -->
                 <div class="form-group signup-only">
                     <div class="form-header">
-                        <label for="username">Nombre de usuario</label>
+                        <label for="username" data-i18n="auth.username">Nombre de usuario</label>
                     </div>
                     <div class="input-wrapper">
                         <i class="ph ph-at input-icon"></i>
-                        <input type="text" id="username" placeholder="Tu nombre de usuario">
+                        <input type="text" id="username" placeholder="Tu nombre de usuario" data-i18n="auth.username_placeholder">
                     </div>
                 </div>
 
                 <!-- Nombre (Solo Sign Up) -->
                 <div class="form-group signup-only">
                     <div class="form-header">
-                        <label for="name">Nombre</label>
+                        <label for="name" data-i18n="auth.first_name">Nombre</label>
                     </div>
                     <div class="input-wrapper">
                         <i class="ph ph-user input-icon"></i>
-                        <input type="text" id="name" placeholder="Tu nombre">
+                        <input type="text" id="name" placeholder="Tu nombre" data-i18n="auth.first_name_placeholder">
+                    </div>
+                </div>
+
+                <!-- Apellidos (Solo Sign Up) -->
+                <div class="form-group signup-only">
+                    <div class="form-header">
+                        <label for="last-name" data-i18n="auth.last_name">Apellidos</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-user input-icon"></i>
+                        <input type="text" id="last-name" placeholder="Tus apellidos" data-i18n="auth.last_name_placeholder">
                     </div>
                 </div>
 
                 <!-- Email / Username (Ambos) -->
                 <div class="form-group">
                     <div class="form-header">
-                        <label for="email" id="email-label">Email o Nombre de usuario</label>
+                        <label for="email" id="email-label" data-i18n="auth.email_or_username">Email o Nombre de usuario</label>
                     </div>
                     <div class="input-wrapper">
                         <i class="ph ph-envelope-simple input-icon"></i>
@@ -77,7 +88,7 @@
                 <div class="form-group">
                     <div class="form-header">
                         <label for="password">Contraseña</label>
-                        <a href="#" class="forgot-password login-only">Contraseña olvidada?</a>
+                        <a href="#" class="forgot-password login-only">¿Contraseña olvidada?</a>
                     </div>
                     <div class="input-wrapper">
                         <i class="ph ph-lock input-icon"></i>
@@ -99,7 +110,7 @@
                 </div>
 
                 <!-- Botón Principal -->
-                <button type="submit" class="auth-btn" id="submit-btn">Log In</button>
+                <button type="submit" class="auth-btn" id="submit-btn" data-i18n="auth.login_tab">Log In</button>
 
                 <!-- Error Message -->
                 <div id="error-msg" class="error-msg"></div>
@@ -107,7 +118,7 @@
             </form>
 
             <div class="divider">
-                <span>O CONTINUA CON</span>
+                <span data-i18n="auth.or_continue_with">O CONTINUA CON</span>
             </div>
 
             <button class="social-btn" type="button" onclick="handleGoogleLogin()">
@@ -120,7 +131,7 @@
 
         <!-- Footer -->
         <div class="auth-footer">
-            Al continuar, aceptas nuestros <a href="terminos.html" data-i18n="auth.terms">Términos y Condiciones</a> y <a href="#" data-i18n="auth.privacy">Política de Privacidad</a>.
+            <span data-i18n="auth.footer_text">Al continuar, aceptas nuestros</span> <a href="terminos.html" data-i18n="auth.terms">Términos y Condiciones</a> <span data-i18n="auth.and">y</span> <a href="#" data-i18n="auth.privacy">Política de Privacidad</a>.
         </div>
 
     </div> <!-- Fin content-wrapper -->
@@ -133,3 +144,6 @@
 
 </body>
 </html>
+
+
+

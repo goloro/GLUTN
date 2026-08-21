@@ -177,6 +177,13 @@ const Translations = {
         [Languages.DE]: "Verlauf",
         [Languages.IT]: "Cronologia"
     },
+    "nav.settings": {
+        [Languages.ES]: "Ajustes",
+        [Languages.EN]: "Settings",
+        [Languages.FR]: "Paramètres",
+        [Languages.DE]: "Einstellungen",
+        [Languages.IT]: "Impostazioni"
+    },
 
     // ---- Status & Time (Historial) ----
     "status.safe": {
@@ -200,19 +207,54 @@ const Translations = {
         [Languages.DE]: "Enthält Gerste",
         [Languages.IT]: "Contiene orzo"
     },
-    "time.10min": {
-        [Languages.ES]: "Hace 10 min",
-        [Languages.EN]: "10 min ago",
-        [Languages.FR]: "Il y a 10 min",
-        [Languages.DE]: "Vor 10 Min.",
-        [Languages.IT]: "10 min fa"
+    "status.unsafe_wheat": {
+        [Languages.ES]: "Contiene trigo",
+        [Languages.EN]: "Contains wheat",
+        [Languages.FR]: "Contient du blé",
+        [Languages.DE]: "Enthält Weizen",
+        [Languages.IT]: "Contiene grano"
     },
-    "time.2hours": {
-        [Languages.ES]: "Hace 2 horas",
-        [Languages.EN]: "2 hours ago",
-        [Languages.FR]: "Il y a 2 heures",
-        [Languages.DE]: "Vor 2 Stunden",
-        [Languages.IT]: "2 ore fa"
+    "status.unsafe_oats": {
+        [Languages.ES]: "Contiene avena",
+        [Languages.EN]: "Contains oats",
+        [Languages.FR]: "Contient de l'avoine",
+        [Languages.DE]: "Enthält Hafer",
+        [Languages.IT]: "Contiene avena"
+    },
+    "status.unsafe_rye": {
+        [Languages.ES]: "Contiene centeno",
+        [Languages.EN]: "Contains rye",
+        [Languages.FR]: "Contient du seigle",
+        [Languages.DE]: "Enthält Roggen",
+        [Languages.IT]: "Contiene segale"
+    },
+    "status.unsafe_traces": {
+        [Languages.ES]: "Trazas de gluten",
+        [Languages.EN]: "Traces of gluten",
+        [Languages.FR]: "Traces de gluten",
+        [Languages.DE]: "Spuren von Gluten",
+        [Languages.IT]: "Tracce di glutine"
+    },
+    "time.just_now": {
+        [Languages.ES]: "Ahora mismo",
+        [Languages.EN]: "Just now",
+        [Languages.FR]: "À l'instant",
+        [Languages.DE]: "Gerade eben",
+        [Languages.IT]: "Proprio ora"
+    },
+    "time.mins_ago": {
+        [Languages.ES]: "hace {m} min",
+        [Languages.EN]: "{m} mins ago",
+        [Languages.FR]: "il y a {m} min",
+        [Languages.DE]: "vor {m} Min",
+        [Languages.IT]: "{m} min fa"
+    },
+    "time.hours_ago": {
+        [Languages.ES]: "hace {h} horas",
+        [Languages.EN]: "{h} hours ago",
+        [Languages.FR]: "il y a {h} heures",
+        [Languages.DE]: "vor {h} Stunden",
+        [Languages.IT]: "{h} ore fa"
     },
     "time.yesterday": {
         [Languages.ES]: "Ayer",
@@ -221,64 +263,8 @@ const Translations = {
         [Languages.DE]: "Gestern",
         [Languages.IT]: "Ieri"
     },
-    "time.just_now": {
-        [Languages.ES]: "Hace un momento",
-        [Languages.EN]: "Just now",
-        [Languages.FR]: "À l'instant",
-        [Languages.DE]: "Gerade eben",
-        [Languages.IT]: "Poco fa"
-    },
-    
-    // ---- Nuevos Textos (EAN, IA, Modal, Resultados) ----
-    "home.scan_ean": {
-        [Languages.ES]: "Scanner",
-        [Languages.EN]: "Scanner",
-        [Languages.FR]: "Scanner",
-        [Languages.DE]: "Scanner",
-        [Languages.IT]: "Scanner"
-    },
-    "home.scan_ean_desc": {
-        [Languages.ES]: "Apuntar al código de barras",
-        [Languages.EN]: "Point at the barcode",
-        [Languages.FR]: "Pointez le code-barres",
-        [Languages.DE]: "Auf den Barcode richten",
-        [Languages.IT]: "Punta al codice a barre"
-    },
-    "home.scan_ia": {
-        [Languages.ES]: "Análisis Etiqueta",
-        [Languages.EN]: "Label Analysis",
-        [Languages.FR]: "Analyse Étiquette",
-        [Languages.DE]: "Etikettenanalyse",
-        [Languages.IT]: "Analisi Etichetta"
-    },
-    "home.scan_ia_desc": {
-        [Languages.ES]: "Foto a los ingredientes",
-        [Languages.EN]: "Photo of ingredients",
-        [Languages.FR]: "Photo des ingrédients",
-        [Languages.DE]: "Foto der Zutaten",
-        [Languages.IT]: "Foto degli ingredienti"
-    },
-    "scanner.focus_ean": {
-        [Languages.ES]: "APUNTA AL CÓDIGO DE BARRAS",
-        [Languages.EN]: "POINT AT THE BARCODE",
-        [Languages.FR]: "POINTEZ LE CODE-BARRES",
-        [Languages.DE]: "AUF DEN BARCODE RICHTEN",
-        [Languages.IT]: "PUNTA AL CODICE A BARRE"
-    },
-    "scanner.switch_ean": {
-        [Languages.ES]: "O: Escanear Código (EAN)",
-        [Languages.EN]: "OR: Scan Barcode (EAN)",
-        [Languages.FR]: "OU: Scanner le Code (EAN)",
-        [Languages.DE]: "ODER: Barcode scannen (EAN)",
-        [Languages.IT]: "O: Scansiona Codice (EAN)"
-    },
-    "scanner.switch_ia": {
-        [Languages.ES]: "O: Escanear Ingredientes (IA)",
-        [Languages.EN]: "OR: Scan Ingredients (AI)",
-        [Languages.FR]: "OU: Scanner Ingrédients (IA)",
-        [Languages.DE]: "ODER: Zutaten scannen (KI)",
-        [Languages.IT]: "O: Scansiona Ingredienti (IA)"
-    },
+
+    // ---- Extras (Scanner UI) ----
     "scanner.warning": {
         [Languages.ES]: "Información Dudosa",
         [Languages.EN]: "Doubtful Information",
@@ -289,14 +275,14 @@ const Translations = {
     "scanner.warning_desc": {
         [Languages.ES]: "No podemos garantizar que este producto sea seguro con los datos actuales. Te recomendamos hacerle una foto a los ingredientes.",
         [Languages.EN]: "We cannot guarantee this product is safe with current data. We recommend taking a photo of the ingredients.",
-        [Languages.FR]: "Nous ne pouvons garantir que ce produit est sûr avec les données actuelles. Nous recommandons de prendre une photo des ingrédients.",
-        [Languages.DE]: "Wir können die Sicherheit dieses Produkts mit aktuellen Daten nicht garantieren. Wir empfehlen, ein Foto der Zutaten zu machen.",
-        [Languages.IT]: "Non possiamo garantire che questo prodotto sia sicuro con i dati attuali. Ti consigliamo di fare una foto agli ingredienti."
+        [Languages.FR]: "Nous ne pouvons garantir la sécurité de ce produit avec les données actuelles. Nous recommandons de prendre une photo des ingrédients.",
+        [Languages.DE]: "Wir können mit den aktuellen Daten nicht garantieren, dass dieses Produkt sicher ist. Wir empfehlen, ein Foto der Zutaten zu machen.",
+        [Languages.IT]: "Non possiamo garantire che questo prodotto sia sicuro con i dati attuali. Si consiglia di scattare una foto degli ingredienti."
     },
     "scanner.analyze_ai": {
         [Languages.ES]: "Analizar Etiqueta con IA",
         [Languages.EN]: "Analyze Label with AI",
-        [Languages.FR]: "Analyser l'étiquette avec IA",
+        [Languages.FR]: "Analyser l'étiquette avec l'IA",
         [Languages.DE]: "Etikett mit KI analysieren",
         [Languages.IT]: "Analizza Etichetta con IA"
     },
@@ -446,6 +432,329 @@ const Translations = {
         [Languages.FR]: "Produit Inconnu",
         [Languages.DE]: "Unbekanntes Produkt",
         [Languages.IT]: "Prodotto Sconosciuto"
+    },
+
+    // ---- auth.html ----
+    "auth.login_tab": {
+        [Languages.ES]: "Log In",
+        [Languages.EN]: "Log In",
+        [Languages.FR]: "Connexion",
+        [Languages.DE]: "Anmelden",
+        [Languages.IT]: "Accedi"
+    },
+    "auth.signup_tab": {
+        [Languages.ES]: "Sign Up",
+        [Languages.EN]: "Sign Up",
+        [Languages.FR]: "S'inscrire",
+        [Languages.DE]: "Registrieren",
+        [Languages.IT]: "Registrati"
+    },
+    "auth.username": {
+        [Languages.ES]: "Nombre de usuario",
+        [Languages.EN]: "Username",
+        [Languages.FR]: "Nom d'utilisateur",
+        [Languages.DE]: "Benutzername",
+        [Languages.IT]: "Nome utente"
+    },
+    "auth.username_placeholder": {
+        [Languages.ES]: "Tu nombre de usuario",
+        [Languages.EN]: "Your username",
+        [Languages.FR]: "Votre nom d'utilisateur",
+        [Languages.DE]: "Dein Benutzername",
+        [Languages.IT]: "Il tuo nome utente"
+    },
+    "auth.first_name": {
+        [Languages.ES]: "Nombre",
+        [Languages.EN]: "First Name",
+        [Languages.FR]: "Prénom",
+        [Languages.DE]: "Vorname",
+        [Languages.IT]: "Nome"
+    },
+    "auth.first_name_placeholder": {
+        [Languages.ES]: "Tu nombre",
+        [Languages.EN]: "Your first name",
+        [Languages.FR]: "Votre prénom",
+        [Languages.DE]: "Dein Vorname",
+        [Languages.IT]: "Il tuo nome"
+    },
+    "auth.last_name": {
+        [Languages.ES]: "Apellidos",
+        [Languages.EN]: "Last Name",
+        [Languages.FR]: "Nom de famille",
+        [Languages.DE]: "Nachname",
+        [Languages.IT]: "Cognome"
+    },
+    "auth.last_name_placeholder": {
+        [Languages.ES]: "Tus apellidos",
+        [Languages.EN]: "Your last name",
+        [Languages.FR]: "Votre nom de famille",
+        [Languages.DE]: "Dein Nachname",
+        [Languages.IT]: "Il tuo cognome"
+    },
+    "auth.email_or_username": {
+        [Languages.ES]: "Email o Nombre de usuario",
+        [Languages.EN]: "Email or Username",
+        [Languages.FR]: "Email ou Nom d'utilisateur",
+        [Languages.DE]: "E-Mail oder Benutzername",
+        [Languages.IT]: "Email o Nome utente"
+    },
+    "auth.password": {
+        [Languages.ES]: "Contraseña",
+        [Languages.EN]: "Password",
+        [Languages.FR]: "Mot de passe",
+        [Languages.DE]: "Passwort",
+        [Languages.IT]: "Password"
+    },
+    "auth.forgot_password": {
+        [Languages.ES]: "Contraseña olvidada?",
+        [Languages.EN]: "Forgot password?",
+        [Languages.FR]: "Mot de passe oublié ?",
+        [Languages.DE]: "Passwort vergessen?",
+        [Languages.IT]: "Password dimenticata?"
+    },
+    "auth.confirm_password": {
+        [Languages.ES]: "Repetir Contraseña",
+        [Languages.EN]: "Repeat Password",
+        [Languages.FR]: "Répéter le mot de passe",
+        [Languages.DE]: "Passwort wiederholen",
+        [Languages.IT]: "Ripeti Password"
+    },
+    "auth.or_continue_with": {
+        [Languages.ES]: "O CONTINÚA CON",
+        [Languages.EN]: "OR CONTINUE WITH",
+        [Languages.FR]: "OU CONTINUER AVEC",
+        [Languages.DE]: "ODER WEITER MIT",
+        [Languages.IT]: "O CONTINUA CON"
+    },
+    "auth.terms": {
+        [Languages.ES]: "Términos y Condiciones",
+        [Languages.EN]: "Terms and Conditions",
+        [Languages.FR]: "Conditions d'utilisation",
+        [Languages.DE]: "Allgemeine Geschäftsbedingungen",
+        [Languages.IT]: "Termini e Condizioni"
+    },
+    "auth.privacy": {
+        [Languages.ES]: "Política de Privacidad",
+        [Languages.EN]: "Privacy Policy",
+        [Languages.FR]: "Politique de confidentialité",
+        [Languages.DE]: "Datenschutz-Bestimmungen",
+        [Languages.IT]: "Informativa sulla privacy"
+    },
+    "auth.footer_text": {
+        [Languages.ES]: "Al continuar, aceptas nuestros",
+        [Languages.EN]: "By continuing, you accept our",
+        [Languages.FR]: "En continuant, vous acceptez nos",
+        [Languages.DE]: "Indem Sie fortfahren, akzeptieren Sie unsere",
+        [Languages.IT]: "Continuando, accetti i nostri"
+    },
+    "auth.and": {
+        [Languages.ES]: "y",
+        [Languages.EN]: "and",
+        [Languages.FR]: "et",
+        [Languages.DE]: "und",
+        [Languages.IT]: "e"
+    },
+
+    // ---- settings.html ----
+    "settings.title": {
+        [Languages.ES]: "Ajustes",
+        [Languages.EN]: "Settings",
+        [Languages.FR]: "Paramètres",
+        [Languages.DE]: "Einstellungen",
+        [Languages.IT]: "Impostazioni"
+    },
+    "settings.account": {
+        [Languages.ES]: "CUENTA",
+        [Languages.EN]: "ACCOUNT",
+        [Languages.FR]: "COMPTE",
+        [Languages.DE]: "KONTO",
+        [Languages.IT]: "ACCOUNT"
+    },
+    "settings.language": {
+        [Languages.ES]: "Idioma",
+        [Languages.EN]: "Language",
+        [Languages.FR]: "Langue",
+        [Languages.DE]: "Sprache",
+        [Languages.IT]: "Lingua"
+    },
+    "settings.support": {
+        [Languages.ES]: "SOPORTE",
+        [Languages.EN]: "SUPPORT",
+        [Languages.FR]: "SUPPORT",
+        [Languages.DE]: "SUPPORT",
+        [Languages.IT]: "SUPPORTO"
+    },
+    "settings.help": {
+        [Languages.ES]: "Ayuda y Contacto",
+        [Languages.EN]: "Help and Contact",
+        [Languages.FR]: "Aide et Contact",
+        [Languages.DE]: "Hilfe und Kontakt",
+        [Languages.IT]: "Guida e Contatti"
+    },
+    "settings.privacy": {
+        [Languages.ES]: "Privacidad",
+        [Languages.EN]: "Privacy",
+        [Languages.FR]: "Confidentialité",
+        [Languages.DE]: "Datenschutz",
+        [Languages.IT]: "Privacy"
+    },
+    "settings.logout": {
+        [Languages.ES]: "Cerrar Sesión",
+        [Languages.EN]: "Log Out",
+        [Languages.FR]: "Déconnexion",
+        [Languages.DE]: "Abmelden",
+        [Languages.IT]: "Esci"
+    },
+
+    // ---- edit-profile.html ----
+    "edit_profile.title": {
+        [Languages.ES]: "Editar Perfil",
+        [Languages.EN]: "Edit Profile",
+        [Languages.FR]: "Modifier le profil",
+        [Languages.DE]: "Profil bearbeiten",
+        [Languages.IT]: "Modifica Profilo"
+    },
+    "edit_profile.username": {
+        [Languages.ES]: "Nombre de usuario",
+        [Languages.EN]: "Username",
+        [Languages.FR]: "Nom d'utilisateur",
+        [Languages.DE]: "Benutzername",
+        [Languages.IT]: "Nome utente"
+    },
+    "edit_profile.first_name": {
+        [Languages.ES]: "Nombre",
+        [Languages.EN]: "First Name",
+        [Languages.FR]: "Prénom",
+        [Languages.DE]: "Vorname",
+        [Languages.IT]: "Nome"
+    },
+    "edit_profile.last_name": {
+        [Languages.ES]: "Apellidos",
+        [Languages.EN]: "Last Name",
+        [Languages.FR]: "Nom de famille",
+        [Languages.DE]: "Nachname",
+        [Languages.IT]: "Cognome"
+    },
+    "edit_profile.email": {
+        [Languages.ES]: "Email",
+        [Languages.EN]: "Email",
+        [Languages.FR]: "Email",
+        [Languages.DE]: "E-Mail",
+        [Languages.IT]: "Email"
+    },
+    "edit_profile.new_password": {
+        [Languages.ES]: "Nueva Contraseña",
+        [Languages.EN]: "New Password",
+        [Languages.FR]: "Nouveau mot de passe",
+        [Languages.DE]: "Neues Passwort",
+        [Languages.IT]: "Nuova Password"
+    },
+    "edit_profile.confirm_password": {
+        [Languages.ES]: "Repetir Contraseña",
+        [Languages.EN]: "Repeat Password",
+        [Languages.FR]: "Répéter le mot de passe",
+        [Languages.DE]: "Passwort wiederholen",
+        [Languages.IT]: "Ripeti Password"
+    },
+    "edit_profile.save": {
+        [Languages.ES]: "Guardar Cambios",
+        [Languages.EN]: "Save Changes",
+        [Languages.FR]: "Enregistrer les modifications",
+        [Languages.DE]: "Änderungen speichern",
+        [Languages.IT]: "Salva modifiche"
+    },
+    "terminos.title": {
+        [Languages.ES]: "Términos y Condiciones",
+        [Languages.EN]: "Terms and Conditions",
+        [Languages.FR]: "Conditions d'utilisation",
+        [Languages.DE]: "Allgemeine Geschäftsbedingungen",
+        [Languages.IT]: "Termini e Condizioni"
+    },
+
+    // ---- help.html ----
+    "help.title": {
+        [Languages.ES]: "Ayuda y Contacto",
+        [Languages.EN]: "Help and Contact",
+        [Languages.FR]: "Aide et Contact",
+        [Languages.DE]: "Hilfe und Kontakt",
+        [Languages.IT]: "Guida e Contatti"
+    },
+    "help.desc": {
+        [Languages.ES]: "¿Tienes algún problema con la aplicación, alguna sugerencia o has encontrado un error? Escríbenos y te responderemos lo antes posible.",
+        [Languages.EN]: "Do you have any problem with the app, a suggestion or found a bug? Write to us and we will reply as soon as possible.",
+        [Languages.FR]: "Avez-vous un problème avec l'application, une suggestion ou avez-vous trouvé un bogue ? Écrivez-nous et nous vous répondrons dans les plus brefs délais.",
+        [Languages.DE]: "Haben Sie ein Problem mit der App, einen Vorschlag oder einen Fehler gefunden? Schreiben Sie uns und wir werden so schnell wie möglich antworten.",
+        [Languages.IT]: "Hai qualche problema con l'app, un suggerimento o hai trovato un bug? Scrivici e ti risponderemo il prima possibile."
+    },
+    "help.email": {
+        [Languages.ES]: "Tu Email",
+        [Languages.EN]: "Your Email",
+        [Languages.FR]: "Votre Email",
+        [Languages.DE]: "Ihre E-Mail",
+        [Languages.IT]: "La tua Email"
+    },
+    "help.subject": {
+        [Languages.ES]: "Asunto",
+        [Languages.EN]: "Subject",
+        [Languages.FR]: "Sujet",
+        [Languages.DE]: "Betreff",
+        [Languages.IT]: "Oggetto"
+    },
+    "help.subject_placeholder": {
+        [Languages.ES]: "Selecciona un motivo",
+        [Languages.EN]: "Select a reason",
+        [Languages.FR]: "Sélectionnez un motif",
+        [Languages.DE]: "Wählen Sie einen Grund",
+        [Languages.IT]: "Seleziona un motivo"
+    },
+    "help.subject_tech": {
+        [Languages.ES]: "Problema técnico / Error",
+        [Languages.EN]: "Technical issue / Bug",
+        [Languages.FR]: "Problème technique / Bogue",
+        [Languages.DE]: "Technisches Problem / Fehler",
+        [Languages.IT]: "Problema tecnico / Bug"
+    },
+    "help.subject_suggestion": {
+        [Languages.ES]: "Sugerencia de mejora",
+        [Languages.EN]: "Suggestion for improvement",
+        [Languages.FR]: "Suggestion d'amélioration",
+        [Languages.DE]: "Verbesserungsvorschlag",
+        [Languages.IT]: "Suggerimento per migliorare"
+    },
+    "help.subject_doubt": {
+        [Languages.ES]: "Duda sobre un escaneo",
+        [Languages.EN]: "Doubt about a scan",
+        [Languages.FR]: "Doute sur un scan",
+        [Languages.DE]: "Zweifel an einem Scan",
+        [Languages.IT]: "Dubbio su una scansione"
+    },
+    "help.subject_other": {
+        [Languages.ES]: "Otro",
+        [Languages.EN]: "Other",
+        [Languages.FR]: "Autre",
+        [Languages.DE]: "Andere",
+        [Languages.IT]: "Altro"
+    },
+    "help.message": {
+        [Languages.ES]: "Mensaje",
+        [Languages.EN]: "Message",
+        [Languages.FR]: "Message",
+        [Languages.DE]: "Nachricht",
+        [Languages.IT]: "Messaggio"
+    },
+    "help.message_placeholder": {
+        [Languages.ES]: "Explícanos en detalle...",
+        [Languages.EN]: "Explain in detail...",
+        [Languages.FR]: "Expliquez-nous en détail...",
+        [Languages.DE]: "Erklären Sie im Detail...",
+        [Languages.IT]: "Spiegaci in dettaglio..."
+    },
+    "help.send": {
+        [Languages.ES]: "Enviar Mensaje",
+        [Languages.EN]: "Send Message",
+        [Languages.FR]: "Envoyer le message",
+        [Languages.DE]: "Nachricht senden",
+        [Languages.IT]: "Invia Messaggio"
     }
 };
 
@@ -462,21 +771,28 @@ function applyTranslations(langName) {
             break;
         }
     }
+    window.currentGlobalLang = selectedLang;
 
     // Traducir todos los elementos marcados en el HTML
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (Translations[key] && Translations[key][selectedLang]) {
-            // Si el elemento contiene HTML (por ejemplo <br>), usamos innerHTML
-            if (Translations[key][selectedLang].includes('<br>')) {
-                el.innerHTML = Translations[key][selectedLang];
+            // Si el elemento es un input o textarea y tiene placeholder
+            if ((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') && el.hasAttribute('placeholder')) {
+                el.placeholder = Translations[key][selectedLang];
             } else {
-                el.innerText = Translations[key][selectedLang];
+                // Si el elemento contiene HTML (por ejemplo <br>), usamos innerHTML
+                if (Translations[key][selectedLang].includes('<br>')) {
+                    el.innerHTML = Translations[key][selectedLang];
+                } else {
+                    el.innerText = Translations[key][selectedLang];
+                }
             }
         }
     });
 }
+window.applyTranslations = applyTranslations;
 
 // Inicializar traducciones automáticamente al cargar el archivo
 document.addEventListener('DOMContentLoaded', () => {
@@ -523,22 +839,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(blocker);
     }
 
-    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-    let lang = userObj.language;
-
-    if (!lang) {
-        const browserLang = (navigator.language || navigator.userLanguage || "en").split('-')[0].toLowerCase();
-        const langMap = {
-            'es': Languages.ES,
-            'en': Languages.EN,
-            'fr': Languages.FR,
-            'de': Languages.DE,
-            'it': Languages.IT
-        };
-        lang = langMap[browserLang] || Languages.EN;
-        userObj.language = lang;
-        localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
-    }
+    // Por defecto usar idioma del navegador
+    const browserLang = (navigator.language || navigator.userLanguage || "en").split('-')[0].toLowerCase();
+    const langMap = {
+        'es': Languages.ES,
+        'en': Languages.EN,
+        'fr': Languages.FR,
+        'de': Languages.DE,
+        'it': Languages.IT
+    };
+    let lang = langMap[browserLang] || Languages.EN;
 
     applyTranslations(lang);
 

@@ -1,5 +1,5 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import { collection, query, where, getDocs, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { collection, query, where, getDocs, getDoc, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import { auth, db } from "./firebase-config.js";
 
 // Estado actual de la UI
@@ -15,6 +15,7 @@ const authForm = document.getElementById('auth-form');
 
 // Inputs
 const nameInput = document.getElementById('name');
+const lastNameInput = document.getElementById('last-name');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const confirmPasswordInput = document.getElementById('confirm-password');
@@ -30,26 +31,33 @@ window.switchTab = (mode) => {
         tabLogin.classList.add('active');
         tabSignup.classList.remove('active');
         authCard.classList.remove('mode-signup');
-        submitBtn.innerText = 'Log In';
-        emailLabel.innerText = 'Email o Nombre de usuario';
+        submitBtn.setAttribute('data-i18n', 'auth.login_tab');
+        emailLabel.setAttribute('data-i18n', 'auth.email_or_username');
         emailInput.placeholder = 'glutn@gmail.com o @usuario';
         
         // Quitar required del signup
         nameInput.required = false;
+        if (lastNameInput) lastNameInput.required = false;
         usernameInput.required = false;
         confirmPasswordInput.required = false;
     } else {
-        tabSignup.classList.add('active');
         tabLogin.classList.remove('active');
+        tabSignup.classList.add('active');
         authCard.classList.add('mode-signup');
-        submitBtn.innerText = 'Sign Up';
-        emailLabel.innerText = 'Email';
+        submitBtn.setAttribute('data-i18n', 'auth.signup_tab');
+        emailLabel.setAttribute('data-i18n', 'edit_profile.email'); // Reusar la key de email
         emailInput.placeholder = 'glutn@gmail.com';
 
         // Poner required al signup
         nameInput.required = true;
+        if (lastNameInput) lastNameInput.required = true;
         usernameInput.required = true;
         confirmPasswordInput.required = true;
+    }
+    
+    // Re-aplicar traducciones si están cargadas
+    if (typeof window.applyTranslations === 'function') {
+        window.applyTranslations(window.currentGlobalLang || 'Español');
     }
 };
 
@@ -75,12 +83,15 @@ window.togglePassword = (inputId) => {
 
 window.handleAuth = async (event) => {
     event.preventDefault();
+    console.log("Auth form submitted! Mode:", currentMode);
     errorMsg.innerText = '';
+    window.isAuthenticating = true;
     let email = emailInput.value.trim();
     const password = passwordInput.value;
 
     try {
         if (currentMode === 'login') {
+            console.log("Attempting login with email:", email);
             submitBtn.innerText = 'Iniciando...';
             
             // Check if input is a username (no '@' symbol)
@@ -107,6 +118,7 @@ window.handleAuth = async (event) => {
         } else {
             // Sign Up
             const name = nameInput.value.trim();
+            const lastName = lastNameInput ? lastNameInput.value.trim() : '';
             const username = usernameInput.value.trim().replace('@', ''); // clean username
             const confirmPassword = confirmPasswordInput.value;
 
@@ -152,12 +164,14 @@ window.handleAuth = async (event) => {
                 email: email,
                 username: username,
                 name: name,
+                lastName: lastName,
                 createdAt: serverTimestamp()
             });
 
             window.location.href = '../index.html';
         }
     } catch (error) {
+        window.isAuthenticating = false;
         console.error("Error Auth:", error);
         submitBtn.innerText = currentMode === 'login' ? 'Log In' : 'Sign Up';
         
@@ -171,21 +185,67 @@ window.handleAuth = async (event) => {
                 errorMsg.innerText = 'Este email ya está registrado.';
                 break;
             default:
-                errorMsg.innerText = 'Ocurrió un error. Inténtalo de nuevo.';
+                // Error genérico devuelto tras comprobar Firebase
+                if (error.code === 'permission-denied' || error.message.includes('permission')) {
+                    errorMsg.innerText = 'Error de permisos en Firebase. ¿Publicaste las reglas?';
+                    alert("Error detallado Firebase: " + error.message);
+                } else {
+                    errorMsg.innerText = 'Ocurrió un error. Inténtalo de nuevo.';
+                }
+                console.error("Error exacto:", error);
         }
     }
 };
 
 window.handleGoogleLogin = async () => {
+    console.log("Google login clicked!");
     errorMsg.innerText = '';
+    window.isAuthenticating = true;
     const provider = new GoogleAuthProvider();
     try {
-        await signInWithPopup(auth, provider);
-        // Login exitoso, ir a la home
+        const result = await signInWithPopup(auth, provider);
+        console.log("Google login successful!");
+        
+        // Crear documento en Firestore si no existe
+        const user = result.user;
+        const userDocRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userDocRef);
+        
+        if (!docSnap.exists()) {
+            // Generar un username por defecto basado en email
+            const defaultUsername = user.email ? user.email.split('@')[0] : 'user' + Math.floor(Math.random() * 10000);
+            
+            // Separar nombre y apellidos si existen
+            let firstName = user.displayName || 'Usuario';
+            let lastName = '';
+            if (user.displayName && user.displayName.includes(' ')) {
+                const parts = user.displayName.split(' ');
+                firstName = parts[0];
+                lastName = parts.slice(1).join(' ');
+            }
+
+            await setDoc(userDocRef, {
+                uid: user.uid,
+                email: user.email,
+                username: defaultUsername,
+                name: firstName,
+                lastName: lastName,
+                createdAt: serverTimestamp()
+            });
+        }
+        
         window.location.href = '../index.html';
     } catch (error) {
+        window.isAuthenticating = false;
         console.error("Error Google Auth:", error);
-        errorMsg.innerText = 'Error al iniciar sesión con Google.';
+        errorMsg.innerText = `Error Google: ${error.code || error.message}`;
     }
 };
 
+// Verificar si el usuario ya está autenticado (restaurado)
+onAuthStateChanged(auth, (user) => {
+    // Solo redirigir si NO estamos en medio de un proceso de auth (que maneja su propia redirección)
+    if (user && !window.isAuthenticating) {
+        window.location.href = '../index.html';
+    }
+});
