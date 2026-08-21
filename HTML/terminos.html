@@ -13,10 +13,10 @@
 
     <style>
         .legal-header {
-            display: flex;
+            display: grid;
+            grid-template-columns: 40px 1fr 40px;
             align-items: center;
             padding: 24px;
-            position: relative;
             background-color: transparent;
         }
 
@@ -24,16 +24,16 @@
             font-size: 24px;
             color: var(--text-dark);
             text-decoration: none;
-            z-index: 10;
-            position: absolute;
-            left: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
         }
 
         .header-title {
-            flex-grow: 1;
             text-align: center;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
+            margin: 0;
         }
 
         .legal-content {
@@ -62,14 +62,15 @@
 <body style="padding-bottom: 0;">
     <header class="legal-header">
         <a href="javascript:history.back()" class="back-btn"><i class="ph ph-caret-left"></i></a>
-        <h1 class="header-title">Términos y Condiciones</h1>
+        <h1 class="header-title" data-i18n="terminos.title">Términos y Condiciones</h1>
+        <div></div> <!-- Spacer para grid -->
     </header>
 
     <main class="legal-content">
         <p>Última actualización: Agosto 2026</p>
 
         <h2>1. Uso de la Aplicación</h2>
-        <p>GLUTN proporciona una herramienta para escanear y verificar productos alimenticios basados en la información de OpenFoodFacts. La aplicaciÃ³n está diseñada como una herramienta de apoyo y no sustituye la supervisión humana o médica.</p>
+        <p>GLUTN proporciona una herramienta para escanear y verificar productos alimenticios basados en la información de OpenFoodFacts. La aplicación está diseñada como una herramienta de apoyo y no sustituye la supervisión humana o médica.</p>
 
         <h2>2. Descargo de Responsabilidad</h2>
         <p>La información sobre alérgenos, incluido el gluten, proviene de una base de datos colaborativa. GLUTN no se hace responsable por información inexacta, incompleta o desactualizada. Siempre debes leer la etiqueta física del producto antes de consumirlo.</p>
@@ -81,11 +82,10 @@
         <p>Tu privacidad es importante para nosotros. Por favor, revisa nuestra Política de Privacidad para entender cómo recopilamos y usamos tu información personal y los datos de tus escaneos.</p>
         
         <h2>5. Modificaciones</h2>
-        <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado de la aplicaciÃ³n después de cualquier cambio constituye tu aceptaciÃ³n de los nuevos términos.</p>
+        <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado de la aplicación después de cualquier cambio constituye tu aceptación de los nuevos términos.</p>
     </main>
 
     <!-- Funcionalidad Global (Blocker & Idiomas) -->
     <script src="../JS/i18n.js"></script>
 </body>
 </html>
-
