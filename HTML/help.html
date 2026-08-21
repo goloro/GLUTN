@@ -4,22 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GLUTN - Help & Contact</title>
-
-    <link rel="shortcut icon" href="Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
     
     <!-- CSS -->
     <link rel="stylesheet" href="../CSS/edit-profile.css">
+    <link rel="stylesheet" href="../CSS/help.css">
     
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <link rel="stylesheet" href="../CSS/help.css">
 </head>
 <body>
 
     <header class="edit-header">
         <a href="settings.html" class="back-btn"><i class="ph ph-caret-left"></i></a>
         <h1 class="header-title" data-i18n="help.title">Ayuda y Contacto</h1>
+        <div></div>
     </header>
 
     <main class="edit-content">
@@ -32,11 +30,11 @@
                 <input type="email" id="contact-email" disabled>
             </div>
 
-                        <!-- Asunto -->
+            <!-- Asunto -->
             <div class="form-group custom-select-wrapper" id="subject-wrapper">
                 <label for="contact-subject" data-i18n="help.subject">Asunto</label>
                 
-                <!-- Select nativo oculto para lgica -->
+                <!-- Select nativo oculto para lógica -->
                 <select id="contact-subject" required style="display: none;">
                     <option value="" disabled selected>Selecciona un motivo</option>
                     <option value="Problema técnico">Problema técnico / Error</option>
@@ -76,14 +74,8 @@
     </main>
 
     <!-- Scripts -->
-    <script type="module" src="../JS/firebase-config.js"></script>
     <script type="module" src="../JS/help.js"></script>
     <script src="../JS/i18n.js"></script>
 
 </body>
 </html>
-
-
-
-
-
