@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-            // 1.5. Lógica del Custom Select
+    // 1.5. Lógica del Custom Select
     const customSelect = document.getElementById('custom-select');
     const customSelectText = document.getElementById('custom-select-text');
     const customSelectOptions = document.getElementById('custom-select-options');
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 2. Manejar el envío del formulario usando Web3Forms (Gratis y sin backend)
+    // 2. Manejar el envío del formulario usando FormSubmit (Gratis y sin backend)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -65,8 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMsg.style.display = 'none';
 
         try {
-            // Documentación: https://formsubmit.co/ajax-documentation
-            const response = await fetch('https://api.web3forms.com/submit', {
             const response = await fetch('https://formsubmit.co/ajax/glutnteam@gmail.com', {
                 method: 'POST',
                 headers: {
@@ -94,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customSelectText.style.color = '#9CA3AF';
             } else {
                 console.error(result);
-                statusMsg.innerText = "Hubo un error al enviar. Por favor, asegúrate de haber activado el correo en FormSubmit.";
+                statusMsg.innerText = "Hubo un error al enviar. Por favor, inténtalo de nuevo.";
                 statusMsg.className = 'status-msg status-error';
                 statusMsg.style.display = 'block';
             }
@@ -109,6 +107,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-
-
