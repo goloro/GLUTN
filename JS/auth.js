@@ -114,7 +114,7 @@ window.handleAuth = async (event) => {
             }
 
             await signInWithEmailAndPassword(auth, email, password);
-            window.location.href = '../index.html';
+            window.location.href = 'HTML/home.html';
         } else {
             // Sign Up
             const name = nameInput.value.trim();
@@ -168,7 +168,7 @@ window.handleAuth = async (event) => {
                 createdAt: serverTimestamp()
             });
 
-            window.location.href = '../index.html';
+            window.location.href = 'HTML/home.html';
         }
     } catch (error) {
         window.isAuthenticating = false;
@@ -234,7 +234,7 @@ window.handleGoogleLogin = async () => {
             });
         }
         
-        window.location.href = '../index.html';
+        window.location.href = 'HTML/home.html';
     } catch (error) {
         window.isAuthenticating = false;
         console.error("Error Google Auth:", error);
@@ -246,6 +246,6 @@ window.handleGoogleLogin = async () => {
 onAuthStateChanged(auth, (user) => {
     // Solo redirigir si NO estamos en medio de un proceso de auth (que maneja su propia redirección)
     if (user && !window.isAuthenticating) {
-        window.location.href = '../index.html';
+        window.location.href = 'HTML/home.html';
     }
 });

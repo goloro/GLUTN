@@ -1,151 +1,149 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>GLUTN</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLUTN - Login & Sign Up</title>
 
-        <link rel="shortcut icon" href="Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
+    <link rel="shortcut icon" href="../Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
 
-        <!-- Fuentes y Iconos -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Fuentes e Iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-        <!-- CSS -->
-        <link rel="stylesheet" href="CSS/home.css?v=8">
-        <link rel="stylesheet" href="CSS/Responsive/home_responsive.css?v=8">
-        <link rel="stylesheet" href="CSS/history.css?v=8">
-        <style>
-            /* Bloquear scroll en la home y ajustar al tamaño del móvil */
-            body {
-                height: 100vh;
-                height: 100dvh;
-                overflow: hidden;
-            }
-            /* Hacer que el contenedor de 'último escaneo' ocupe el espacio restante sin scrollear */
-            .last-scan {
-                flex-grow: 1;
-                width: 100%;
-                padding-bottom: 20px;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-            }
-        </style>
-    </head>
-    <body>
-        <header class="home-header">
-            <img id="main-logo" src="Images/Logos/Glutn_Logo_SinFondo.png" alt="Logo de GLUTN">
-        </header>
+    <!-- CSS -->
+    <link rel="stylesheet" href="CSS/auth.css">
+</head>
+<body>
 
-        <div class="scan-options-container">
-            <!-- Opción 1: EAN -->
-            <div class="scan-card" id="scan-ean-card">
-                <div class="scan-icon-wrapper ean-icon">
-                    <i class="ph-bold ph-barcode"></i>
-                </div>
-                <div class="scan-info">
-                    <h2 data-i18n="home.scan_ean">Scanner</h2>
-                    <p data-i18n="home.scan_ean_desc">Apuntar al código de barras</p>
-                </div>
-            </div>
+    <!-- Fondo curvo decorativo (completamente por detrás) -->
+    <div class="auth-bg-shape"></div>
 
-            <!-- Opción 2: IA -->
-            <div class="scan-card" id="scan-ia-card">
-                <div class="scan-icon-wrapper ia-icon">
-                    <i class="ph-bold ph-scan"></i>
-                </div>
-                <div class="scan-info">
-                    <h2 data-i18n="home.scan_ia">Análisis Etiqueta</h2>
-                    <p data-i18n="home.scan_ia_desc">Foto a los ingredientes</p>
-                </div>
-            </div>
+    <!-- Contenedor principal para el layout -->
+    <div class="content-wrapper">
+        
+        <!-- Logo -->
+        <div class="logo-box">
+            <img src="Images/Logos/Glutn_Logo_SinFondo.png" alt="GLUTN Logo">
         </div>
 
+        <!-- Tarjeta de Autenticación -->
+        <div class="auth-card" id="auth-card">
+        
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login" onclick="switchTab('login')" data-i18n="auth.login_tab">Log In</div>
+                <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')" data-i18n="auth.signup_tab">Sign Up</div>
+            </div>
 
-        <div class="last-scan">
-            <h2 data-i18n="home.last_scan">Último escaneo</h2>
-            <!-- Este contenedor se rellenará dinámicamente desde JS -->
-            <div id="last-scan-container"></div>
-        </div>
-
-        <!-- Pantalla de Detalle de Escaneo (Oculta por defecto) -->
-        <div class="history-detail-overlay" id="history-detail-screen">
-            <header class="detail-header">
-                <!-- Cerramos la ventana al hacer click en el logo -->
-                <img src="Images/Logos/Glutn_Logo_SinFondo.png" alt="Logo de GLUTN" onclick="document.getElementById('history-detail-screen').classList.remove('active')">
-            </header>
-
-            <div class="detail-content-wrapper">
-                <h1 class="detail-title" id="detail-title">Producto</h1>
-                <span class="detail-time" id="detail-time">Tiempo</span>
+            <form id="auth-form" onsubmit="handleAuth(event)">
                 
-                <div class="detail-badge" id="detail-badge">
-                    <i class="ph-fill ph-x-circle"></i> No Apto
+                <!-- Username (Solo Sign Up) -->
+                <div class="form-group signup-only">
+                    <div class="form-header">
+                        <label for="username" data-i18n="auth.username">Nombre de usuario</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-at input-icon"></i>
+                        <input type="text" id="username" placeholder="Tu nombre de usuario" data-i18n="auth.username_placeholder">
+                    </div>
                 </div>
 
-                <!-- Explicación -->
-                <div class="detail-reason">
-                    <h3 data-i18n="scanner.why">Por qué:</h3>
-                    <p id="detail-reason-text">Razón</p>
+                <!-- Nombre (Solo Sign Up) -->
+                <div class="form-group signup-only">
+                    <div class="form-header">
+                        <label for="name" data-i18n="auth.first_name">Nombre</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-user input-icon"></i>
+                        <input type="text" id="name" placeholder="Tu nombre" data-i18n="auth.first_name_placeholder">
+                    </div>
                 </div>
 
-                <!-- Lista de ingredientes -->
-                <div class="detail-ingredients">
-                    <h4 data-i18n="scanner.ingredients_list">Lista de ingredientes</h4>
-                    <ul id="detail-ingredients-list">
-                    </ul>
+                <!-- Apellidos (Solo Sign Up) -->
+                <div class="form-group signup-only">
+                    <div class="form-header">
+                        <label for="last-name" data-i18n="auth.last_name">Apellidos</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-user input-icon"></i>
+                        <input type="text" id="last-name" placeholder="Tus apellidos" data-i18n="auth.last_name_placeholder">
+                    </div>
                 </div>
-                
-                <!-- Botón de nuevo escaneo -->
-                <div class="detail-action">
-                    <button class="detail-new-scan-btn" onclick="window.location.href='HTML/scanner.html'">
-                        <i class="ph ph-qr-code"></i> <span data-i18n="scanner.new_scan">Nuevo escaneo</span>
-                    </button>
+
+                <!-- Email / Username (Ambos) -->
+                <div class="form-group">
+                    <div class="form-header">
+                        <label for="email" id="email-label" data-i18n="auth.email_or_username">Email o Nombre de usuario</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-envelope-simple input-icon"></i>
+                        <input type="text" id="email" placeholder="glutn@gmail.com o @usuario" required>
+                    </div>
                 </div>
+
+                <!-- Contraseña (Ambos) -->
+                <div class="form-group">
+                    <div class="form-header">
+                        <label for="password">Contraseña</label>
+                        <a href="#" class="forgot-password login-only">¿Contraseña olvidada?</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock input-icon"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                        <i class="ph ph-eye input-icon-right" onclick="togglePassword('password')"></i>
+                    </div>
+                </div>
+
+                <!-- Repetir Contraseña (Solo Sign Up) -->
+                <div class="form-group signup-only">
+                    <div class="form-header">
+                        <label for="confirm-password">Repetir Contraseña</label>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ph ph-lock input-icon"></i>
+                        <input type="password" id="confirm-password" placeholder="••••••••">
+                        <i class="ph ph-eye input-icon-right" onclick="togglePassword('confirm-password')"></i>
+                    </div>
+                </div>
+
+                <!-- Botón Principal -->
+                <button type="submit" class="auth-btn" id="submit-btn" data-i18n="auth.login_tab">Log In</button>
+
+                <!-- Error Message -->
+                <div id="error-msg" class="error-msg"></div>
+
+            </form>
+
+            <div class="divider">
+                <span data-i18n="auth.or_continue_with">O CONTINUA CON</span>
             </div>
+
+            <button class="social-btn" type="button" onclick="handleGoogleLogin()">
+                <!-- SVG de Google simple -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+                Google
+            </button>
+
+        </div> <!-- Fin auth-card -->
+
+        <!-- Footer -->
+        <div class="auth-footer">
+            <span data-i18n="auth.footer_text">Al continuar, aceptas nuestros</span> <a href="HTML/terminos.html" data-i18n="auth.terms">Términos y Condiciones</a> <span data-i18n="auth.and">y</span> <a href="#" data-i18n="auth.privacy">Política de Privacidad</a>.
         </div>
 
-        <div class="nav-bar">
-            <div class="nav-bar-item active" id="home-button" onclick="window.location.href='index.html'">
-                <i class="ph-fill ph-house"></i>
-                <a href="index.html" data-i18n="nav.home">Inicio</a>
-            </div>
-            <div class="nav-bar-item" id="scan-button" onclick="window.location.href='HTML/scanner.html'">
-                <i class="ph ph-camera"></i>
-                <a href="HTML/scanner.html" data-i18n="nav.scan">Escanear</a>
-            </div>
-            <div class="nav-bar-item" id="history-button" onclick="window.location.href='HTML/history.html'">
-                <i class="ph ph-clock-counter-clockwise"></i>
-                <a href="HTML/history.html" data-i18n="nav.history">Historial</a>
-            </div>
-            <div class="nav-bar-item" id="settings-button" onclick="window.location.href='HTML/settings.html'">
-                <i class="ph ph-gear"></i>
-                <a href="HTML/settings.html" data-i18n="nav.settings">Ajustes</a>
-            </div>
-        </div>
+    </div> <!-- Fin content-wrapper -->
 
-        <!-- Modal Disclaimer -->
-        <div class="disclaimer-overlay" id="disclaimer-modal">
-            <div class="disclaimer-box">
-                <div class="disclaimer-icon">
-                    <i class="ph-bold ph-warning"></i>
-                </div>
-                <h2 class="disclaimer-title" data-i18n="modal.disclaimer_title">Aviso Importante</h2>
-                <p class="disclaimer-text" data-i18n="modal.disclaimer_msg">
-                    Esta aplicación utiliza Inteligencia Artificial y la base de datos abierta OpenFoodFacts.<br><br>
-                    <strong>La información no es infalible</strong> y requiere supervisión humana. No es recomendable fiarse a ciegas. Verifica siempre la etiqueta física si tienes dudas.
-                </p>
-                <button class="disclaimer-btn" id="disclaimer-accept-btn" data-i18n="modal.disclaimer_accept">Entendido</button>
-            </div>
-        </div>
-        <!-- Firebase SDK (Módulo) -->
-        <script type="module" src="JS/firebase-config.js"></script>
+    <!-- Funcionalidad Global -->
+    <script src="JS/i18n.js"></script>
 
-        <!-- Funcionalidad -->
-        <script src="JS/i18n.js?v=8"></script>
-        <script type="module" src="JS/home.js?v=8"></script>
-    </body>
+    <!-- Lógica de Auth -->
+    <script type="module" src="JS/auth.js"></script>
+
+</body>
 </html>
+
+
+

@@ -190,7 +190,4 @@
     margin-bottom: min(10px, 1vh);
 }
 
-#main-logo {
-    height: min(150px, 18vh);
-    width: auto;
-}
+#main-logo { height: 120px; width: auto; margin: 10px auto; display: block; }

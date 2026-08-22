@@ -41,12 +41,7 @@ body {
 }
 
 /* Header Logo */
-#main-logo {
-    height: 150px;
-    margin: 0 0 -16px 0;
-    display: block;
-    object-fit: contain;
-}
+#main-logo { height: 120px; display: block; margin: 10px auto; object-fit: contain; }
 
 /* Contenedor de Opciones */
 .scan-options-container {
