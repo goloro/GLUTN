@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                window.location.href = 'auth.html';
+                window.location.href = '../index.html';
             } catch (error) {
                 console.error("Error cerrando sesión: ", error);
                 alert("Hubo un problema al cerrar sesión.");
