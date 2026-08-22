@@ -1,4 +1,4 @@
-﻿import { auth } from "./firebase-config.js";
+import { auth } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -65,33 +65,36 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMsg.style.display = 'none';
 
         try {
-            // Documentación: https://docs.web3forms.com/how-to-guides/js-frameworks/javascript
+            // Documentación: https://formsubmit.co/ajax-documentation
             const response = await fetch('https://api.web3forms.com/submit', {
+            const response = await fetch('https://formsubmit.co/ajax/glutnteam@gmail.com', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    // SUSTITUYE ESTA CLAVE POR LA TUYA DE WEB3FORMS (https://web3forms.com/)
-                    access_key: "04fb9e0c-af41-4a9a-91d2-309fd61df792", 
                     email: email,
-                    subject: "[GLUTN App] - " + subject,
+                    _subject: "[GLUTN App] - " + subject,
                     message: message
                 })
             });
 
             const result = await response.json();
 
-            if (response.status === 200) {
+            if (response.ok || result.success === "true") {
                 statusMsg.innerText = "¡Mensaje enviado con éxito! Te responderemos pronto.";
                 statusMsg.className = 'status-msg status-success';
                 statusMsg.style.display = 'block';
                 form.reset();
                 if (auth.currentUser) emailInput.value = auth.currentUser.email; // Restaurar email
+                
+                // Resetear texto de select custom
+                customSelectText.innerText = "Selecciona un motivo";
+                customSelectText.style.color = '#9CA3AF';
             } else {
                 console.error(result);
-                statusMsg.innerText = "Hubo un error al enviar. Revisa la consola o asegúrate de haber puesto tu Access Key.";
+                statusMsg.innerText = "Hubo un error al enviar. Por favor, asegúrate de haber activado el correo en FormSubmit.";
                 statusMsg.className = 'status-msg status-error';
                 statusMsg.style.display = 'block';
             }
