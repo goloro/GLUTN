@@ -582,6 +582,34 @@ const Translations = {
         [Languages.DE]: "Link senden",
         [Languages.IT]: "Invia link"
     },
+    "auth.rule_length": {
+        [Languages.ES]: "Mínimo 8 caracteres",
+        [Languages.EN]: "Minimum 8 characters",
+        [Languages.FR]: "Minimum 8 caractères",
+        [Languages.DE]: "Mindestens 8 Zeichen",
+        [Languages.IT]: "Minimo 8 caratteri"
+    },
+    "auth.rule_upper": {
+        [Languages.ES]: "Una letra mayúscula",
+        [Languages.EN]: "One uppercase letter",
+        [Languages.FR]: "Une lettre majuscule",
+        [Languages.DE]: "Ein Großbuchstabe",
+        [Languages.IT]: "Una lettera maiuscola"
+    },
+    "auth.rule_number": {
+        [Languages.ES]: "Un número",
+        [Languages.EN]: "One number",
+        [Languages.FR]: "Un chiffre",
+        [Languages.DE]: "Eine Zahl",
+        [Languages.IT]: "Un numero"
+    },
+    "auth.rule_special": {
+        [Languages.ES]: "Un carácter especial (!@#$...)",
+        [Languages.EN]: "One special character (!@#$...)",
+        [Languages.FR]: "Un caractère spécial (!@#$...)",
+        [Languages.DE]: "Ein Sonderzeichen (!@#$...)",
+        [Languages.IT]: "Un carattere speciale (!@#$...)"
+    },
     "auth.footer_text": {
         [Languages.ES]: "Al continuar, aceptas nuestros",
         [Languages.EN]: "By continuing, you accept our",

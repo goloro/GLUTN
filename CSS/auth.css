@@ -403,3 +403,33 @@ body.no-scroll {
 .disclaimer-overlay.active .disclaimer-box {
     transform: translateY(0);
 }
+
+/* Password Rules Styles */
+.password-rules {
+    list-style: none;
+    margin-top: 10px;
+    padding-left: 5px;
+    font-size: 13px;
+    color: var(--text-gray);
+}
+
+.password-rules li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    transition: color 0.2s ease;
+}
+
+.password-rules li i {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.password-rules li.valid {
+    color: var(--safe-green);
+}
+
+.password-rules li.invalid {
+    color: #EF4444; /* red */
+}

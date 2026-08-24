@@ -55,11 +55,53 @@ window.switchTab = (mode) => {
         confirmPasswordInput.required = true;
     }
     
-    // Re-aplicar traducciones si están cargadas
+    // Aplicar traducciones inmediatamente
     if (typeof window.applyTranslations === 'function') {
         window.applyTranslations(window.currentGlobalLang || 'Español');
     }
 };
+
+// Password Validation Logic
+const ruleLength = document.getElementById('rule-length');
+const ruleUpper = document.getElementById('rule-upper');
+const ruleNumber = document.getElementById('rule-number');
+const ruleSpecial = document.getElementById('rule-special');
+
+let isPasswordValid = false;
+
+passwordInput.addEventListener('input', () => {
+    if (currentMode === 'signup') {
+        const p = passwordInput.value;
+        
+        const hasLength = p.length >= 8;
+        const hasUpper = /[A-Z]/.test(p);
+        const hasNumber = /[0-9]/.test(p);
+        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(p);
+
+        isPasswordValid = hasLength && hasUpper && hasNumber && hasSpecial;
+
+        updateRule(ruleLength, hasLength);
+        updateRule(ruleUpper, hasUpper);
+        updateRule(ruleNumber, hasNumber);
+        updateRule(ruleSpecial, hasSpecial);
+    } else {
+        isPasswordValid = true; // No rules on login
+    }
+});
+
+function updateRule(element, isValid) {
+    if (!element) return;
+    const icon = element.querySelector('i');
+    if (isValid) {
+        element.classList.remove('invalid');
+        element.classList.add('valid');
+        icon.className = 'ph ph-check';
+    } else {
+        element.classList.remove('valid');
+        element.classList.add('invalid');
+        icon.className = 'ph ph-x';
+    }
+}
 
 // Limpiamos la clase por defecto
 document.addEventListener('DOMContentLoaded', () => {
@@ -88,6 +130,11 @@ window.handleAuth = async (event) => {
     window.isAuthenticating = true;
     let email = emailInput.value.trim();
     const password = passwordInput.value;
+
+    if (currentMode === 'signup' && !isPasswordValid) {
+        errorMsg.innerText = 'La contraseña no cumple con los requisitos mínimos de seguridad.';
+        return;
+    }
 
     try {
         if (currentMode === 'login') {

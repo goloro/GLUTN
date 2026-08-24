@@ -95,6 +95,13 @@
                         <input type="password" id="password" placeholder="••••••••" required>
                         <i class="ph ph-eye input-icon-right" onclick="togglePassword('password')"></i>
                     </div>
+                    <!-- Restricciones de contraseña -->
+                    <ul class="password-rules signup-only" id="password-rules">
+                        <li id="rule-length" class="invalid"><i class="ph ph-x"></i> <span data-i18n="auth.rule_length">Mínimo 8 caracteres</span></li>
+                        <li id="rule-upper" class="invalid"><i class="ph ph-x"></i> <span data-i18n="auth.rule_upper">Una letra mayúscula</span></li>
+                        <li id="rule-number" class="invalid"><i class="ph ph-x"></i> <span data-i18n="auth.rule_number">Un número</span></li>
+                        <li id="rule-special" class="invalid"><i class="ph ph-x"></i> <span data-i18n="auth.rule_special">Un carácter especial (!@#$...)</span></li>
+                    </ul>
                 </div>
 
                 <!-- Repetir Contraseña (Solo Sign Up) -->
