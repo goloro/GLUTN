@@ -54,6 +54,27 @@ const Translations = {
         [Languages.DE]: "Fokussieren Sie das Zutatenetikett",
         [Languages.IT]: "Metti a fuoco l'etichetta degli ingredienti"
     },
+    "scanner.focus_ean": {
+        [Languages.ES]: "Enfoca el código de barras",
+        [Languages.EN]: "Focus on the barcode",
+        [Languages.FR]: "Concentrez-vous sur le code-barres",
+        [Languages.DE]: "Fokussieren Sie den Barcode",
+        [Languages.IT]: "Metti a fuoco il codice a barre"
+    },
+    "home.scan_ia": {
+        [Languages.ES]: "Foto de ingredientes (IA)",
+        [Languages.EN]: "Ingredients photo (AI)",
+        [Languages.FR]: "Photo des ingrédients (IA)",
+        [Languages.DE]: "Zutatenfoto (KI)",
+        [Languages.IT]: "Foto degli ingredienti (IA)"
+    },
+    "home.scan_ean": {
+        [Languages.ES]: "Escanear código de barras",
+        [Languages.EN]: "Scan barcode",
+        [Languages.FR]: "Scanner le code-barres",
+        [Languages.DE]: "Barcode scannen",
+        [Languages.IT]: "Scansiona codice a barre"
+    },
     "scanner.cancel": {
         [Languages.ES]: "Cancelar",
         [Languages.EN]: "Cancel",
@@ -529,16 +550,37 @@ const Translations = {
     "auth.terms": {
         [Languages.ES]: "Términos y Condiciones",
         [Languages.EN]: "Terms and Conditions",
-        [Languages.FR]: "Conditions d'utilisation",
+        [Languages.FR]: "Termes et Conditions",
         [Languages.DE]: "Allgemeine Geschäftsbedingungen",
         [Languages.IT]: "Termini e Condizioni"
     },
     "auth.privacy": {
         [Languages.ES]: "Política de Privacidad",
         [Languages.EN]: "Privacy Policy",
-        [Languages.FR]: "Politique de confidentialité",
-        [Languages.DE]: "Datenschutz-Bestimmungen",
-        [Languages.IT]: "Informativa sulla privacy"
+        [Languages.FR]: "Politique de Confidentialité",
+        [Languages.DE]: "Datenschutzerklärung",
+        [Languages.IT]: "Informativa sulla Privacy"
+    },
+    "auth.forgot_title": {
+        [Languages.ES]: "Recuperar contraseña",
+        [Languages.EN]: "Reset Password",
+        [Languages.FR]: "Réinitialiser le mot de passe",
+        [Languages.DE]: "Passwort zurücksetzen",
+        [Languages.IT]: "Reimposta password"
+    },
+    "auth.forgot_desc": {
+        [Languages.ES]: "Introduce tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.",
+        [Languages.EN]: "Enter your email address and we'll send you a link to reset your password.",
+        [Languages.FR]: "Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+        [Languages.DE]: "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts.",
+        [Languages.IT]: "Inserisci il tuo indirizzo email e ti invieremo un link per reimpostare la password."
+    },
+    "auth.forgot_btn": {
+        [Languages.ES]: "Enviar enlace",
+        [Languages.EN]: "Send reset link",
+        [Languages.FR]: "Envoyer le lien",
+        [Languages.DE]: "Link senden",
+        [Languages.IT]: "Invia link"
     },
     "auth.footer_text": {
         [Languages.ES]: "Al continuar, aceptas nuestros",

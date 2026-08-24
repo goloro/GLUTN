@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import { collection, query, where, getDocs, getDoc, setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import { auth, db } from "./firebase-config.js";
 
@@ -247,5 +247,77 @@ onAuthStateChanged(auth, (user) => {
     // Solo redirigir si NO estamos en medio de un proceso de auth (que maneja su propia redirección)
     if (user && !window.isAuthenticating) {
         window.location.href = 'HTML/home.html';
+    }
+});
+
+// Lógica de "Contraseña Olvidada"
+document.addEventListener('DOMContentLoaded', () => {
+    const forgotLink = document.querySelector('.forgot-password');
+    const forgotModal = document.getElementById('forgot-password-modal');
+    const closeForgotModal = document.getElementById('close-forgot-modal');
+    const sendResetBtn = document.getElementById('send-reset-btn');
+    const forgotEmailInput = document.getElementById('forgot-email');
+    const forgotMessage = document.getElementById('forgot-message');
+
+    if (forgotLink && forgotModal) {
+        forgotLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            forgotModal.classList.add('active');
+        });
+
+        closeForgotModal.addEventListener('click', () => {
+            forgotModal.classList.remove('active');
+            forgotMessage.style.display = 'none';
+            forgotEmailInput.value = '';
+        });
+
+        // Close on click outside
+        forgotModal.addEventListener('click', (e) => {
+            if (e.target === forgotModal) {
+                forgotModal.classList.remove('active');
+                forgotMessage.style.display = 'none';
+                forgotEmailInput.value = '';
+            }
+        });
+
+        sendResetBtn.addEventListener('click', async () => {
+            const email = forgotEmailInput.value.trim();
+            if (!email) {
+                forgotMessage.innerText = "Por favor, introduce tu correo.";
+                forgotMessage.style.color = "#EF4444";
+                forgotMessage.style.display = "block";
+                return;
+            }
+
+            const originalText = sendResetBtn.innerHTML;
+            sendResetBtn.disabled = true;
+            sendResetBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                forgotMessage.innerText = "¡Correo enviado! Revisa tu bandeja de entrada.";
+                forgotMessage.style.color = "#10B981";
+                forgotMessage.style.display = "block";
+                setTimeout(() => {
+                    forgotModal.classList.remove('active');
+                    forgotMessage.style.display = 'none';
+                    forgotEmailInput.value = '';
+                }, 3000);
+            } catch (error) {
+                console.error("Error al restablecer contraseña:", error);
+                if (error.code === 'auth/user-not-found') {
+                    forgotMessage.innerText = "No hay ninguna cuenta con este correo.";
+                } else if (error.code === 'auth/invalid-email') {
+                    forgotMessage.innerText = "El correo no es válido.";
+                } else {
+                    forgotMessage.innerText = "Hubo un error al enviar el correo.";
+                }
+                forgotMessage.style.color = "#EF4444";
+                forgotMessage.style.display = "block";
+            } finally {
+                sendResetBtn.disabled = false;
+                sendResetBtn.innerHTML = originalText;
+            }
+        });
     }
 });
