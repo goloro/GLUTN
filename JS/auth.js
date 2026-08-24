@@ -131,9 +131,16 @@ window.handleAuth = async (event) => {
     let email = emailInput.value.trim();
     const password = passwordInput.value;
 
-    if (currentMode === 'signup' && !isPasswordValid) {
-        errorMsg.innerText = 'La contraseña no cumple con los requisitos mínimos de seguridad.';
-        return;
+    if (currentMode === 'signup') {
+        if (!isPasswordValid) {
+            errorMsg.innerText = 'La contraseña no cumple con los requisitos mínimos de seguridad.';
+            return;
+        }
+        const legalCheckbox = document.getElementById('legal-checkbox');
+        if (legalCheckbox && !legalCheckbox.checked) {
+            errorMsg.innerText = 'Debes aceptar los Términos y Condiciones y la Política de Privacidad.';
+            return;
+        }
     }
 
     try {

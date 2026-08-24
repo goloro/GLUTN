@@ -624,6 +624,20 @@ const Translations = {
         [Languages.DE]: "und",
         [Languages.IT]: "e"
     },
+    "auth.agree": {
+        [Languages.ES]: "He leído y acepto los",
+        [Languages.EN]: "I have read and accept the",
+        [Languages.FR]: "J'ai lu et j'accepte les",
+        [Languages.DE]: "Ich habe gelesen und akzeptiere die",
+        [Languages.IT]: "Ho letto e accetto i"
+    },
+    "auth.and_the": {
+        [Languages.ES]: "y la",
+        [Languages.EN]: "and the",
+        [Languages.FR]: "et la",
+        [Languages.DE]: "und die",
+        [Languages.IT]: "e la"
+    },
 
     // ---- settings.html ----
     "settings.title": {

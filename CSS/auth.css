@@ -433,3 +433,36 @@ body.no-scroll {
 .password-rules li.invalid {
     color: #EF4444; /* red */
 }
+
+/* Legal Checkbox Styles */
+.checkbox-wrapper {
+    margin-bottom: 20px;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.mode-signup .checkbox-wrapper.signup-only {
+    display: flex;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    margin-top: 3px;
+    accent-color: var(--card-green);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.checkbox-wrapper label {
+    font-size: 13px;
+    color: var(--text-gray);
+    margin-bottom: 0;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.checkbox-wrapper label a {
+    color: var(--card-green);
+    text-decoration: none;
+    font-weight: 500;
+}

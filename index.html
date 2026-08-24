@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLUTN - Login & Sign Up</title>
 
-    <link rel="shortcut icon" href="../Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
+    <link rel="shortcut icon" href="Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
 
     <!-- Fuentes e Iconos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -114,6 +114,14 @@
                         <input type="password" id="confirm-password" placeholder="••••••••">
                         <i class="ph ph-eye input-icon-right" onclick="togglePassword('confirm-password')"></i>
                     </div>
+                </div>
+
+                <!-- Checkbox Legal (Solo Sign Up) -->
+                <div class="signup-only checkbox-wrapper">
+                    <input type="checkbox" id="legal-checkbox">
+                    <label for="legal-checkbox">
+                        <span data-i18n="auth.agree">He leído y acepto los</span> <a href="HTML/terminos.html?from=auth" data-i18n="auth.terms">Términos y Condiciones</a> <span data-i18n="auth.and_the">y la</span> <a href="HTML/privacy.html?from=auth" data-i18n="auth.privacy">Política de Privacidad</a>.
+                    </label>
                 </div>
 
                 <!-- Botón Principal -->
