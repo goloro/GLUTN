@@ -139,25 +139,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             isDecoding = true;
             
-            // Intentar usar BarcodeDetector nativo si está disponible (Android/iOS 17+)
+            // Intentar usar BarcodeDetector nativo si está disponible
             if ('BarcodeDetector' in window) {
-                if (!window.nativeBarcodeDetector) {
-                    window.nativeBarcodeDetector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'qr_code', 'upc_a', 'upc_e'] });
+                try {
+                    if (!window.nativeBarcodeDetector) {
+                        // Al omitir formats, usa todos los que el sistema soporte por defecto
+                        window.nativeBarcodeDetector = new BarcodeDetector();
+                    }
+                    window.nativeBarcodeDetector.detect(video)
+                        .then(barcodes => {
+                            if (barcodes.length > 0 && isScanningBarcode) {
+                                isScanningBarcode = false;
+                                isDecoding = false;
+                                handleBarcodeDetected(barcodes[0].rawValue);
+                            } else {
+                                isDecoding = false;
+                                if (isScanningBarcode) setTimeout(scan, 100);
+                            }
+                        })
+                        .catch(err => {
+                            fallbackZXing();
+                        });
+                } catch (e) {
+                    // Si falla al instanciar (por ej. iOS no soporta algún formato), usar fallback
+                    fallbackZXing();
                 }
-                window.nativeBarcodeDetector.detect(video)
-                    .then(barcodes => {
-                        if (barcodes.length > 0 && isScanningBarcode) {
-                            isScanningBarcode = false;
-                            isDecoding = false;
-                            handleBarcodeDetected(barcodes[0].rawValue);
-                        } else {
-                            isDecoding = false;
-                            if (isScanningBarcode) setTimeout(scan, 100);
-                        }
-                    })
-                    .catch(err => {
-                        fallbackZXing();
-                    });
             } else {
                 fallbackZXing();
             }
