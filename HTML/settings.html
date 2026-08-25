@@ -1,150 +1,296 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#FFFFFF">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="manifest" href="../manifest.json">
-    <title>GLUTN - Settings</title>
-
-    <link rel="shortcut icon" href="../Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
-
-    <!-- Fuentes y Iconos -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <link rel="stylesheet" href="../CSS/home.css?v=8">
-    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=8">
-    <link rel="stylesheet" href="../CSS/settings.css?v=8">
-    
-    <style>
-        /* Bloquear scroll en la pantalla completa */
-        
-        
-        .settings-content {
-            flex-grow: 1;
-            padding: 10px 24px 30px 24px !important;
-            justify-content: flex-start;
-            
-            scrollbar-width: none; /* Firefox */
-        }
-        .settings-content::-webkit-scrollbar {
-            display: none; /* Chrome/Safari/Edge */
-        }
-    </style>
-</head>
-<body>
-    <main class="content settings-content">
-        <!-- Header con el logo principal -->
-        <header class="home-header">
-            <img id="main-logo" src="../Images/Logos/Glutn_Logo_SinFondo.png" alt="Logo de GLUTN">
-        </header>
-
-        <!-- Profile Card -->
-        <div class="profile-card" onclick="window.location.href='edit-profile.html'">
-            <div class="profile-avatar" id="user-avatar">A</div>
-            <div class="profile-info">
-                <h2 class="profile-name" id="user-name">Usuario</h2>
-                <p class="profile-email" id="user-email">cargando...</p>
-            </div>
-            <i class="ph ph-caret-right profile-arrow"></i>
-        </div>
-
-        <!-- Section: CUENTA -->
-        <div class="settings-section">
-            <h3 class="section-title" data-i18n="settings.account">CUENTA</h3>
-            <div class="settings-list">
-                <div class="settings-item" id="lang-setting-item" style="position: relative;">
-                    <div class="item-left">
-                        <i class="ph ph-globe"></i>
-                        <span data-i18n="settings.language">Idioma</span>
-                    </div>
-                    <div class="item-right" style="gap: 8px;">
-                        <span id="current-lang-text">Español</span>
-                        <i class="ph ph-caret-down"></i>
-                    </div>
-                    <!-- Dropdown de idiomas -->
-                    <div class="lang-dropdown" id="lang-dropdown" style="right: 16px; left: auto; transform: none; top: 80%;">
-                        <div class="lang-option" data-lang="Español" style="display: none;">Español</div>
-                        <div class="lang-option" data-lang="English">English</div>
-                        <div class="lang-option" data-lang="Français">Français</div>
-                        <div class="lang-option" data-lang="Deutsch">Deutsch</div>
-                        <div class="lang-option" data-lang="Italiano">Italiano</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section: SOPORTE -->
-        <div class="settings-section">
-            <h3 class="section-title" data-i18n="settings.support">SOPORTE</h3>
-            <div class="settings-list">
-                <div class="settings-item">
-                    <a href="help.html" style="display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none; color: inherit;">
-                        <div class="item-left">
-                            <i class="ph ph-question"></i>
-                            <span data-i18n="settings.help">Ayuda y Contacto</span>
-                        </div>
-                        <div class="item-right">
-                            <i class="ph ph-caret-right"></i>
-                        </div>
-                    </a>
-                </div>
-                <div class="settings-item">
-                    <a href="privacy.html?from=settings" style="display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none; color: inherit;">
-                        <div class="item-left">
-                            <i class="ph ph-shield-check"></i>
-                            <span data-i18n="settings.privacy">Privacidad</span>
-                        </div>
-                        <div class="item-right">
-                            <i class="ph ph-caret-right"></i>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Logout Button -->
-        <div class="logout-container">
-            <button class="btn-logout" id="logout-btn">
-                <i class="ph ph-sign-out"></i>
-                <span data-i18n="settings.logout">Cerrar Sesión>
-            </button>
-        </div>
-    </main>
-
-    <!-- Navegación Inferior -->
-    <div class="nav-bar">
-        <div class="nav-bar-item" id="home-button" onclick="window.location.href='home.html'">
-            <i class="ph ph-house"></i>
-            <a href="home.html" data-i18n="nav.home">Inicio</a>
-        </div>
-        <div class="nav-bar-item" id="scan-button" onclick="window.location.href='scanner.html'">
-            <i class="ph ph-camera"></i>
-            <a href="scanner.html" data-i18n="nav.scan">Escanear</a>
-        </div>
-        <div class="nav-bar-item" id="history-button" onclick="window.location.href='history.html'">
-            <i class="ph ph-clock-counter-clockwise"></i>
-            <a href="history.html" data-i18n="nav.history">Historial</a>
-        </div>
-        <div class="nav-bar-item active" id="settings-button" onclick="window.location.href='settings.html'">
-            <i class="ph-fill ph-gear"></i>
-            <a href="settings.html" data-i18n="nav.settings">Ajustes</a>
-        </div>
-    </div>
-
-    <!-- Firebase SDK (MÃƒÂƒÃ‚Â³dulo) -->
-    <script type="module" src="../JS/firebase-config.js"></script>
-
-    <!-- Script para traducciones y ajustes -->
-    <script src="../JS/i18n.js?v=8"></script>
-    <script type="module" src="../JS/settings.js?v=8"></script>
-</body>
-</html>
-
-
-
+    <link rel="manifest" href="../manifest.json">
+
+    <title>GLUTN - Settings</title>
+
+
+
+    <link rel="shortcut icon" href="../Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
+
+
+
+    <!-- Fuentes y Iconos -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+
+
+    <link rel="stylesheet" href="../CSS/home.css?v=9">
+
+    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=9">
+
+    <link rel="stylesheet" href="../CSS/settings.css?v=9">
+
+    
+
+    <style>
+
+        /* Bloquear scroll en la pantalla completa */
+
+        
+
+        
+
+        .settings-content {
+
+            flex-grow: 1;
+
+            padding: 10px 24px 30px 24px !important;
+
+            justify-content: flex-start;
+
+            
+
+            scrollbar-width: none; /* Firefox */
+
+        }
+
+        .settings-content::-webkit-scrollbar {
+
+            display: none; /* Chrome/Safari/Edge */
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main class="content settings-content">
+
+        <!-- Header con el logo principal -->
+
+        <header class="home-header">
+
+            <img id="main-logo" src="../Images/Logos/Glutn_Logo_SinFondo.png" alt="Logo de GLUTN">
+
+        </header>
+
+
+
+        <!-- Profile Card -->
+
+        <div class="profile-card" onclick="window.location.href='edit-profile.html'">
+
+            <div class="profile-avatar" id="user-avatar">A</div>
+
+            <div class="profile-info">
+
+                <h2 class="profile-name" id="user-name">Usuario</h2>
+
+                <p class="profile-email" id="user-email">cargando...</p>
+
+            </div>
+
+            <i class="ph ph-caret-right profile-arrow"></i>
+
+        </div>
+
+
+
+        <!-- Section: CUENTA -->
+
+        <div class="settings-section">
+
+            <h3 class="section-title" data-i18n="settings.account">CUENTA</h3>
+
+            <div class="settings-list">
+
+                <div class="settings-item" id="lang-setting-item" style="position: relative;">
+
+                    <div class="item-left">
+
+                        <i class="ph ph-globe"></i>
+
+                        <span data-i18n="settings.language">Idioma</span>
+
+                    </div>
+
+                    <div class="item-right" style="gap: 8px;">
+
+                        <span id="current-lang-text">Español</span>
+
+                        <i class="ph ph-caret-down"></i>
+
+                    </div>
+
+                    <!-- Dropdown de idiomas -->
+
+                    <div class="lang-dropdown" id="lang-dropdown" style="right: 16px; left: auto; transform: none; top: 80%;">
+
+                        <div class="lang-option" data-lang="Español" style="display: none;">Español</div>
+
+                        <div class="lang-option" data-lang="English">English</div>
+
+                        <div class="lang-option" data-lang="Français">Français</div>
+
+                        <div class="lang-option" data-lang="Deutsch">Deutsch</div>
+
+                        <div class="lang-option" data-lang="Italiano">Italiano</div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Section: SOPORTE -->
+
+        <div class="settings-section">
+
+            <h3 class="section-title" data-i18n="settings.support">SOPORTE</h3>
+
+            <div class="settings-list">
+
+                <div class="settings-item">
+
+                    <a href="help.html" style="display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none; color: inherit;">
+
+                        <div class="item-left">
+
+                            <i class="ph ph-question"></i>
+
+                            <span data-i18n="settings.help">Ayuda y Contacto</span>
+
+                        </div>
+
+                        <div class="item-right">
+
+                            <i class="ph ph-caret-right"></i>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+                <div class="settings-item">
+
+                    <a href="privacy.html?from=settings" style="display: flex; justify-content: space-between; align-items: center; width: 100%; text-decoration: none; color: inherit;">
+
+                        <div class="item-left">
+
+                            <i class="ph ph-shield-check"></i>
+
+                            <span data-i18n="settings.privacy">Privacidad</span>
+
+                        </div>
+
+                        <div class="item-right">
+
+                            <i class="ph ph-caret-right"></i>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Logout Button -->
+
+        <div class="logout-container">
+
+            <button class="btn-logout" id="logout-btn">
+
+                <i class="ph ph-sign-out"></i>
+
+                <span data-i18n="settings.logout">Cerrar Sesión>
+
+            </button>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- Navegación Inferior -->
+
+    <div class="nav-bar">
+
+        <div class="nav-bar-item" id="home-button" onclick="window.location.href='home.html'">
+
+            <i class="ph ph-house"></i>
+
+            <a href="home.html" data-i18n="nav.home">Inicio</a>
+
+        </div>
+
+        <div class="nav-bar-item" id="scan-button" onclick="window.location.href='scanner.html'">
+
+            <i class="ph ph-camera"></i>
+
+            <a href="scanner.html" data-i18n="nav.scan">Escanear</a>
+
+        </div>
+
+        <div class="nav-bar-item" id="history-button" onclick="window.location.href='history.html'">
+
+            <i class="ph ph-clock-counter-clockwise"></i>
+
+            <a href="history.html" data-i18n="nav.history">Historial</a>
+
+        </div>
+
+        <div class="nav-bar-item active" id="settings-button" onclick="window.location.href='settings.html'">
+
+            <i class="ph-fill ph-gear"></i>
+
+            <a href="settings.html" data-i18n="nav.settings">Ajustes</a>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Firebase SDK (MÃƒÂƒÃ‚Â³dulo) -->
+
+    <script type="module" src="../JS/firebase-config.js"></script>
+
+
+
+    <!-- Script para traducciones y ajustes -->
+
+    <script src="../JS/i18n.js?v=9"></script>
+
+    <script type="module" src="../JS/settings.js?v=9"></script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
