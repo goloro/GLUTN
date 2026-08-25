@@ -1,4 +1,4 @@
-import { auth, db } from "./firebase-config.js";
+﻿import { auth, db } from "./firebase-config.js";
 import { doc, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     let stream = null;
     let codeReader = new ZXing.BrowserMultiFormatReader();
     let isScanningBarcode = false;
-    let currentUserLang = 'Español'; // Default, will update if user is logged in
+    let currentUserLang = 'EspaÃ±ol'; // Default, will update if user is logged in
     
-    // Obtener idioma del usuario de Firestore de forma asíncrona (opcional para no bloquear)
+    // Obtener idioma del usuario de Firestore de forma asÃ­ncrona (opcional para no bloquear)
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             const docSnap = await getDoc(doc(db, "users", user.uid));
@@ -30,13 +30,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (typeof Translations !== 'undefined' && Translations[key] && Translations[key][lang]) {
             return Translations[key][lang];
         }
-        if (typeof Translations !== 'undefined' && Translations[key] && Translations[key]['Español']) {
-            return Translations[key]['Español'];
+        if (typeof Translations !== 'undefined' && Translations[key] && Translations[key]['EspaÃ±ol']) {
+            return Translations[key]['EspaÃ±ol'];
         }
         return key; // Fallback al key
     }
 
-    // === LÓGICA DE MODOS DE ESCANEO ===
+    // === LÃ“GICA DE MODOS DE ESCANEO ===
     const urlParams = new URLSearchParams(window.location.search);
     let currentScanMode = urlParams.get('mode') || 'EAN';
     
@@ -71,21 +71,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             modeSwitchText.setAttribute('data-i18n', 'home.scan_ean');
             modeSwitchText.innerText = getT('home.scan_ean');
             modeSwitchIcon.className = "ph-bold ph-barcode";
-            captureBtn.style.display = 'flex'; // Restaurar botón
+            captureBtn.style.display = 'flex'; // Restaurar botÃ³n
             stopBarcodeScan();
         }
     }
 
-    // Inicializar UI después de definir todo
-    // La primera llamada a updateScannerUI se hará después de inicializar la cámara
+    // Inicializar UI despuÃ©s de definir todo
+    // La primera llamada a updateScannerUI se harÃ¡ despuÃ©s de inicializar la cÃ¡mara
 
-    // Botón para alternar modo
+    // BotÃ³n para alternar modo
     modeSwitchBtn.addEventListener('click', () => {
         const newMode = currentScanMode === 'IA' ? 'EAN' : 'IA';
         updateScannerUI(newMode);
     });
 
-    // 1. Iniciar la cámara
+    // 1. Iniciar la cÃ¡mara
     async function startCamera() {
         try {
             stream = await navigator.mediaDevices.getUserMedia({
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             video.setAttribute('playsinline', 'true'); // Asegurar para iOS
             video.srcObject = stream;
             
-            // Esperar a que el vídeo esté listo antes de permitir escaneos
+            // Esperar a que el vÃ­deo estÃ© listo antes de permitir escaneos
             await new Promise((resolve) => {
                 if (video.readyState >= 2) {
                     video.play().then(resolve).catch(resolve);
@@ -105,10 +105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             
-            // Iniciar interfaz una vez tenemos el stream y está reproduciendo
+            // Iniciar interfaz una vez tenemos el stream y estÃ¡ reproduciendo
             updateScannerUI(currentScanMode);
         } catch (error) {
-            console.error("Error accediendo a la cámara:", error);
+            console.error("Error accediendo a la cÃ¡mara:", error);
             showCustomDialog({
                 type: 'error',
                 title: getT('modal.error_camera'),
@@ -119,31 +119,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     startCamera();
 
-    // Asegurar que la cámara se libera cuando el usuario sale de la página
+    // Asegurar que la cÃ¡mara se libera cuando el usuario sale de la pÃ¡gina
     window.addEventListener('beforeunload', () => {
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
         }
     });
 
-    // === 2. LÓGICA DE BARCODE (ZXING) ===
+    // === 2. LÃ“GICA DE BARCODE (ZXING) ===
     let isDecoding = false;
     let lastScannedBarcode = null;
     
-    function startBarcodeScan() {
+            function startBarcodeScan() {
         if (!stream) return;
         isScanningBarcode = true;
         
         function scan() {
             if (!isScanningBarcode || currentScanMode !== 'EAN' || isDecoding) return;
             
+            // Wait for video to have valid dimensions
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                setTimeout(scan, 200);
+                return;
+            }
+            
             isDecoding = true;
             
-            // Intentar usar BarcodeDetector nativo si está disponible
-            if ('BarcodeDetector' in window) {
-                try {
+            try {
+                // Try hardware-accelerated BarcodeDetector first
+                if ('BarcodeDetector' in window) {
                     if (!window.nativeBarcodeDetector) {
-                        // Al omitir formats, usa todos los que el sistema soporte por defecto
                         window.nativeBarcodeDetector = new BarcodeDetector();
                     }
                     window.nativeBarcodeDetector.detect(video)
@@ -154,18 +159,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 handleBarcodeDetected(barcodes[0].rawValue);
                             } else {
                                 isDecoding = false;
-                                if (isScanningBarcode) setTimeout(scan, 100);
+                                if (isScanningBarcode) setTimeout(scan, 150);
                             }
                         })
                         .catch(err => {
                             fallbackZXing();
                         });
-                } catch (e) {
-                    // Si falla al instanciar (por ej. iOS no soporta algún formato), usar fallback
+                } else {
                     fallbackZXing();
                 }
-            } else {
-                fallbackZXing();
+            } catch (err) {
+                isDecoding = false;
+                if (isScanningBarcode) setTimeout(scan, 200);
             }
         }
         
@@ -173,26 +178,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 codeReader.decodeFromVideoElement(video)
                     .then(result => {
-                        isDecoding = false;
                         if (result && isScanningBarcode) {
                             isScanningBarcode = false;
+                            isDecoding = false;
                             handleBarcodeDetected(result.text);
-                        } else if (isScanningBarcode) {
-                            setTimeout(scan, 100);
+                        } else {
+                            isDecoding = false;
+                            if (isScanningBarcode) setTimeout(scan, 150);
                         }
                     })
                     .catch(err => {
                         isDecoding = false;
-                        if (isScanningBarcode) {
-                            setTimeout(scan, 200);
-                        }
+                        if (isScanningBarcode) setTimeout(scan, 150);
                     });
             } catch (err) {
-                console.error("ZXing synchronous error:", err);
                 isDecoding = false;
-                if (isScanningBarcode) {
-                    setTimeout(scan, 200);
-                }
+                if (isScanningBarcode) setTimeout(scan, 150);
             }
         }
         
@@ -201,11 +202,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function stopBarcodeScan() {
         isScanningBarcode = false;
+        isDecoding = false;
     }
-
-    async function handleBarcodeDetected(barcode) {
+async function handleBarcodeDetected(barcode) {
         lastScannedBarcode = barcode;
-        // Reproducir un pitido o dar feedback háptico si es posible
+        // Reproducir un pitido o dar feedback hÃ¡ptico si es posible
         if (navigator.vibrate) navigator.vibrate(100);
         
         loadingScreen.classList.add('active');
@@ -275,8 +276,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 mappedIngredients = [{ name: 'Ingredientes no detallados en la base de datos' }];
             }
 
-            // 1. Es seguro si tiene el label explícito o el análisis de OFF dice que es gluten-free
-            // Ampliamos la búsqueda a categorías, nombre y texto de ingredientes por si la base de datos está incompleta
+            // 1. Es seguro si tiene el label explÃ­cito o el anÃ¡lisis de OFF dice que es gluten-free
+            // Ampliamos la bÃºsqueda a categorÃ­as, nombre y texto de ingredientes por si la base de datos estÃ¡ incompleta
             const allTags = [...labels, ...categories, ...analysisTags].map(t => t.toLowerCase());
             
             const isExplicitlySafe = allTags.some(t => 
@@ -300,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // 2. Es peligroso si declara alérgenos de gluten explícitos
+            // 2. Es peligroso si declara alÃ©rgenos de gluten explÃ­citos
             if (
                 allergens.includes('en:gluten') || 
                 allergens.includes('en:wheat') || 
@@ -342,7 +343,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 2. Evento del botón de captura (Solo IA)
+    // 2. Evento del botÃ³n de captura (Solo IA)
     captureBtn.addEventListener('click', async () => {
         if (!video.videoWidth) return;
 
@@ -361,16 +362,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         let sourceX = 0, sourceY = 0, sourceWidth = vw, sourceHeight = vh;
 
         if (screenRatio > videoRatio) {
-            // La pantalla es más ancha que el vídeo (recortar arriba y abajo)
+            // La pantalla es mÃ¡s ancha que el vÃ­deo (recortar arriba y abajo)
             sourceHeight = vw / screenRatio;
             sourceY = (vh - sourceHeight) / 2;
         } else {
-            // La pantalla es más alta que el vídeo (recortar a los lados)
+            // La pantalla es mÃ¡s alta que el vÃ­deo (recortar a los lados)
             sourceWidth = vh * screenRatio;
             sourceX = (vw - sourceWidth) / 2;
         }
 
-        // Escalar para no enviar un payload gigante (máximo 800px)
+        // Escalar para no enviar un payload gigante (mÃ¡ximo 800px)
         const MAX_WIDTH = 800;
         let scale = 1;
         if (sourceWidth > MAX_WIDTH) {
@@ -383,7 +384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Dibujar el frame actual escalado y recortado
         ctx.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
         
-        // Obtener la imagen en base64 (JPEG) con compresión
+        // Obtener la imagen en base64 (JPEG) con compresiÃ³n
         const base64Image = canvas.toDataURL('image/jpeg', 0.7);
         const base64Data = base64Image.split(',')[1];
 
@@ -394,30 +395,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         await analyzeWithGemini(base64Data);
     });
 
-    // 3. Función para llamar a Gemini
+    // 3. FunciÃ³n para llamar a Gemini
     async function analyzeWithGemini(base64Data) {
 
         let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-        let userLang = userObj.language || 'Español';
+        let userLang = userObj.language || 'EspaÃ±ol';
 
         const promptText = `
-Eres un experto nutricionista especializado en intolerancias alimentarias y celiaquía.
-A continuación tienes una imagen de una etiqueta. 
-IMPORTANTE: El idioma principal del usuario es ${userLang}. Debes TRADUCIR todos los nombres de los ingredientes, el nombre del producto y la explicación al ${userLang}, independientemente del idioma en el que esté escrita la etiqueta original.
+Eres un experto nutricionista especializado en intolerancias alimentarias y celiaquÃ­a.
+A continuaciÃ³n tienes una imagen de una etiqueta. 
+IMPORTANTE: El idioma principal del usuario es ${userLang}. Debes TRADUCIR todos los nombres de los ingredientes, el nombre del producto y la explicaciÃ³n al ${userLang}, independientemente del idioma en el que estÃ© escrita la etiqueta original.
 
 1. Primero, verifica si en la imagen aparece una lista de ingredientes o etiqueta de un producto alimenticio.
 2. Si NO detectas ninguna etiqueta legible o no parece un alimento, devuelve EXCLUSIVAMENTE este JSON:
 {
   "error": "no_label_detected",
-  "reason": "No he podido detectar una lista de ingredientes clara. Por favor, asegúrate de enfocar bien la etiqueta y repite la foto."
+  "reason": "No he podido detectar una lista de ingredientes clara. Por favor, asegÃºrate de enfocar bien la etiqueta y repite la foto."
 }
-3. Si SÍ hay una etiqueta, extrae los ingredientes (traducidos al ${userLang}) y determina si el producto es seguro para un celíaco (gluten-free). Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
-Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni texto fuera del JSON):
+3. Si SÃ hay una etiqueta, extrae los ingredientes (traducidos al ${userLang}) y determina si el producto es seguro para un celÃ­aco (gluten-free). Busca explÃ­citamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
+Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no aÃ±adas markdown ni texto fuera del JSON):
 {
   "productName": "Nombre del producto - Nombre de la marca (si no logras deducir la marca de la foto, pon solo el nombre del producto. Si no ves ninguno, pon 'Producto detectado')",
-  "gluten": true (si contiene gluten explícito) o false (si es seguro),
-  "isWarning": true (si tienes dudas, información ilegible o dice "puede contener trazas de gluten") o false,
-  "reason": "Explicación breve",
+  "gluten": true (si contiene gluten explÃ­cito) o false (si es seguro),
+  "isWarning": true (si tienes dudas, informaciÃ³n ilegible o dice "puede contener trazas de gluten") o false,
+  "reason": "ExplicaciÃ³n breve",
   "ingredientWithGluten": "El nombre exacto del primer ingrediente detectado con gluten (o null si es seguro)",
   "ingredients": [
     { "name": "Ingrediente 1" }
@@ -470,8 +471,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             if (scanResult.error === 'no_label_detected') {
                 showCustomDialog({
                     type: 'error',
-                    title: 'No se detectó etiqueta',
-                    message: scanResult.reason || 'No he podido detectar una lista de ingredientes clara. Por favor, asegúrate de enfocar bien la etiqueta y repite la foto.'
+                    title: 'No se detectÃ³ etiqueta',
+                    message: scanResult.reason || 'No he podido detectar una lista de ingredientes clara. Por favor, asegÃºrate de enfocar bien la etiqueta y repite la foto.'
                 });
                 loadingScreen.classList.remove('active');
                 return;
@@ -483,8 +484,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             console.error("Error procesando imagen:", error);
             showCustomDialog({
                 type: 'error',
-                title: 'Error en el análisis',
-                message: 'No pudimos procesar la imagen correctamente. Asegúrate de que la foto se vea nítida e inténtalo de nuevo.'
+                title: 'Error en el anÃ¡lisis',
+                message: 'No pudimos procesar la imagen correctamente. AsegÃºrate de que la foto se vea nÃ­tida e intÃ©ntalo de nuevo.'
             });
             loadingScreen.classList.remove('active');
         }
@@ -503,8 +504,8 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
                 scans: arrayUnion(scanResult)
             });
             
-            // Opcional: si queremos limitar a 10 escaneos, tendríamos que leer, truncar y guardar, 
-            // pero para esta versión básica dejaremos que arrayUnion añada indefinidamente 
+            // Opcional: si queremos limitar a 10 escaneos, tendrÃ­amos que leer, truncar y guardar, 
+            // pero para esta versiÃ³n bÃ¡sica dejaremos que arrayUnion aÃ±ada indefinidamente 
             // o lo gestionamos en la pantalla de historial.
         } catch (error) {
             console.error("Error guardando en historial:", error);
@@ -515,7 +516,7 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
     function renderResult(scan) {
         loadingScreen.classList.remove('active');
 
-        // Solo guardar en historial si aún no se ha guardado en esta instancia
+        // Solo guardar en historial si aÃºn no se ha guardado en esta instancia
         if (!scan.date) {
             const now = new Date();
             const day = now.getDate().toString().padStart(2, '0');
@@ -563,12 +564,12 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             
         } else if (isWarning) {
             badge.className = 'verdict-banner warning';
-            badge.innerHTML = `<i class="ph-fill ph-warning"></i> <span data-i18n="scanner.warning">Información Dudosa</span>`;
+            badge.innerHTML = `<i class="ph-fill ph-warning"></i> <span data-i18n="scanner.warning">InformaciÃ³n Dudosa</span>`;
             badge.style.backgroundColor = '#F59E0B';
             
             // Mostrar sugerencia de usar IA
             aiBox.style.display = 'block';
-            aiWarningHeader.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="scanner.warning">Información Dudosa</span>`;
+            aiWarningHeader.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="scanner.warning">InformaciÃ³n Dudosa</span>`;
             aiWarningText.setAttribute('data-i18n', 'scanner.warning_desc');
             aiWarningText.innerText = getT('scanner.warning_desc');
             
@@ -582,14 +583,14 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             badge.style.backgroundColor = '#EF4444';
         }
 
-        // Lógica para mostrar el botón de aportar a OpenFoodFacts
+        // LÃ³gica para mostrar el botÃ³n de aportar a OpenFoodFacts
         if (scan.barcode && offEditBox) {
             // Si no fue encontrado (estado EAN inicial), no lo mostramos. Lo mostraremos tras la IA
             if (!isNotFound && (currentScanMode === 'IA' || currentScanMode === 'EAN')) {
                 offEditBox.style.display = 'block';
                 const offEditBtnText = offEditBox.querySelector('span');
                 if (currentScanMode === 'IA') {
-                    offEditBtnText.innerText = "Añadir a OpenFoodFacts";
+                    offEditBtnText.innerText = "AÃ±adir a OpenFoodFacts";
                 } else {
                     offEditBtnText.innerText = "Aportar a OpenFoodFacts";
                 }
@@ -599,7 +600,7 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             }
         }
 
-        // Razón
+        // RazÃ³n
         document.getElementById('scanner-result-reason').innerText = scan.reason;
 
         // Lista de Ingredientes
@@ -615,19 +616,19 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
                 ul.appendChild(li);
             });
         } else {
-            ul.innerHTML = '<li>Sin información detallada de ingredientes</li>';
+            ul.innerHTML = '<li>Sin informaciÃ³n detallada de ingredientes</li>';
         }
 
         // Aplicar traducciones a los textos nuevos
         if (typeof window.applyTranslations === 'function') {
-            window.applyTranslations(currentUserLang || 'Español');
+            window.applyTranslations(currentUserLang || 'EspaÃ±ol');
         }
 
         // Mostrar pantalla de resultado
         resultScreen.classList.add('active');
     }
 
-    // Botón de Recomendación IA
+    // BotÃ³n de RecomendaciÃ³n IA
     document.getElementById('ai-switch-btn').addEventListener('click', () => {
         resultScreen.classList.remove('active');
         updateScannerUI('IA', true); // Cambia a modo IA y mantiene el barcode
@@ -650,7 +651,7 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
             input.style.display = 'none';
             btnCancel.style.display = 'none';
             
-            // Configurar según tipo
+            // Configurar segÃºn tipo
             title.innerText = options.title || 'Aviso';
             message.innerText = options.message || '';
 
@@ -706,3 +707,5 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni text
     };
 
 });
+
+
