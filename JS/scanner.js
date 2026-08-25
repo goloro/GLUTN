@@ -102,25 +102,15 @@ class EANScanner {
             try {
                 const barcodes = await this.native.detect(this.video);
                 if (barcodes.length > 0) return barcodes[0].rawValue;
-            } catch (e) {
-                // Ignore and fallback
-            }
+            } catch (e) {}
         }
 
-        // 2. Fallback to ZXing using drawn canvas (extremely robust)
+        // 2. Fallback to ZXing using video directly (fixes TypeError from canvas)
         try {
-            const MAX_WIDTH = 480;
-            const scale = this.video.videoWidth > MAX_WIDTH ? (MAX_WIDTH / this.video.videoWidth) : 1;
-            
-            this.canvas.width = this.video.videoWidth * scale;
-            this.canvas.height = this.video.videoHeight * scale;
-            this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
-            
-            const result = await this.zxing.decodeFromImageElement(this.canvas);
+            const result = await this.zxing.decodeFromVideoElement(this.video);
             if (result) return result.text;
         } catch (e) {
-            // NotFoundException is thrown when no barcode is in frame
-            return null;
+            return null; // NotFoundException is normal
         }
         
         return null;
@@ -254,9 +244,7 @@ function updateScannerUI(mode, keepBarcode = false) {
         reticleIa.classList.add('reticle-hidden');
         reticleEan.classList.remove('reticle-hidden');
         instructionText.setAttribute('data-i18n', 'scanner.focus_ean');
-        instructionText.innerText = getT('scanner.focus_ean');
         modeSwitchText.setAttribute('data-i18n', 'home.scan_ia');
-        modeSwitchText.innerText = getT('home.scan_ia');
         modeSwitchIcon.className = "ph-bold ph-scan";
         captureBtn.style.display = 'none';
         
@@ -265,13 +253,16 @@ function updateScannerUI(mode, keepBarcode = false) {
         reticleEan.classList.add('reticle-hidden');
         reticleIa.classList.remove('reticle-hidden');
         instructionText.setAttribute('data-i18n', 'scanner.focus');
-        instructionText.innerText = getT('scanner.focus');
         modeSwitchText.setAttribute('data-i18n', 'home.scan_ean');
-        modeSwitchText.innerText = getT('home.scan_ean');
         modeSwitchIcon.className = "ph-bold ph-barcode";
         captureBtn.style.display = 'flex';
         
         eanScanner.stop();
+    }
+    
+    // Aplicar traducción inmediatamente
+    if (typeof window.applyTranslations === 'function') {
+        window.applyTranslations(localStorage.getItem('glutn_lang') || 'es');
     }
 }
 
