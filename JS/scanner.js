@@ -1,360 +1,151 @@
-﻿import { auth, db } from "./firebase-config.js";
-import { doc, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { db, auth } from "./firebase-config.js";
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const video = document.getElementById('camera-stream');
-    const captureBtn = document.getElementById('capture-btn');
-    const canvas = document.getElementById('capture-canvas');
-    const loadingScreen = document.getElementById('loading-screen');
-    const resultScreen = document.getElementById('result-screen');
-    const ctx = canvas.getContext('2d');
+// DOM Elements
+const video = document.getElementById('camera-stream');
+const captureCanvas = document.getElementById('capture-canvas');
+const ctx = captureCanvas.getContext('2d', { willReadFrequently: true });
+const captureBtn = document.getElementById('capture-btn');
+const modeSwitchBtn = document.getElementById('mode-switch-btn');
+const reticleIa = document.getElementById('reticle-ia');
+const reticleEan = document.getElementById('reticle-ean');
+const instructionText = document.getElementById('instruction-text');
+const modeSwitchText = document.getElementById('mode-switch-text');
+const modeSwitchIcon = modeSwitchBtn.querySelector('i');
+const loadingScreen = document.getElementById('loading-screen');
+const resultScreen = document.getElementById('result-screen');
+const customModal = document.getElementById('custom-modal');
 
-    let stream = null;
-    let codeReader = new ZXing.BrowserMultiFormatReader();
-    let isScanningBarcode = false;
-    let currentUserLang = 'EspaÃ±ol'; // Default, will update if user is logged in
-    
-    // Obtener idioma del usuario de Firestore de forma asÃ­ncrona (opcional para no bloquear)
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            const docSnap = await getDoc(doc(db, "users", user.uid));
-            if (docSnap.exists() && docSnap.data().language) {
-                currentUserLang = docSnap.data().language;
-            }
-        }
-    });
-
-    // Helper de traducciones para JS
-    function getT(key) {
-        const lang = currentUserLang;
-        if (typeof Translations !== 'undefined' && Translations[key] && Translations[key][lang]) {
-            return Translations[key][lang];
-        }
-        if (typeof Translations !== 'undefined' && Translations[key] && Translations[key]['EspaÃ±ol']) {
-            return Translations[key]['EspaÃ±ol'];
-        }
-        return key; // Fallback al key
+// Translation helper
+function getT(key) {
+    if (typeof window.getTranslation === 'function') {
+        return window.getTranslation(key);
     }
+    return key;
+}
 
-    // === LÃ“GICA DE MODOS DE ESCANEO ===
-    const urlParams = new URLSearchParams(window.location.search);
-    let currentScanMode = urlParams.get('mode') || 'EAN';
-    
-    const reticleIa = document.getElementById('reticle-ia');
-    const reticleEan = document.getElementById('reticle-ean');
-    const instructionText = document.getElementById('instruction-text');
-    const modeSwitchBtn = document.getElementById('mode-switch-btn');
-    const modeSwitchText = document.getElementById('mode-switch-text');
-    const modeSwitchIcon = modeSwitchBtn.querySelector('i');
-
-    function updateScannerUI(mode, keepBarcode = false) {
-        if (!keepBarcode) {
-            lastScannedBarcode = null;
-        }
-
-        currentScanMode = mode;
-        if (mode === 'EAN') {
-            reticleIa.classList.add('reticle-hidden');
-            reticleEan.classList.remove('reticle-hidden');
-            instructionText.setAttribute('data-i18n', 'scanner.focus_ean');
-            instructionText.innerText = getT('scanner.focus_ean');
-            modeSwitchText.setAttribute('data-i18n', 'home.scan_ia');
-            modeSwitchText.innerText = getT('home.scan_ia');
-            modeSwitchIcon.className = "ph-bold ph-scan";
-            captureBtn.style.display = 'none'; // Ocultar por completo para que el panel se encoja
-            startBarcodeScan();
-        } else {
-            reticleEan.classList.add('reticle-hidden');
-            reticleIa.classList.remove('reticle-hidden');
-            instructionText.setAttribute('data-i18n', 'scanner.focus');
-            instructionText.innerText = getT('scanner.focus');
-            modeSwitchText.setAttribute('data-i18n', 'home.scan_ean');
-            modeSwitchText.innerText = getT('home.scan_ean');
-            modeSwitchIcon.className = "ph-bold ph-barcode";
-            captureBtn.style.display = 'flex'; // Restaurar botÃ³n
-            stopBarcodeScan();
-        }
-    }
-
-    // Inicializar UI despuÃ©s de definir todo
-    // La primera llamada a updateScannerUI se harÃ¡ despuÃ©s de inicializar la cÃ¡mara
-
-    // BotÃ³n para alternar modo
-    modeSwitchBtn.addEventListener('click', () => {
-        const newMode = currentScanMode === 'IA' ? 'EAN' : 'IA';
-        updateScannerUI(newMode);
-    });
-
-    // 1. Iniciar la cÃ¡mara
-    async function startCamera() {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-            });
-            video.setAttribute('playsinline', 'true'); // Asegurar para iOS
-            video.srcObject = stream;
-            
-            // Esperar a que el vÃ­deo estÃ© listo antes de permitir escaneos
-            await new Promise((resolve) => {
-                if (video.readyState >= 2) {
-                    video.play().then(resolve).catch(resolve);
-                } else {
-                    video.onloadedmetadata = () => {
-                        video.play().then(resolve).catch(resolve);
-                    };
-                }
-            });
-            
-            // Iniciar interfaz una vez tenemos el stream y estÃ¡ reproduciendo
-            updateScannerUI(currentScanMode);
-        } catch (error) {
-            console.error("Error accediendo a la cÃ¡mara:", error);
-            showCustomDialog({
-                type: 'error',
-                title: getT('modal.error_camera'),
-                message: getT('modal.error_camera_desc')
-            });
-        }
-    }
-
-    startCamera();
-
-    // Asegurar que la cÃ¡mara se libera cuando el usuario sale de la pÃ¡gina
-    window.addEventListener('beforeunload', () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-    });
-
-    // === 2. LÃ“GICA DE BARCODE (ZXING) ===
-    let isDecoding = false;
-    let lastScannedBarcode = null;
-    
-            function startBarcodeScan() {
-        if (!stream) return;
-        isScanningBarcode = true;
+// ---------------------------------------------------------
+// 1. BARCODE SCANNER CLASS
+// ---------------------------------------------------------
+class EANScanner {
+    constructor(videoElement, onDetected) {
+        this.video = videoElement;
+        this.onDetected = onDetected;
+        this.isScanning = false;
+        this.isDecoding = false;
         
-        function scan() {
-            if (!isScanningBarcode || currentScanMode !== 'EAN' || isDecoding) return;
-            
-            // Wait for video to have valid dimensions
-            if (video.videoWidth === 0 || video.videoHeight === 0) {
-                setTimeout(scan, 200);
-                return;
-            }
-            
-            isDecoding = true;
-            
+        // Setup detectors
+        this.zxing = new ZXing.BrowserMultiFormatReader();
+        this.native = null;
+        if ('BarcodeDetector' in window) {
             try {
-                // Try hardware-accelerated BarcodeDetector first
-                if ('BarcodeDetector' in window) {
-                    if (!window.nativeBarcodeDetector) {
-                        window.nativeBarcodeDetector = new BarcodeDetector();
-                    }
-                    window.nativeBarcodeDetector.detect(video)
-                        .then(barcodes => {
-                            if (barcodes.length > 0 && isScanningBarcode) {
-                                isScanningBarcode = false;
-                                isDecoding = false;
-                                handleBarcodeDetected(barcodes[0].rawValue);
-                            } else {
-                                isDecoding = false;
-                                if (isScanningBarcode) setTimeout(scan, 150);
-                            }
-                        })
-                        .catch(err => {
-                            fallbackZXing();
-                        });
-                } else {
-                    fallbackZXing();
-                }
-            } catch (err) {
-                isDecoding = false;
-                if (isScanningBarcode) setTimeout(scan, 200);
-            }
+                this.native = new BarcodeDetector();
+            } catch(e) { console.warn('Native BarcodeDetector not fully supported.'); }
         }
         
-        function fallbackZXing() {
+        // Pre-allocate canvas for performance fallback
+        this.canvas = document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+    }
+
+    start() {
+        if (this.isScanning) return;
+        this.isScanning = true;
+        this.isDecoding = false;
+        this.loop();
+    }
+
+    stop() {
+        this.isScanning = false;
+        this.isDecoding = false;
+    }
+
+    async loop() {
+        if (!this.isScanning) return;
+        if (this.isDecoding) return;
+        
+        // Skip if video isn't rendering yet
+        if (this.video.videoWidth === 0 || this.video.videoHeight === 0) {
+            setTimeout(() => this.loop(), 200);
+            return;
+        }
+
+        this.isDecoding = true;
+
+        try {
+            // Promise wrapper to prevent hanging!
+            const result = await Promise.race([
+                this.detectBarcode(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 800))
+            ]);
+
+            if (result && this.isScanning) {
+                this.isScanning = false;
+                this.isDecoding = false;
+                this.onDetected(result);
+                return; // Stop loop, we found it!
+            }
+        } catch (e) {
+            // Timeout or detection error, ignore and continue
+        }
+
+        this.isDecoding = false;
+        if (this.isScanning) {
+            setTimeout(() => this.loop(), 150);
+        }
+    }
+
+    async detectBarcode() {
+        // 1. Try Native BarcodeDetector (iOS 17+ / Android)
+        if (this.native) {
             try {
-                codeReader.decodeFromVideoElement(video)
-                    .then(result => {
-                        if (result && isScanningBarcode) {
-                            isScanningBarcode = false;
-                            isDecoding = false;
-                            handleBarcodeDetected(result.text);
-                        } else {
-                            isDecoding = false;
-                            if (isScanningBarcode) setTimeout(scan, 150);
-                        }
-                    })
-                    .catch(err => {
-                        isDecoding = false;
-                        if (isScanningBarcode) setTimeout(scan, 150);
-                    });
-            } catch (err) {
-                isDecoding = false;
-                if (isScanningBarcode) setTimeout(scan, 150);
+                const barcodes = await this.native.detect(this.video);
+                if (barcodes.length > 0) return barcodes[0].rawValue;
+            } catch (e) {
+                // Ignore and fallback
             }
         }
-        
-        scan();
-    }
 
-    function stopBarcodeScan() {
-        isScanningBarcode = false;
-        isDecoding = false;
-    }
-async function handleBarcodeDetected(barcode) {
-        lastScannedBarcode = barcode;
-        // Reproducir un pitido o dar feedback hÃ¡ptico si es posible
-        if (navigator.vibrate) navigator.vibrate(100);
-        
-        loadingScreen.classList.add('active');
-        
+        // 2. Fallback to ZXing using drawn canvas (extremely robust)
         try {
-            await analyzeWithOpenFoodFacts(barcode);
-        } catch (error) {
-            console.error("Error analizando EAN:", error);
-            showCustomDialog({
-                type: 'error',
-                title: getT('modal.error_network'),
-                message: getT('modal.error_network_desc')
-            });
-            loadingScreen.classList.remove('active');
-            startBarcodeScan(); // Reanudar escaneo si falla
+            const MAX_WIDTH = 480;
+            const scale = this.video.videoWidth > MAX_WIDTH ? (MAX_WIDTH / this.video.videoWidth) : 1;
+            
+            this.canvas.width = this.video.videoWidth * scale;
+            this.canvas.height = this.video.videoHeight * scale;
+            this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+            
+            const result = await this.zxing.decodeFromImageElement(this.canvas);
+            if (result) return result.text;
+        } catch (e) {
+            // NotFoundException is thrown when no barcode is in frame
+            return null;
         }
+        
+        return null;
+    }
+}
+
+// ---------------------------------------------------------
+// 2. IA SCANNER CLASS
+// ---------------------------------------------------------
+class IAScanner {
+    constructor(videoElement, captureCanvas, onCaptured) {
+        this.video = videoElement;
+        this.canvas = captureCanvas;
+        this.ctx = captureCanvas.getContext('2d', { willReadFrequently: true });
+        this.onCaptured = onCaptured;
     }
 
-    async function analyzeWithOpenFoodFacts(barcode) {
-        try {
-            const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-            const data = await response.json();
+    async captureAndAnalyze() {
+        if (!this.video.videoWidth) return;
 
-            if (data.status === 0 || !data.product) {
-                // Producto no encontrado
-                renderResult({
-                    isNotFound: true,
-                    isWarning: true,
-                    barcode: barcode,
-                    reason: getT('result.not_found') + ` (EAN: ${barcode})`,
-                    ingredients: [],
-                    gluten: null,
-                    productName: `Producto ${barcode}`
-                });
-                return;
-            }
-
-            const p = data.product;
-            const labels = p.labels_tags || [];
-            const allergens = p.allergens_tags || [];
-            const traces = p.traces_tags || [];
-            const ingredientsText = p.ingredients_text || '';
-            const analysisTags = p.ingredients_analysis_tags || [];
-            const categories = p.categories_tags || [];
-            const productName = (p.product_name || '').toLowerCase();
-            
-            const rawProductName = p.product_name || '';
-            const rawBrand = p.brands || '';
-            let displayName = '';
-            if (rawProductName && rawBrand) {
-                displayName = `${rawProductName} - ${rawBrand}`;
-            } else if (rawProductName) {
-                displayName = rawProductName;
-            } else if (rawBrand) {
-                displayName = rawBrand;
-            } else {
-                displayName = `Producto ${barcode}`;
-            }
-
-            // Extraer lista real de ingredientes
-            let mappedIngredients = [];
-            if (p.ingredients && p.ingredients.length > 0) {
-                mappedIngredients = p.ingredients.map(ing => ({ name: ing.text || ing.id }));
-            } else if (ingredientsText) {
-                mappedIngredients = ingredientsText.split(',').map(i => ({ name: i.trim() }));
-            } else {
-                mappedIngredients = [{ name: 'Ingredientes no detallados en la base de datos' }];
-            }
-
-            // 1. Es seguro si tiene el label explÃ­cito o el anÃ¡lisis de OFF dice que es gluten-free
-            // Ampliamos la bÃºsqueda a categorÃ­as, nombre y texto de ingredientes por si la base de datos estÃ¡ incompleta
-            const allTags = [...labels, ...categories, ...analysisTags].map(t => t.toLowerCase());
-            
-            const isExplicitlySafe = allTags.some(t => 
-                t.includes('gluten-free') || 
-                t.includes('sin-gluten') || 
-                t.includes('sans-gluten') ||
-                t.includes('sin-tacc') ||
-                t.includes('no-gluten')
-            ) || productName.includes('sin gluten') || ingredientsText.toLowerCase().includes('sin gluten');
-            
-            if (isExplicitlySafe) {
-                renderResult({
-                    isWarning: false,
-                    gluten: false,
-                    reason: getT('result.safe_cert'),
-                    ingredients: mappedIngredients,
-                    imageUrl: p.image_url || p.image_front_url || null,
-                    barcode: barcode,
-                    productName: displayName
-                });
-                return;
-            }
-
-            // 2. Es peligroso si declara alÃ©rgenos de gluten explÃ­citos
-            if (
-                allergens.includes('en:gluten') || 
-                allergens.includes('en:wheat') || 
-                allergens.includes('en:barley') || 
-                allergens.includes('en:oats') || 
-                allergens.includes('en:rye')
-            ) {
-                renderResult({
-                    isWarning: false,
-                    gluten: true,
-                    reason: getT('result.unsafe_allergens'),
-                    ingredientWithGluten: 'Gluten / Cereales',
-                    ingredients: mappedIngredients,
-                    imageUrl: p.image_url || p.image_front_url || null,
-                    barcode: barcode,
-                    productName: displayName
-                });
-                return;
-            }
-
-            // 3. Dudoso: Puede tener trazas o no estar certificado
-            let reasonText = getT('result.warning_not_certified');
-            if (traces.includes('en:gluten') || traces.includes('en:wheat')) {
-                reasonText = getT('result.warning_traces');
-            }
-
-            renderResult({
-                isWarning: true,
-                gluten: null,
-                reason: reasonText,
-                ingredients: mappedIngredients,
-                imageUrl: p.image_url || p.image_front_url || null,
-                barcode: barcode,
-                productName: displayName
-            });
-
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    // 2. Evento del botÃ³n de captura (Solo IA)
-    captureBtn.addEventListener('click', async () => {
-        if (!video.videoWidth) return;
-
-        // Mostrar pantalla de carga
-        loadingScreen.classList.add('active');
-
-        // Calcular el recorte exacto para que coincida con lo que se ve en pantalla (object-fit: cover)
-        const vw = video.videoWidth;
-        const vh = video.videoHeight;
-        const cw = video.clientWidth;
-        const ch = video.clientHeight;
+        // Calculate exact crop to match object-fit: cover
+        const vw = this.video.videoWidth;
+        const vh = this.video.videoHeight;
+        const cw = this.video.clientWidth;
+        const ch = this.video.clientHeight;
 
         const videoRatio = vw / vh;
         const screenRatio = cw / ch;
@@ -362,63 +153,266 @@ async function handleBarcodeDetected(barcode) {
         let sourceX = 0, sourceY = 0, sourceWidth = vw, sourceHeight = vh;
 
         if (screenRatio > videoRatio) {
-            // La pantalla es mÃ¡s ancha que el vÃ­deo (recortar arriba y abajo)
             sourceHeight = vw / screenRatio;
             sourceY = (vh - sourceHeight) / 2;
         } else {
-            // La pantalla es mÃ¡s alta que el vÃ­deo (recortar a los lados)
             sourceWidth = vh * screenRatio;
             sourceX = (vw - sourceWidth) / 2;
         }
 
-        // Escalar para no enviar un payload gigante (mÃ¡ximo 800px)
+        // Scale down to max 800px to save payload size
         const MAX_WIDTH = 800;
         let scale = 1;
         if (sourceWidth > MAX_WIDTH) {
             scale = MAX_WIDTH / sourceWidth;
         }
         
-        canvas.width = sourceWidth * scale;
-        canvas.height = sourceHeight * scale;
+        this.canvas.width = sourceWidth * scale;
+        this.canvas.height = sourceHeight * scale;
         
-        // Dibujar el frame actual escalado y recortado
-        ctx.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
+        this.ctx.drawImage(this.video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, this.canvas.width, this.canvas.height);
         
-        // Obtener la imagen en base64 (JPEG) con compresiÃ³n
-        const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+        const base64Image = this.canvas.toDataURL('image/jpeg', 0.7);
         const base64Data = base64Image.split(',')[1];
 
-        // Poner la foto capturada en el resultado
-        document.getElementById('scanner-result-img').src = base64Image;
+        this.onCaptured(base64Image, base64Data);
+    }
+}
 
-        // Llamar a Gemini
-        await analyzeWithGemini(base64Data);
+// ---------------------------------------------------------
+// 3. MAIN CONTROLLER
+// ---------------------------------------------------------
+let stream = null;
+let currentScanMode = new URLSearchParams(window.location.search).get('mode') || 'EAN';
+let lastScannedBarcode = null;
+
+const eanScanner = new EANScanner(video, async (barcode) => {
+    // TRIGGERED WHEN BARCODE FOUND
+    if (navigator.vibrate) navigator.vibrate(100);
+    lastScannedBarcode = barcode;
+    loadingScreen.classList.add('active');
+    
+    try {
+        await analyzeWithOpenFoodFacts(barcode);
+    } catch (error) {
+        console.error("Network Error:", error);
+        showCustomDialog({
+            type: 'error',
+            title: getT('modal.error_network'),
+            message: getT('modal.error_network_desc')
+        });
+        loadingScreen.classList.remove('active');
+        eanScanner.start(); // Resume
+    }
+});
+
+const iaScanner = new IAScanner(video, captureCanvas, async (base64Image, base64Data) => {
+    // TRIGGERED WHEN PHOTO TAKEN
+    document.getElementById('scanner-result-img').src = base64Image;
+    loadingScreen.classList.add('active');
+    await analyzeWithGemini(base64Data);
+});
+
+
+// Camera Initialization
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        video.setAttribute('playsinline', 'true');
+        video.srcObject = stream;
+        
+        await new Promise((resolve) => {
+            if (video.readyState >= 2) {
+                video.play().then(resolve).catch(resolve);
+            } else {
+                video.onloadedmetadata = () => {
+                    video.play().then(resolve).catch(resolve);
+                };
+            }
+        });
+        
+        updateScannerUI(currentScanMode);
+    } catch (error) {
+        console.error("Camera Error:", error);
+        showCustomDialog({
+            type: 'error',
+            title: getT('modal.error_camera'),
+            message: getT('modal.error_camera_desc')
+        });
+    }
+}
+
+function updateScannerUI(mode, keepBarcode = false) {
+    if (!keepBarcode) {
+        lastScannedBarcode = null;
+    }
+
+    currentScanMode = mode;
+    if (mode === 'EAN') {
+        reticleIa.classList.add('reticle-hidden');
+        reticleEan.classList.remove('reticle-hidden');
+        instructionText.setAttribute('data-i18n', 'scanner.focus_ean');
+        instructionText.innerText = getT('scanner.focus_ean');
+        modeSwitchText.setAttribute('data-i18n', 'home.scan_ia');
+        modeSwitchText.innerText = getT('home.scan_ia');
+        modeSwitchIcon.className = "ph-bold ph-scan";
+        captureBtn.style.display = 'none';
+        
+        eanScanner.start();
+    } else {
+        reticleEan.classList.add('reticle-hidden');
+        reticleIa.classList.remove('reticle-hidden');
+        instructionText.setAttribute('data-i18n', 'scanner.focus');
+        instructionText.innerText = getT('scanner.focus');
+        modeSwitchText.setAttribute('data-i18n', 'home.scan_ean');
+        modeSwitchText.innerText = getT('home.scan_ean');
+        modeSwitchIcon.className = "ph-bold ph-barcode";
+        captureBtn.style.display = 'flex';
+        
+        eanScanner.stop();
+    }
+}
+
+modeSwitchBtn.addEventListener('click', () => {
+    updateScannerUI(currentScanMode === 'IA' ? 'EAN' : 'IA');
+});
+
+captureBtn.addEventListener('click', () => {
+    iaScanner.captureAndAnalyze();
+});
+
+// Start everything
+startCamera();
+
+window.addEventListener('beforeunload', () => {
+    if (stream) stream.getTracks().forEach(track => track.stop());
+    eanScanner.stop();
+});
+
+// ---------------------------------------------------------
+// 4. API CALLS & RENDERING (OpenFoodFacts & Gemini)
+// ---------------------------------------------------------
+
+async function analyzeWithOpenFoodFacts(barcode) {
+    const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const data = await response.json();
+
+    if (data.status === 0 || !data.product) {
+        renderResult({
+            isNotFound: true,
+            isWarning: true,
+            barcode: barcode,
+            reason: getT('result.not_found') + ` (EAN: ${barcode})`,
+            ingredients: [],
+            gluten: null,
+            productName: `Producto ${barcode}`
+        });
+        return;
+    }
+
+    const p = data.product;
+    const labels = p.labels_tags || [];
+    const allergens = p.allergens_tags || [];
+    const traces = p.traces_tags || [];
+    const ingredientsText = p.ingredients_text || '';
+    const analysisTags = p.ingredients_analysis_tags || [];
+    const categories = p.categories_tags || [];
+    const productName = (p.product_name || '').toLowerCase();
+    
+    const rawProductName = p.product_name || '';
+    const rawBrand = p.brands || '';
+    const displayName = rawBrand ? `${rawProductName} - ${rawBrand}` : rawProductName;
+
+    let ingredientsList = [];
+    if (p.ingredients && Array.isArray(p.ingredients)) {
+        ingredientsList = p.ingredients;
+    }
+
+    const mappedIngredients = ingredientsList.map(i => ({
+        name: i.text || i.id || ''
+    })).filter(i => i.name.trim() !== '');
+
+    if (mappedIngredients.length === 0 && ingredientsText) {
+        mappedIngredients.push({ name: ingredientsText });
+    }
+
+    if (
+        labels.includes('en:gluten-free') || 
+        labels.includes('es:sin-gluten') ||
+        analysisTags.includes('en:gluten-free')
+    ) {
+        renderResult({
+            isWarning: false,
+            gluten: false,
+            reason: getT('result.safe_certified'),
+            ingredients: mappedIngredients,
+            imageUrl: p.image_url || p.image_front_url || null,
+            barcode: barcode,
+            productName: displayName
+        });
+        return;
+    }
+
+    if (
+        allergens.includes('en:gluten') || 
+        allergens.includes('en:wheat') || 
+        allergens.includes('en:barley') || 
+        allergens.includes('en:oats') || 
+        allergens.includes('en:rye')
+    ) {
+        renderResult({
+            isWarning: false,
+            gluten: true,
+            reason: getT('result.unsafe_allergens'),
+            ingredientWithGluten: 'Gluten / Cereales',
+            ingredients: mappedIngredients,
+            imageUrl: p.image_url || p.image_front_url || null,
+            barcode: barcode,
+            productName: displayName
+        });
+        return;
+    }
+
+    let reasonText = getT('result.warning_not_certified');
+    if (traces.includes('en:gluten') || traces.includes('en:wheat')) {
+        reasonText = getT('result.warning_traces');
+    }
+
+    renderResult({
+        isWarning: true,
+        gluten: null,
+        reason: reasonText,
+        ingredients: mappedIngredients,
+        imageUrl: p.image_url || p.image_front_url || null,
+        barcode: barcode,
+        productName: displayName
     });
+}
 
-    // 3. FunciÃ³n para llamar a Gemini
-    async function analyzeWithGemini(base64Data) {
+async function analyzeWithGemini(base64Data) {
+    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
+    let userLang = userObj.language || 'Español';
 
-        let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-        let userLang = userObj.language || 'EspaÃ±ol';
-
-        const promptText = `
-Eres un experto nutricionista especializado en intolerancias alimentarias y celiaquÃ­a.
-A continuaciÃ³n tienes una imagen de una etiqueta. 
-IMPORTANTE: El idioma principal del usuario es ${userLang}. Debes TRADUCIR todos los nombres de los ingredientes, el nombre del producto y la explicaciÃ³n al ${userLang}, independientemente del idioma en el que estÃ© escrita la etiqueta original.
+    const promptText = `
+Eres un experto nutricionista especializado en intolerancias alimentarias y celiaquía.
+A continuación tienes una imagen de una etiqueta. 
+IMPORTANTE: El idioma principal del usuario es ${userLang}. Debes TRADUCIR todos los nombres de los ingredientes, el nombre del producto y la explicación al ${userLang}, independientemente del idioma en el que esté escrita la etiqueta original.
 
 1. Primero, verifica si en la imagen aparece una lista de ingredientes o etiqueta de un producto alimenticio.
 2. Si NO detectas ninguna etiqueta legible o no parece un alimento, devuelve EXCLUSIVAMENTE este JSON:
 {
   "error": "no_label_detected",
-  "reason": "No he podido detectar una lista de ingredientes clara. Por favor, asegÃºrate de enfocar bien la etiqueta y repite la foto."
+  "reason": "No he podido detectar una lista de ingredientes clara. Por favor, asegúrate de enfocar bien la etiqueta y repite la foto."
 }
-3. Si SÃ hay una etiqueta, extrae los ingredientes (traducidos al ${userLang}) y determina si el producto es seguro para un celÃ­aco (gluten-free). Busca explÃ­citamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
-Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no aÃ±adas markdown ni texto fuera del JSON):
+3. Si SÍ hay una etiqueta, extrae los ingredientes (traducidos al ${userLang}) y determina si el producto es seguro para un celíaco (gluten-free). Busca explícitamente: trigo, cebada, centeno, avena, malta, levadura de cerveza, espelta, kamut.
+Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no añadas markdown ni texto fuera del JSON):
 {
   "productName": "Nombre del producto - Nombre de la marca (si no logras deducir la marca de la foto, pon solo el nombre del producto. Si no ves ninguno, pon 'Producto detectado')",
-  "gluten": true (si contiene gluten explÃ­cito) o false (si es seguro),
-  "isWarning": true (si tienes dudas, informaciÃ³n ilegible o dice "puede contener trazas de gluten") o false,
-  "reason": "ExplicaciÃ³n breve",
+  "gluten": true (si contiene gluten explícito) o false (si es seguro),
+  "isWarning": true (si tienes dudas, información ilegible o dice "puede contener trazas de gluten") o false,
+  "reason": "Explicación breve",
   "ingredientWithGluten": "El nombre exacto del primer ingrediente detectado con gluten (o null si es seguro)",
   "ingredients": [
     { "name": "Ingrediente 1" }
@@ -426,286 +420,254 @@ Devuelve EXCLUSIVAMENTE un JSON con esta estructura (no aÃ±adas markdown ni te
 }
 `;
 
-        const requestBody = {
-            contents: [{
-                parts: [
-                    { text: promptText },
-                    {
-                        inlineData: {
-                            mimeType: "image/jpeg",
-                            data: base64Data
-                        }
+    const requestBody = {
+        contents: [{
+            parts: [
+                { text: promptText },
+                {
+                    inlineData: {
+                        mimeType: "image/jpeg",
+                        data: base64Data
                     }
-                ]
-            }],
-            generationConfig: {
-                temperature: 0.1,
-                responseMimeType: "application/json"
-            }
-        };
+                }
+            ]
+        }],
+        generationConfig: {
+            temperature: 0.1,
+            responseMimeType: "application/json"
+        }
+    };
 
-        try {
-            // Llamada al endpoint backend de Vercel
-            const response = await fetch(`/api/analyze`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody)
-            });
+    try {
+        const response = await fetch(`/api/analyze`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
 
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error?.message || "Error HTTP " + response.status);
-            }
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error?.message || "Error HTTP " + response.status);
+        }
 
-            const data = await response.json();
-            const textResponse = data.candidates[0].content.parts[0].text;
-            
-            const cleanJsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
-            const scanResult = JSON.parse(cleanJsonStr);
+        const data = await response.json();
+        const textResponse = data.candidates[0].content.parts[0].text;
+        
+        const cleanJsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+        const scanResult = JSON.parse(cleanJsonStr);
 
-            // Inyectar el barcode si venimos de un EAN no encontrado/dudoso
-            if (lastScannedBarcode) {
-                scanResult.barcode = lastScannedBarcode;
-            }
+        if (lastScannedBarcode) {
+            scanResult.barcode = lastScannedBarcode;
+        }
 
-            if (scanResult.error === 'no_label_detected') {
-                showCustomDialog({
-                    type: 'error',
-                    title: 'No se detectÃ³ etiqueta',
-                    message: scanResult.reason || 'No he podido detectar una lista de ingredientes clara. Por favor, asegÃºrate de enfocar bien la etiqueta y repite la foto.'
-                });
-                loadingScreen.classList.remove('active');
-                return;
-            }
-
-            renderResult(scanResult);
-
-        } catch (error) {
-            console.error("Error procesando imagen:", error);
+        if (scanResult.error === 'no_label_detected') {
             showCustomDialog({
                 type: 'error',
-                title: 'Error en el anÃ¡lisis',
-                message: 'No pudimos procesar la imagen correctamente. AsegÃºrate de que la foto se vea nÃ­tida e intÃ©ntalo de nuevo.'
+                title: 'No se detectó etiqueta',
+                message: scanResult.reason || 'No he podido detectar una lista de ingredientes clara. Por favor, asegúrate de enfocar bien la etiqueta y repite la foto.'
             });
             loadingScreen.classList.remove('active');
+            return;
         }
-    }
 
-    // 4. Guardar en Historial
-    async function saveToHistory(scanResult) {
-        if (!auth.currentUser) return; // Si no hay usuario, no guardar
+        renderResult(scanResult);
 
-        // Asignar ID basado en timestamp
-        scanResult.id = Date.now();
-        
-        try {
-            const userRef = doc(db, "users", auth.currentUser.uid);
-            await updateDoc(userRef, {
-                scans: arrayUnion(scanResult)
-            });
-            
-            // Opcional: si queremos limitar a 10 escaneos, tendrÃ­amos que leer, truncar y guardar, 
-            // pero para esta versiÃ³n bÃ¡sica dejaremos que arrayUnion aÃ±ada indefinidamente 
-            // o lo gestionamos en la pantalla de historial.
-        } catch (error) {
-            console.error("Error guardando en historial:", error);
-        }
-    }
-
-    // 5. Renderizar Resultado en Pantalla
-    function renderResult(scan) {
+    } catch (error) {
+        console.error("Error procesando imagen:", error);
+        showCustomDialog({
+            type: 'error',
+            title: 'Error en el análisis',
+            message: 'No pudimos procesar la imagen correctamente. Asegúrate de que la foto se vea nítida e inténtalo de nuevo.'
+        });
         loadingScreen.classList.remove('active');
+    }
+}
 
-        // Solo guardar en historial si aÃºn no se ha guardado en esta instancia
-        if (!scan.date) {
-            const now = new Date();
-            const day = now.getDate().toString().padStart(2, '0');
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            const year = now.getFullYear();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            scan.date = `${day}/${month}/${year} ${hours}:${minutes}`;
-            saveToHistory(scan);
-        }
+// 5. Render Result & Save to History
+function renderResult(scan) {
+    loadingScreen.classList.remove('active');
 
-        // Si tenemos una URL de imagen (OpenFoodFacts) la ponemos
-        if (scan.imageUrl) {
-            document.getElementById('scanner-result-img').src = scan.imageUrl;
-        } else if (currentScanMode === 'EAN' && !document.getElementById('scanner-result-img').src.startsWith('data:')) {
-            // Si es EAN pero no hay foto, ponemos una por defecto (y evitamos pisar la de IA si ya estaba)
-            document.getElementById('scanner-result-img').src = '../ASSETS/logo.png';
-        }
+    if (!scan.date) {
+        const now = new Date();
+        const day = now.getDate().toString().padStart(2, '0');
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const year = now.getFullYear();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        scan.date = `${day}/${month}/${year} ${hours}:${minutes}`;
+        saveToHistory(scan);
+    }
 
-        const isNotFound = scan.isNotFound === true;
-        const isSafe = scan.gluten === false;
-        const isWarning = scan.isWarning && !isNotFound;
+    if (scan.imageUrl) {
+        document.getElementById('scanner-result-img').src = scan.imageUrl;
+    } else if (currentScanMode === 'EAN' && !document.getElementById('scanner-result-img').src.startsWith('data:')) {
+        document.getElementById('scanner-result-img').src = '../Images/Logos/Glutn_Logo-ShortIcon.PNG';
+    }
+
+    const isNotFound = scan.isNotFound === true;
+    const isSafe = scan.gluten === false;
+    const isWarning = scan.isWarning && !isNotFound;
+    
+    const badge = document.getElementById('scanner-result-badge');
+    const aiBox = document.getElementById('ai-recommendation-box');
+    const offEditBox = document.getElementById('off-edit-box');
+    const offEditBtn = document.getElementById('off-edit-btn');
+    const aiWarningHeader = aiBox.querySelector('.ai-warning-header');
+    const aiWarningText = aiBox.querySelector('.ai-warning-text');
+    
+    aiBox.style.display = 'none';
+    if (offEditBox) offEditBox.style.display = 'none';
+
+    if (isNotFound) {
+        badge.className = 'verdict-banner';
+        badge.innerHTML = `<i class="ph-bold ph-question"></i> <span data-i18n="result.not_found">Producto no encontrado</span>`;
+        badge.style.backgroundColor = '#6B7280';
         
-        const badge = document.getElementById('scanner-result-badge');
-        const aiBox = document.getElementById('ai-recommendation-box');
-        const offEditBox = document.getElementById('off-edit-box');
-        const offEditBtn = document.getElementById('off-edit-btn');
-        const aiWarningHeader = aiBox.querySelector('.ai-warning-header');
-        const aiWarningText = aiBox.querySelector('.ai-warning-text');
+        aiBox.style.display = 'block';
+        aiWarningHeader.innerHTML = `<i class="ph-bold ph-magnifying-glass"></i> <span data-i18n="scanner.not_found_title">Producto Desconocido</span>`;
+        aiWarningText.setAttribute('data-i18n', 'scanner.not_found_desc');
+        aiWarningText.innerText = getT('scanner.not_found_desc');
         
-        // Reset state
-        aiBox.style.display = 'none';
-        if (offEditBox) offEditBox.style.display = 'none';
-
-        if (isNotFound) {
-            badge.className = 'verdict-banner';
-            badge.innerHTML = `<i class="ph-bold ph-question"></i> <span data-i18n="result.not_found">Producto no encontrado</span>`;
-            badge.style.backgroundColor = '#6B7280'; // Gris
-            
-            // Sugerir escanear con IA
-            aiBox.style.display = 'block';
-            aiWarningHeader.innerHTML = `<i class="ph-bold ph-magnifying-glass"></i> <span data-i18n="scanner.not_found_title">Producto Desconocido</span>`;
-            aiWarningText.setAttribute('data-i18n', 'scanner.not_found_desc');
-            aiWarningText.innerText = getT('scanner.not_found_desc');
-            
-        } else if (isWarning) {
-            badge.className = 'verdict-banner warning';
-            badge.innerHTML = `<i class="ph-fill ph-warning"></i> <span data-i18n="scanner.warning">InformaciÃ³n Dudosa</span>`;
-            badge.style.backgroundColor = '#F59E0B';
-            
-            // Mostrar sugerencia de usar IA
-            aiBox.style.display = 'block';
-            aiWarningHeader.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="scanner.warning">InformaciÃ³n Dudosa</span>`;
-            aiWarningText.setAttribute('data-i18n', 'scanner.warning_desc');
-            aiWarningText.innerText = getT('scanner.warning_desc');
-            
-        } else if (isSafe) {
-            badge.className = 'verdict-banner safe';
-            badge.innerHTML = `<i class="ph-fill ph-check-circle"></i> <span data-i18n="scanner.safe">SEGURO</span>`;
-            badge.style.backgroundColor = '#0FA874';
-        } else {
-            badge.className = 'verdict-banner unsafe';
-            badge.innerHTML = `<i class="ph-fill ph-x-circle"></i> <span data-i18n="scanner.unsafe">No Apto</span>`;
-            badge.style.backgroundColor = '#EF4444';
-        }
-
-        // LÃ³gica para mostrar el botÃ³n de aportar a OpenFoodFacts
-        if (scan.barcode && offEditBox) {
-            // Si no fue encontrado (estado EAN inicial), no lo mostramos. Lo mostraremos tras la IA
-            if (!isNotFound && (currentScanMode === 'IA' || currentScanMode === 'EAN')) {
+    } else if (isWarning) {
+        badge.className = 'verdict-banner warning';
+        badge.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="result.caution">Precaución</span>`;
+        
+        aiBox.style.display = 'block';
+        aiWarningHeader.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="scanner.warning">Información Dudosa</span>`;
+        aiWarningText.setAttribute('data-i18n', 'scanner.warning_desc');
+        aiWarningText.innerText = getT('scanner.warning_desc');
+        
+        if (scan.barcode) {
+            if (offEditBox) {
                 offEditBox.style.display = 'block';
-                const offEditBtnText = offEditBox.querySelector('span');
-                if (currentScanMode === 'IA') {
-                    offEditBtnText.innerText = "AÃ±adir a OpenFoodFacts";
-                } else {
-                    offEditBtnText.innerText = "Aportar a OpenFoodFacts";
-                }
                 offEditBtn.onclick = () => {
                     window.open(`https://world.openfoodfacts.org/cgi/product.pl?type=edit&code=${scan.barcode}`, '_blank');
                 };
             }
         }
-
-        // RazÃ³n
-        document.getElementById('scanner-result-reason').innerText = scan.reason;
-
-        // Lista de Ingredientes
-        const ul = document.getElementById('scanner-result-ingredients');
-        ul.innerHTML = '';
-        if (scan.ingredients && scan.ingredients.length > 0) {
-            scan.ingredients.forEach(ing => {
-                const li = document.createElement('li');
-                li.innerText = ing.name;
-                if (ing.name === scan.ingredientWithGluten) {
-                    li.className = 'unsafe-ingredient unsafe-item'; // Para aplicar el CSS rojo
-                }
-                ul.appendChild(li);
-            });
-        } else {
-            ul.innerHTML = '<li>Sin informaciÃ³n detallada de ingredientes</li>';
-        }
-
-        // Aplicar traducciones a los textos nuevos
-        if (typeof window.applyTranslations === 'function') {
-            window.applyTranslations(currentUserLang || 'EspaÃ±ol');
-        }
-
-        // Mostrar pantalla de resultado
-        resultScreen.classList.add('active');
+    } else if (isSafe) {
+        badge.className = 'verdict-banner safe';
+        badge.innerHTML = `<i class="ph-bold ph-check-circle"></i> <span data-i18n="result.safe">Apto para Celíacos</span>`;
+    } else {
+        badge.className = 'verdict-banner danger';
+        badge.innerHTML = `<i class="ph-bold ph-x-circle"></i> <span data-i18n="result.not_safe">Contiene Gluten</span>`;
     }
 
-    // BotÃ³n de RecomendaciÃ³n IA
-    document.getElementById('ai-switch-btn').addEventListener('click', () => {
-        resultScreen.classList.remove('active');
-        updateScannerUI('IA', true); // Cambia a modo IA y mantiene el barcode
-    });
+    const reasonEl = document.getElementById('scanner-result-reason');
+    if (scan.ingredientWithGluten) {
+        reasonEl.innerHTML = `${scan.reason} <br><strong>Ingrediente detectado: <span style="color:#ef4444">${scan.ingredientWithGluten}</span></strong>`;
+    } else {
+        reasonEl.innerText = scan.reason;
+    }
 
-    // === 4. MODAL PERSONALIZADO ===
-    function showCustomDialog(options) {
-        return new Promise((resolve) => {
-            const modal = document.getElementById('custom-modal');
-            const iconWrapper = document.getElementById('custom-modal-icon');
-            const icon = iconWrapper.querySelector('i');
-            const title = document.getElementById('custom-modal-title');
-            const message = document.getElementById('custom-modal-message');
-            const input = document.getElementById('custom-modal-input');
-            const btnCancel = document.getElementById('custom-modal-cancel');
-            const btnConfirm = document.getElementById('custom-modal-confirm');
-
-            // Reset
-            input.value = '';
-            input.style.display = 'none';
-            btnCancel.style.display = 'none';
-            
-            // Configurar segÃºn tipo
-            title.innerText = options.title || 'Aviso';
-            message.innerText = options.message || '';
-
-            if (options.type === 'error') {
-                iconWrapper.className = 'custom-icon-wrapper';
-                icon.className = 'ph-bold ph-warning-circle';
-                btnConfirm.style.backgroundColor = '#DC2626';
-            } else if (options.type === 'prompt') {
-                iconWrapper.className = 'custom-icon-wrapper info';
-                icon.className = 'ph-bold ph-key';
-                btnConfirm.style.backgroundColor = 'var(--card-green)';
-                input.style.display = 'block';
-                input.placeholder = options.placeholder || '';
-                btnCancel.style.display = 'block';
-            } else {
-                iconWrapper.className = 'custom-icon-wrapper info';
-                icon.className = 'ph-bold ph-info';
-                btnConfirm.style.backgroundColor = 'var(--card-green)';
+    const ul = document.getElementById('scanner-result-ingredients');
+    ul.innerHTML = '';
+    
+    if (scan.ingredients && scan.ingredients.length > 0) {
+        scan.ingredients.forEach(ing => {
+            const li = document.createElement('li');
+            li.innerText = ing.name;
+            if (scan.ingredientWithGluten && ing.name.toLowerCase().includes(scan.ingredientWithGluten.toLowerCase())) {
+                li.style.color = '#ef4444';
+                li.style.fontWeight = 'bold';
             }
-
-            // Manejadores
-            const handleConfirm = () => {
-                closeModal();
-                resolve(options.type === 'prompt' ? input.value.trim() : true);
-            };
-
-            const handleCancel = () => {
-                closeModal();
-                resolve(null);
-            };
-
-            const closeModal = () => {
-                modal.classList.remove('active');
-                btnConfirm.removeEventListener('click', handleConfirm);
-                btnCancel.removeEventListener('click', handleCancel);
-            };
-
-            btnConfirm.addEventListener('click', handleConfirm);
-            btnCancel.addEventListener('click', handleCancel);
-
-            // Mostrar modal
-            modal.classList.add('active');
-            if (options.type === 'prompt') {
-                setTimeout(() => input.focus(), 100);
-            }
+            ul.appendChild(li);
         });
+    } else {
+        const li = document.createElement('li');
+        li.innerText = getT('scanner.no_ingredients');
+        ul.appendChild(li);
     }
 
-    // Exponer resetScanner globalmente para los botones HTML
-    window.resetScanner = function(mode) {
-        document.getElementById('result-screen').style.display = 'none';
-        updateScannerUI(mode);
-    };
+    // Traducir los textos dinámicos generados
+    if (typeof window.applyTranslations === 'function') {
+        window.applyTranslations(localStorage.getItem('glutn_lang') || 'es');
+    }
 
-});
+    resultScreen.classList.add('active');
+    
+    // Configurar botón de IA
+    const aiSwitchBtn = document.getElementById('ai-switch-btn');
+    const oldAiSwitchBtn = aiSwitchBtn.cloneNode(true);
+    aiSwitchBtn.parentNode.replaceChild(oldAiSwitchBtn, aiSwitchBtn);
+    
+    oldAiSwitchBtn.addEventListener('click', () => {
+        resultScreen.classList.remove('active');
+        updateScannerUI('IA', true);
+    });
+}
 
+// 6. Save to History
+async function saveToHistory(scanResult) {
+    if (!auth.currentUser) return;
 
+    scanResult.id = Date.now();
+    
+    try {
+        await addDoc(collection(db, "users", auth.currentUser.uid, "history"), {
+            ...scanResult,
+            timestamp: serverTimestamp()
+        });
+    } catch (e) {
+        console.error("Error guardando en historial: ", e);
+    }
+}
+
+// 7. CUSTOM MODAL LOGIC
+function showCustomDialog(options) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('custom-modal');
+        const iconWrapper = document.getElementById('custom-modal-icon');
+        const icon = iconWrapper.querySelector('i');
+        const title = document.getElementById('custom-modal-title');
+        const message = document.getElementById('custom-modal-message');
+        const input = document.getElementById('custom-modal-input');
+        const btnCancel = document.getElementById('custom-modal-cancel');
+        const btnConfirm = document.getElementById('custom-modal-confirm');
+
+        input.value = '';
+        input.style.display = 'none';
+        btnCancel.style.display = 'none';
+        
+        iconWrapper.className = 'custom-icon-wrapper';
+        if (options.type === 'error') {
+            iconWrapper.classList.add('error');
+            icon.className = 'ph-bold ph-warning-circle';
+        } else if (options.type === 'success') {
+            iconWrapper.classList.add('success');
+            icon.className = 'ph-bold ph-check-circle';
+        } else {
+            iconWrapper.classList.add('info');
+            icon.className = 'ph-bold ph-info';
+        }
+
+        title.innerText = options.title || 'Aviso';
+        message.innerText = options.message || '';
+
+        if (options.showInput) {
+            input.style.display = 'block';
+            input.placeholder = options.inputPlaceholder || '';
+        }
+
+        if (options.showCancel) {
+            btnCancel.style.display = 'inline-block';
+            btnCancel.onclick = () => {
+                modal.classList.remove('active');
+                resolve({ confirmed: false });
+            };
+        }
+
+        btnConfirm.onclick = () => {
+            modal.classList.remove('active');
+            resolve({ 
+                confirmed: true,
+                value: options.showInput ? input.value : null
+            });
+        };
+
+        modal.classList.add('active');
+        if (options.showInput) {
+            input.focus();
+        }
+    });
+}
