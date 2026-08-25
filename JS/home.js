@@ -149,13 +149,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (scanEanCard) {
         scanEanCard.addEventListener('click', () => {
-            window.location.href = 'HTML/scanner.html?mode=EAN';
+            window.location.href = 'scanner.html?mode=EAN';
         });
     }
 
     if (scanIaCard) {
         scanIaCard.addEventListener('click', () => {
-            window.location.href = 'HTML/scanner.html?mode=IA';
+            window.location.href = 'scanner.html?mode=IA';
         });
     }
 });
