@@ -52,9 +52,10 @@ async function startEANScanner() {
         await html5QrCode.start(
             { facingMode: "environment" },
             {
-                fps: 10,
-                qrbox: { width: 250, height: 150 },
-                formatsToSupport: [ Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E ]
+                fps: 15
+                // Eliminamos qrbox para que escanee TODA la pantalla. Si el usuario se acerca mucho,
+                // con qrbox se recortan los bordes del código y falla.
+                // Eliminamos formatsToSupport para que pille todo por defecto.
             },
             async (decodedText, decodedResult) => {
                 // Success Callback
