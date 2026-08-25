@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // === LÓGICA DE MODOS DE ESCANEO ===
     const urlParams = new URLSearchParams(window.location.search);
-    let currentScanMode = urlParams.get('mode') || 'IA';
+    let currentScanMode = urlParams.get('mode') || 'EAN';
     
     const reticleIa = document.getElementById('reticle-ia');
     const reticleEan = document.getElementById('reticle-ean');
@@ -138,6 +138,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!isScanningBarcode || currentScanMode !== 'EAN' || isDecoding) return;
             
             isDecoding = true;
+            
+            // Intentar usar BarcodeDetector nativo si está disponible (Android/iOS 17+)
+            if ('BarcodeDetector' in window) {
+                if (!window.nativeBarcodeDetector) {
+                    window.nativeBarcodeDetector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'qr_code', 'upc_a', 'upc_e'] });
+                }
+                window.nativeBarcodeDetector.detect(video)
+                    .then(barcodes => {
+                        if (barcodes.length > 0 && isScanningBarcode) {
+                            isScanningBarcode = false;
+                            isDecoding = false;
+                            handleBarcodeDetected(barcodes[0].rawValue);
+                        } else {
+                            isDecoding = false;
+                            if (isScanningBarcode) setTimeout(scan, 100);
+                        }
+                    })
+                    .catch(err => {
+                        fallbackZXing();
+                    });
+            } else {
+                fallbackZXing();
+            }
+        }
+        
+        function fallbackZXing() {
             try {
                 codeReader.decodeFromVideoElement(video)
                     .then(result => {
@@ -152,7 +178,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .catch(err => {
                         isDecoding = false;
                         if (isScanningBarcode) {
-                            // Reintentar cada 200ms si no detecta nada
                             setTimeout(scan, 200);
                         }
                     });
