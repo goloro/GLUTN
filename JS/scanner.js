@@ -33,87 +33,50 @@ class EANScanner {
         this.video = videoElement;
         this.onDetected = onDetected;
         this.isScanning = false;
-        this.isDecoding = false;
         
-        // Setup detectors
+        // Setup detector (100% ZXing, no experimental native APIs)
         this.zxing = new ZXing.BrowserMultiFormatReader();
-        this.native = null;
-        if ('BarcodeDetector' in window) {
-            try {
-                this.native = new BarcodeDetector();
-            } catch(e) { console.warn('Native BarcodeDetector not fully supported.'); }
-        }
-        
-        // Pre-allocate canvas for performance fallback
-        this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
     }
 
     start() {
         if (this.isScanning) return;
         this.isScanning = true;
-        this.isDecoding = false;
-        this.loop();
+        
+        // Wait for video dimensions to be ready before giving it to ZXing
+        const checkVideo = () => {
+            if (this.video.videoWidth === 0 || this.video.videoHeight === 0) {
+                if (this.isScanning) setTimeout(checkVideo, 100);
+                return;
+            }
+            this.scanContinuously();
+        };
+        checkVideo();
     }
 
     stop() {
         this.isScanning = false;
-        this.isDecoding = false;
+        try {
+            this.zxing.reset();
+        } catch (e) {}
     }
 
-    async loop() {
+    scanContinuously() {
         if (!this.isScanning) return;
-        if (this.isDecoding) return;
-        
-        // Skip if video isn't rendering yet
-        if (this.video.videoWidth === 0 || this.video.videoHeight === 0) {
-            setTimeout(() => this.loop(), 200);
-            return;
-        }
 
-        this.isDecoding = true;
-
-        try {
-            // Promise wrapper to prevent hanging!
-            const result = await Promise.race([
-                this.detectBarcode(),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 800))
-            ]);
-
-            if (result && this.isScanning) {
-                this.isScanning = false;
-                this.isDecoding = false;
-                this.onDetected(result);
-                return; // Stop loop, we found it!
-            }
-        } catch (e) {
-            // Timeout or detection error, ignore and continue
-        }
-
-        this.isDecoding = false;
-        if (this.isScanning) {
-            setTimeout(() => this.loop(), 150);
-        }
-    }
-
-    async detectBarcode() {
-        // 1. Try Native BarcodeDetector (iOS 17+ / Android)
-        if (this.native) {
-            try {
-                const barcodes = await this.native.detect(this.video);
-                if (barcodes.length > 0) return barcodes[0].rawValue;
-            } catch (e) {}
-        }
-
-        // 2. Fallback to ZXing using video directly (fixes TypeError from canvas)
-        try {
-            const result = await this.zxing.decodeFromVideoElement(this.video);
-            if (result) return result.text;
-        } catch (e) {
-            return null; // NotFoundException is normal
-        }
-        
-        return null;
+        // ZXing's built-in continuous scanner API
+        this.zxing.decodeFromVideoElement(this.video)
+            .then(result => {
+                if (result && this.isScanning) {
+                    this.isScanning = false;
+                    this.onDetected(result.text);
+                }
+            })
+            .catch(err => {
+                // If it fails (e.g. timeout, unreadable frame, or reset), we restart it if we are still supposed to be scanning
+                if (this.isScanning) {
+                    setTimeout(() => this.scanContinuously(), 300);
+                }
+            });
     }
 }
 
