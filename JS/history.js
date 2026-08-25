@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         container.innerHTML = '';
-        if (clearContainer) clearContainer.style.display = 'block';
+        if (clearContainer) clearContainer.style.display = 'flex';
 
         // Recorrer historial al revés para mostrar el más reciente primero
         [...userObj.scans].reverse().forEach((scan, index) => {

@@ -131,6 +131,16 @@ window.handleAuth = async (event) => {
     let email = emailInput.value.trim();
     const password = passwordInput.value;
 
+    if (!email) {
+        errorMsg.innerText = 'Por favor, introduce tu correo electrónico.';
+        return;
+    }
+    
+    if (!password) {
+        errorMsg.innerText = 'Por favor, introduce tu contraseña.';
+        return;
+    }
+
     if (currentMode === 'signup') {
         if (!isPasswordValid) {
             errorMsg.innerText = 'La contraseña no cumple con los requisitos mínimos de seguridad.';

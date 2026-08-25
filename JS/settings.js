@@ -46,6 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Actualizar selector de idioma
             updateLanguageSelector(userLang);
+            
+            if (localStorage.getItem('glutn_lang') !== userLang) {
+                localStorage.setItem('glutn_lang', userLang);
+            }
             if (typeof window.applyTranslations === 'function') {
                 window.applyTranslations(userLang);
             }
@@ -102,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 updateLanguageSelector(lang);
                 langDropdown.classList.remove('show');
+
+                // Guardar en localStorage para respuesta instantánea en otras páginas
+                localStorage.setItem('glutn_lang', lang);
 
                 // Aplicar traducción si está disponible
                 if (typeof window.applyTranslations === 'function') {

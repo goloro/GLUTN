@@ -21,8 +21,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentUserDoc = docSnap.data();
 
                 // 1. Aplicar idioma guardado si existe
-                if (currentUserDoc.language && typeof window.applyTranslations === 'function') {
-                    window.applyTranslations(currentUserDoc.language);
+                if (currentUserDoc.language) {
+                    if (localStorage.getItem('glutn_lang') !== currentUserDoc.language) {
+                        localStorage.setItem('glutn_lang', currentUserDoc.language);
+                    }
+                    if (typeof window.applyTranslations === 'function') {
+                        window.applyTranslations(currentUserDoc.language);
+                    }
                 }
 
                 // 2. Mostrar modal de disclaimer si no lo ha visto

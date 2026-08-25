@@ -90,6 +90,7 @@ body.no-scroll {
     box-shadow: 0 20px 40px rgba(181, 163, 142, 0.12); /* Sombra flotante cálida */
     display: flex;
     flex-direction: column;
+    margin-bottom: 24px;
 }
 
 /* Tabs */
@@ -285,8 +286,8 @@ body.no-scroll {
     font-size: 12px;
     color: var(--auth-text-light);
     font-weight: 500;
+    margin-top: 24px;
     padding-bottom: 24px;
-    margin-top: auto;
 }
 
 .auth-footer a {
@@ -411,6 +412,7 @@ body.no-scroll {
     padding-left: 5px;
     font-size: 13px;
     color: var(--text-gray);
+    flex-direction: column;
 }
 
 .password-rules li {

@@ -923,17 +923,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(blocker);
     }
 
-    // Por defecto usar idioma del navegador
-    const browserLang = (navigator.language || navigator.userLanguage || "en").split('-')[0].toLowerCase();
-    const langMap = {
-        'es': Languages.ES,
-        'en': Languages.EN,
-        'fr': Languages.FR,
-        'de': Languages.DE,
-        'it': Languages.IT
-    };
-    let lang = langMap[browserLang] || Languages.EN;
+    // Por defecto usar idioma guardado o el del navegador
+    const savedLang = localStorage.getItem('glutn_lang');
+    let lang = Languages.EN; // Default fallback
+    
+    if (savedLang) {
+        lang = savedLang;
+    } else {
+        const browserLang = (navigator.language || navigator.userLanguage || "en").split('-')[0].toLowerCase();
+        const langMap = {
+            'es': Languages.ES,
+            'en': Languages.EN,
+            'fr': Languages.FR,
+            'de': Languages.DE,
+            'it': Languages.IT
+        };
+        lang = langMap[browserLang] || Languages.EN;
+    }
 
+    // Ocultar body temporalmente si queremos evitar el FOUC completamente, 
+    // pero como ahora es síncrono por localStorage, applyTranslations será casi instantáneo.
     applyTranslations(lang);
 
     // Actualizar el texto del selector de idiomas en el menú (si existe en la vista actual)

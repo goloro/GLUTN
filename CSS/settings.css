@@ -183,11 +183,5 @@
 }
 
 /* ========================================= */
-/*   RESPONSIVIDAD FLUIDA: Ajuste del Logo   */
+/*   RESPONSIVIDAD FLUIDA                    */
 /* ========================================= */
-.home-header {
-    padding: min(16px, 2vh) 0;
-    margin-bottom: min(10px, 1vh);
-}
-
-#main-logo { height: 120px; width: auto; margin: 10px auto; display: block; }
