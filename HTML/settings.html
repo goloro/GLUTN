@@ -1,8 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#FFFFFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="../manifest.json">
     <title>GLUTN - Settings</title>
 
     <link rel="shortcut icon" href="../Images/Logos/Glutn_Logo-ShortIcon.PNG" type="image/x-icon">
@@ -60,14 +64,14 @@
                         <span data-i18n="settings.language">Idioma</span>
                     </div>
                     <div class="item-right" style="gap: 8px;">
-                        <span id="current-lang-text">Español</span>
+                        <span id="current-lang-text">EspaÃ±ol</span>
                         <i class="ph ph-caret-down"></i>
                     </div>
                     <!-- Dropdown de idiomas -->
                     <div class="lang-dropdown" id="lang-dropdown" style="right: 16px; left: auto; transform: none; top: 80%;">
-                        <div class="lang-option" data-lang="Español" style="display: none;">Español</div>
+                        <div class="lang-option" data-lang="EspaÃ±ol" style="display: none;">EspaÃ±ol</div>
                         <div class="lang-option" data-lang="English">English</div>
-                        <div class="lang-option" data-lang="Français">Français</div>
+                        <div class="lang-option" data-lang="FranÃ§ais">FranÃ§ais</div>
                         <div class="lang-option" data-lang="Deutsch">Deutsch</div>
                         <div class="lang-option" data-lang="Italiano">Italiano</div>
                     </div>
@@ -108,12 +112,12 @@
         <div class="logout-container">
             <button class="btn-logout" id="logout-btn">
                 <i class="ph ph-sign-out"></i>
-                <span data-i18n="settings.logout">Cerrar Sesión>
+                <span data-i18n="settings.logout">Cerrar SesiÃ³n>
             </button>
         </div>
     </main>
 
-    <!-- Navegación Inferior -->
+    <!-- NavegaciÃ³n Inferior -->
     <div class="nav-bar">
         <div class="nav-bar-item" id="home-button" onclick="window.location.href='home.html'">
             <i class="ph ph-house"></i>
@@ -133,7 +137,7 @@
         </div>
     </div>
 
-    <!-- Firebase SDK (MÃƒÂƒÃ‚Â³dulo) -->
+    <!-- Firebase SDK (MÃƒÆ’Ã‚Æ’Ãƒâ€šÃ‚Â³dulo) -->
     <script type="module" src="../JS/firebase-config.js"></script>
 
     <!-- Script para traducciones y ajustes -->
@@ -141,5 +145,6 @@
     <script type="module" src="../JS/settings.js?v=8"></script>
 </body>
 </html>
+
 
 
