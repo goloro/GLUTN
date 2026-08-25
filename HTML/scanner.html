@@ -34,11 +34,11 @@
 
     <!-- CSS Compartido y EspecÃ­fico -->
 
-    <link rel="stylesheet" href="../CSS/home.css?v=16">
+    <link rel="stylesheet" href="../CSS/home.css?v=18">
 
-    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=16">
+    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=18">
 
-        <link rel="stylesheet" href="../CSS/scanner.css?v=16">
+        <link rel="stylesheet" href="../CSS/scanner.css?v=18">
 </head>
 <body
 
@@ -46,17 +46,16 @@
  class="scanner-body">
     <!-- DEV VERSION BADGE -->
     <div style="position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; z-index: 9999; font-size: 12px; pointer-events: none;">
-        DEV v16.0
+        DEV v18.0
     </div>
 
     <!-- Area de la Camara (Placeholder visual) -->
     <main class="camera-view">
         <div class="camera-placeholder">
             <!-- Video de la camara -->
-            <div id="reader" style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:-2; overflow:hidden;"></div>
-        <video id="camera-stream" autoplay playsinline muted></video>
+            <video id="camera-stream" autoplay playsinline muted></video>
             <!-- Canvas oculto para capturar fotos -->
-            <canvas id="capture-canvas" style="display: none;"></canvas>
+            <canvas id="capture-canvas" ></canvas>
 
             <!-- Capa oscura sutil -->
             <div class="camera-overlay"></div>
@@ -197,11 +196,11 @@
 
             <p id="custom-modal-message">Mensaje...</p>
 
-            <input type="text" id="custom-modal-input" class="custom-modal-input" style="display: none;" placeholder="Introduce tu texto...">
+            <input type="text" id="custom-modal-input" class="custom-modal-input"  placeholder="Introduce tu texto...">
 
             <div class="custom-modal-actions">
 
-                <button class="btn-cancel" id="custom-modal-cancel" style="display: none;" data-i18n="modal.cancel">Cancelar</button>
+                <button class="btn-cancel" id="custom-modal-cancel"  data-i18n="modal.cancel">Cancelar</button>
 
                 <button class="btn-confirm" id="custom-modal-confirm" data-i18n="modal.accept">Aceptar</button>
 
@@ -271,7 +270,7 @@
 
             <!-- Bloque de Advertencia / RecomendaciÃ³n IA (Oculto por defecto) -->
 
-            <div class="ai-recommendation-box" id="ai-recommendation-box" style="display: none;">
+            <div class="ai-recommendation-box" id="ai-recommendation-box" >
 
                 <div class="ai-warning-header">
 
@@ -378,7 +377,7 @@
     <!-- Dependencias de ZXing para cÃ³digos de barras -->
 
     <!-- ZXing Library (versión estable fijada en 0.20.0 para evitar cuelgues) -->
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
 
     <!-- Firebase SDK (MÃ³dulo) -->
 
@@ -386,9 +385,9 @@
 
 
 
-    <script src="../JS/i18n.js?v=16"></script>
+    <script src="../JS/i18n.js?v=18"></script>
 
-    <script type="module" src="../JS/scanner.js?v=16"></script>
+    <script type="module" src="../JS/scanner.js?v=18"></script>
 
 </body>
 

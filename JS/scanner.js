@@ -1,9 +1,7 @@
 import { db, auth } from "./firebase-config.js";
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
-// DOM Elements
 const video = document.getElementById('camera-stream');
-const readerDiv = document.getElementById('reader');
 const captureCanvas = document.getElementById('capture-canvas');
 const ctx = captureCanvas.getContext('2d', { willReadFrequently: true });
 const captureBtn = document.getElementById('capture-btn');
@@ -16,92 +14,76 @@ const modeSwitchIcon = modeSwitchBtn.querySelector('i');
 const loadingScreen = document.getElementById('loading-screen');
 const resultScreen = document.getElementById('result-screen');
 
-let html5QrCode = null;
 let iaStream = null;
 let currentScanMode = new URLSearchParams(window.location.search).get('mode') || 'EAN';
 let lastScannedBarcode = null;
+let zxingReader = new ZXing.BrowserMultiFormatReader();
+let isEANScanning = false;
+let isProcessing = false;
 
-// Helper to get translation or fallback
 function getT(key) {
-    if (typeof window.getTranslation === 'function') {
-        return window.getTranslation(key);
-    }
+    if (typeof window.getTranslation === 'function') return window.getTranslation(key);
     return key;
 }
 
 // ---------------------------------------------------------
-// 1. HTML5-QRCODE BARCODE SCANNER (EAN MODE)
+// 1. ZXING CONTINUOUS SCANNER (EAN MODE)
 // ---------------------------------------------------------
 async function startEANScanner() {
     if (iaStream) {
         iaStream.getTracks().forEach(t => t.stop());
         iaStream = null;
     }
-    video.style.display = 'none';
-    readerDiv.style.display = 'block';
+    
+    video.style.display = 'block';
+    if (isEANScanning) return;
+    isEANScanning = true;
+    isProcessing = false;
 
-    if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader");
-    }
-
+    // Use ZXing's built-in continuous scanner via getUserMedia directly!
+    // This is the most stable method they offer. It handles its own video feed.
     try {
-        if (html5QrCode.isScanning) {
-            await html5QrCode.stop();
-        }
-        
-        await html5QrCode.start(
-            { facingMode: "environment" },
-            {
-                fps: 15
-                // Eliminamos qrbox para que escanee TODA la pantalla. Si el usuario se acerca mucho,
-                // con qrbox se recortan los bordes del código y falla.
-                // Eliminamos formatsToSupport para que pille todo por defecto.
-            },
-            async (decodedText, decodedResult) => {
-                // Success Callback
-                if (html5QrCode.isScanning) {
-                    await html5QrCode.stop(); // Stop scanning immediately
-                }
+        await zxingReader.decodeFromVideoDevice(undefined, video, async (result, err) => {
+            if (result && isEANScanning && !isProcessing) {
+                isProcessing = true; // prevent duplicate fires
+                isEANScanning = false;
+                
+                try {
+                    zxingReader.reset(); // Stop scanning
+                } catch(e) {}
                 
                 if (navigator.vibrate) navigator.vibrate(100);
-                lastScannedBarcode = decodedText;
+                lastScannedBarcode = result.text;
                 loadingScreen.classList.add('active');
                 
                 try {
-                    await analyzeWithOpenFoodFacts(decodedText);
+                    await analyzeWithOpenFoodFacts(result.text);
                 } catch (error) {
                     showCustomDialog({
-                        type: 'error',
-                        title: getT('modal.error_network'),
-                        message: getT('modal.error_network_desc')
+                        type: 'error', title: getT('modal.error_network'), message: getT('modal.error_network_desc')
                     });
                     loadingScreen.classList.remove('active');
-                    startEANScanner(); // Restart on failure
+                    startEANScanner();
                 }
-            },
-            (errorMessage) => {
-                // Ignore parsing errors (very frequent during continuous scanning)
             }
-        );
-    } catch (err) {
-        console.error("Error starting html5-qrcode:", err);
+        });
+    } catch (e) {
+        console.error("ZXing Initialization Error:", e);
     }
 }
 
-async function stopEANScanner() {
-    if (html5QrCode && html5QrCode.isScanning) {
-        try {
-            await html5QrCode.stop();
-        } catch (e) {}
-    }
-    readerDiv.style.display = 'none';
+function stopEANScanner() {
+    isEANScanning = false;
+    try {
+        zxingReader.reset();
+    } catch(e){}
 }
 
 // ---------------------------------------------------------
 // 2. MANUAL VIDEO STREAM (IA MODE)
 // ---------------------------------------------------------
 async function startIAScanner() {
-    await stopEANScanner();
+    stopEANScanner();
     video.style.display = 'block';
 
     try {
@@ -112,13 +94,8 @@ async function startIAScanner() {
         video.srcObject = iaStream;
         
         await new Promise((resolve) => {
-            if (video.readyState >= 2) {
-                video.play().then(resolve).catch(resolve);
-            } else {
-                video.onloadedmetadata = () => {
-                    video.play().then(resolve).catch(resolve);
-                };
-            }
+            if (video.readyState >= 2) video.play().then(resolve).catch(resolve);
+            else video.onloadedmetadata = () => video.play().then(resolve).catch(resolve);
         });
     } catch (error) {
         console.error("IA Camera Error:", error);
@@ -132,12 +109,10 @@ async function captureAndAnalyzeIA() {
     const vh = video.videoHeight;
     const cw = video.clientWidth;
     const ch = video.clientHeight;
-
     const videoRatio = vw / vh;
     const screenRatio = cw / ch;
 
     let sourceX = 0, sourceY = 0, sourceWidth = vw, sourceHeight = vh;
-
     if (screenRatio > videoRatio) {
         sourceHeight = vw / screenRatio;
         sourceY = (vh - sourceHeight) / 2;
@@ -148,10 +123,8 @@ async function captureAndAnalyzeIA() {
 
     const MAX_WIDTH = 800;
     let scale = sourceWidth > MAX_WIDTH ? (MAX_WIDTH / sourceWidth) : 1;
-    
     captureCanvas.width = sourceWidth * scale;
     captureCanvas.height = sourceHeight * scale;
-    
     ctx.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, captureCanvas.width, captureCanvas.height);
     
     const base64Image = captureCanvas.toDataURL('image/jpeg', 0.7);
@@ -177,7 +150,6 @@ function updateScannerUI(mode, keepBarcode = false) {
         modeSwitchText.setAttribute('data-i18n', 'home.scan_ia');
         modeSwitchIcon.className = "ph-bold ph-scan";
         captureBtn.style.display = 'none';
-        
         startEANScanner();
     } else {
         reticleEan.classList.add('reticle-hidden');
@@ -186,26 +158,17 @@ function updateScannerUI(mode, keepBarcode = false) {
         modeSwitchText.setAttribute('data-i18n', 'home.scan_ean');
         modeSwitchIcon.className = "ph-bold ph-barcode";
         captureBtn.style.display = 'flex';
-        
         startIAScanner();
     }
 
-    if (typeof window.applyTranslations === 'function') {
-        window.applyTranslations(localStorage.getItem('glutn_lang') || 'es');
-    }
+    if (typeof window.applyTranslations === 'function') window.applyTranslations(localStorage.getItem('glutn_lang') || 'es');
 }
 
-modeSwitchBtn.addEventListener('click', () => {
-    updateScannerUI(currentScanMode === 'IA' ? 'EAN' : 'IA');
-});
-
-captureBtn.addEventListener('click', () => {
-    captureAndAnalyzeIA();
-});
+modeSwitchBtn.addEventListener('click', () => updateScannerUI(currentScanMode === 'IA' ? 'EAN' : 'IA'));
+captureBtn.addEventListener('click', () => captureAndAnalyzeIA());
 
 // INITIALIZE
 updateScannerUI(currentScanMode);
-
 window.addEventListener('beforeunload', () => {
     if (iaStream) iaStream.getTracks().forEach(t => t.stop());
     stopEANScanner();
@@ -220,13 +183,8 @@ async function analyzeWithOpenFoodFacts(barcode) {
 
     if (data.status === 0 || !data.product) {
         renderResult({
-            isNotFound: true,
-            isWarning: true,
-            barcode: barcode,
-            reason: getT('result.not_found') + ` (EAN: ${barcode})`,
-            ingredients: [],
-            gluten: null,
-            productName: `Producto ${barcode}`
+            isNotFound: true, isWarning: true, barcode: barcode,
+            reason: getT('result.not_found') + ` (EAN: ${barcode})`, ingredients: [], gluten: null, productName: `Producto ${barcode}`
         });
         return;
     }
@@ -240,9 +198,7 @@ async function analyzeWithOpenFoodFacts(barcode) {
     const displayName = p.brands ? `${p.product_name || ''} - ${p.brands}` : (p.product_name || '');
 
     let mappedIngredients = (p.ingredients || []).map(i => ({ name: i.text || i.id || '' })).filter(i => i.name.trim() !== '');
-    if (mappedIngredients.length === 0 && ingredientsText) {
-        mappedIngredients.push({ name: ingredientsText });
-    }
+    if (mappedIngredients.length === 0 && ingredientsText) mappedIngredients.push({ name: ingredientsText });
 
     if (labels.includes('en:gluten-free') || labels.includes('es:sin-gluten') || analysisTags.includes('en:gluten-free')) {
         renderResult({
@@ -285,13 +241,11 @@ async function analyzeWithGemini(base64Data) {
         });
 
         if (!response.ok) throw new Error("Error HTTP");
-        
         const data = await response.json();
         const cleanJsonStr = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
         const scanResult = JSON.parse(cleanJsonStr);
 
         if (lastScannedBarcode) scanResult.barcode = lastScannedBarcode;
-
         if (scanResult.error === 'no_label_detected') {
             showCustomDialog({ type: 'error', title: 'No se detectó etiqueta', message: 'Por favor, asegúrate de enfocar bien.' });
             loadingScreen.classList.remove('active');
@@ -313,9 +267,8 @@ function renderResult(scan) {
         saveToHistory(scan);
     }
 
-    if (scan.imageUrl) {
-        document.getElementById('scanner-result-img').src = scan.imageUrl;
-    } else if (currentScanMode === 'EAN' && !document.getElementById('scanner-result-img').src.startsWith('data:')) {
+    if (scan.imageUrl) document.getElementById('scanner-result-img').src = scan.imageUrl;
+    else if (currentScanMode === 'EAN' && !document.getElementById('scanner-result-img').src.startsWith('data:')) {
         document.getElementById('scanner-result-img').src = '../Images/Logos/Glutn_Logo-ShortIcon.PNG';
     }
 
@@ -353,16 +306,13 @@ function renderResult(scan) {
     ul.innerHTML = '';
     if (scan.ingredients && scan.ingredients.length > 0) {
         scan.ingredients.forEach(ing => {
-            const li = document.createElement('li');
-            li.innerText = ing.name;
+            const li = document.createElement('li'); li.innerText = ing.name;
             if (scan.ingredientWithGluten && ing.name.toLowerCase().includes(scan.ingredientWithGluten.toLowerCase())) {
                 li.style.color = '#ef4444'; li.style.fontWeight = 'bold';
             }
             ul.appendChild(li);
         });
-    } else {
-        ul.innerHTML = `<li>${getT('scanner.no_ingredients')}</li>`;
-    }
+    } else ul.innerHTML = `<li>${getT('scanner.no_ingredients')}</li>`;
 
     if (typeof window.applyTranslations === 'function') window.applyTranslations(localStorage.getItem('glutn_lang') || 'es');
     resultScreen.classList.add('active');
@@ -379,9 +329,8 @@ function renderResult(scan) {
 async function saveToHistory(scanResult) {
     if (!auth.currentUser) return;
     scanResult.id = Date.now();
-    try {
-        await addDoc(collection(db, "users", auth.currentUser.uid, "history"), { ...scanResult, timestamp: serverTimestamp() });
-    } catch (e) { console.error("Error guardando en historial: ", e); }
+    try { await addDoc(collection(db, "users", auth.currentUser.uid, "history"), { ...scanResult, timestamp: serverTimestamp() }); } 
+    catch (e) { console.error("Error guardando en historial: ", e); }
 }
 
 function showCustomDialog(options) {
