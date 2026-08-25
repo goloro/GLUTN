@@ -440,6 +440,20 @@ const Translations = {
         [Languages.DE]: "Produkt nicht gefunden.",
         [Languages.IT]: "Prodotto non trovato."
     },
+    "result.contribute_btn": {
+        [Languages.ES]: "Aportar a OpenFoodFacts",
+        [Languages.EN]: "Contribute to OpenFoodFacts",
+        [Languages.FR]: "Contribuer à OpenFoodFacts",
+        [Languages.DE]: "Zu OpenFoodFacts beitragen",
+        [Languages.IT]: "Contribuisci a OpenFoodFacts"
+    },
+    "result.contribute_desc": {
+        [Languages.ES]: "Al pulsar se abrirá la web para que añadas la etiqueta 'Sin Gluten' y ayudes a la comunidad.",
+        [Languages.EN]: "Clicking will open the web so you can add the 'Gluten Free' tag and help the community.",
+        [Languages.FR]: "En cliquant, la page s'ouvrira pour vous permettre d'ajouter le tag 'Sans Gluten' et d'aider la communauté.",
+        [Languages.DE]: "Durch Klicken öffnet sich die Website, damit Sie das Tag 'Glutenfrei' hinzufügen und der Community helfen können.",
+        [Languages.IT]: "Cliccando si aprirà il web in modo da poter aggiungere l'etichetta 'Senza Glutine' e aiutare la comunità."
+    },
     "scanner.not_found_desc": {
         [Languages.ES]: "Este producto no está en la base de datos. Puedes escanear los ingredientes con IA para comprobar si es seguro.",
         [Languages.EN]: "This product is not in the database. You can scan the ingredients with AI to check if it's safe.",
