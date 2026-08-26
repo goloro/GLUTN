@@ -84,10 +84,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const lastScan = userDoc.scans[userDoc.scans.length - 1];
-        const isSafe = !lastScan.gluten;
-        const iconClass = isSafe ? "icon-safe" : "icon-unsafe";
-        const iconPh = isSafe ? "ph-fill ph-check-circle" : "ph-fill ph-x-circle";
-        const statusClass = isSafe ? "" : "unsafe-text"; 
+        let iconClass = "icon-unsafe";
+        let iconPh = "ph-fill ph-x-circle";
+        let statusClass = "unsafe-text";
+        
+        if (lastScan.isWarning) {
+            iconClass = "icon-warning";
+            iconPh = "ph-fill ph-warning";
+            statusClass = "warning-text";
+        } else if (!lastScan.gluten) {
+            iconClass = "icon-safe";
+            iconPh = "ph-fill ph-check-circle";
+            statusClass = "";
+        } 
 
         container.innerHTML = `
             <div class="scan-item" id="last-scan-item" style="cursor: pointer;">

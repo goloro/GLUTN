@@ -259,7 +259,7 @@ async function analyzeWithOpenFoodFacts(barcode) {
 
     if (isGlutenFreeLabel) {
         renderResult({
-            isWarning: false, gluten: false, reason: getT('result.safe_certified'), ingredients: mappedIngredients,
+            isWarning: false, gluten: false, reason: getT('result.safe_cert'), ingredients: mappedIngredients,
             imageUrl: p.image_url || p.image_front_url || null, barcode: barcode, productName: displayName
         });
         return;
