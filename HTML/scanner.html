@@ -34,11 +34,11 @@
 
     <!-- CSS Compartido y EspecÃƒÆ’Ã‚Â­fico -->
 
-    <link rel="stylesheet" href="../CSS/home.css?v=31">
+    <link rel="stylesheet" href="../CSS/home.css?v=33">
 
-    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=31">
+    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=33">
 
-        <link rel="stylesheet" href="../CSS/scanner.css?v=31">
+        <link rel="stylesheet" href="../CSS/scanner.css?v=33">
 </head>
 <body
 
@@ -46,7 +46,7 @@
  class="scanner-body">
     <!-- DEV VERSION BADGE -->
     <div style="position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; z-index: 9999; font-size: 12px; pointer-events: none;">
-        DEV v31.0
+        DEV v33.0
     </div>
 
     <!-- Area de la Camara (Placeholder visual) -->
@@ -321,16 +321,12 @@
 
             <!-- BotÃƒÆ’Ã‚Â³n Volver a Inicio -->
 
+                        <!-- Botón de Nuevo Escaneo -->
             <div class="result-actions" style="margin-top: 1rem;">
-
-                <button class="new-scan-btn" onclick="window.location.href='home.html'" style="background-color: #E5E7EB; color: #4B5563; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
-
-                    <i class="ph-bold ph-house"></i>
-
-                    <span data-i18n="nav.home">Volver a Inicio</span>
-
+                <button class="new-scan-btn" onclick="window.location.reload()" style="background-color: #0FA874; color: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border-radius: 8px; font-weight: 600; padding: 14px 16px;">
+                    <i class="ph ph-qr-code" style="font-size: 20px;"></i>
+                    <span data-i18n="scanner.new_scan">Nuevo escaneo</span>
                 </button>
-
             </div>
 
         </div>
@@ -392,9 +388,9 @@
 
 
 
-    <script src="../JS/i18n.js?v=31"></script>
+    <script src="../JS/i18n.js?v=33"></script>
 
-    <script type="module" src="../JS/scanner.js?v=31"></script>
+    <script type="module" src="../JS/scanner.js?v=33"></script>
 
 </body>
 

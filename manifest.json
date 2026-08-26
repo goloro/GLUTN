@@ -4,8 +4,8 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#F2E5D5",
-  "theme_color": "#0FA874",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
   "description": "Tu asistente para escanear y detectar gluten en alimentos.",
   "icons": [
     {

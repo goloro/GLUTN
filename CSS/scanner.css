@@ -159,6 +159,7 @@ body.scanner-body {
 
 /* Ajustes específicos para el nav-bar en la página del escáner */
 body.scanner-body .nav-bar {
+    z-index: 300; /* Force above result-screen */
     background-color: transparent; /* El fondo lo pone el bottom-sheet */
     box-shadow: none; /* Quitamos la sombra superior del nav-bar porque la tiene el bottom-sheet */
     border-top-left-radius: 0;
