@@ -1,5 +1,5 @@
 import { db, auth } from "./firebase-config.js";
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { doc, getDoc, updateDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const video = document.getElementById('camera-stream');
 const captureCanvas = document.getElementById('capture-canvas');
@@ -273,7 +273,17 @@ async function analyzeWithOpenFoodFacts(barcode) {
         return;
     }
 
-    let reasonText = (traces.includes('en:gluten') || traces.includes('en:wheat')) ? getT('result.warning_traces') : getT('result.warning_not_certified');
+    const hasGlutenTraces = traces.includes('en:gluten') || traces.includes('en:wheat') || traces.includes('en:barley') || traces.includes('en:oats') || traces.includes('en:rye');
+    let reasonText = hasGlutenTraces ? getT('result.warning_traces') : getT('result.warning_not_certified');
+    
+    // Si tiene trazas y no están en la lista de ingredientes, las inyectamos para que el usuario las vea
+    if (hasGlutenTraces) {
+        const hasTracesInList = mappedIngredients.some(i => i.name.toLowerCase().includes('trazas') || i.name.toLowerCase().includes('traces'));
+        if (!hasTracesInList) {
+            mappedIngredients.push({ name: 'Puede contener trazas de gluten' });
+        }
+    }
+
     renderResult({
         isWarning: true, gluten: null, reason: reasonText, ingredients: mappedIngredients,
         imageUrl: p.image_url || p.image_front_url || null, barcode: barcode, productName: displayName

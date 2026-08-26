@@ -1,5 +1,5 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { doc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import { auth, db } from "./firebase-config.js";
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -67,11 +67,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function loadLastScan(userDoc) {
+    async function loadLastScan(userDoc) {
         const container = document.getElementById('last-scan-container');
         if (!container) return;
 
-        if (!userDoc.scans || userDoc.scans.length === 0) {
+        let lastScan = null;
+        if (currentUid) {
+            try {
+                const q = query(collection(db, "users", currentUid, "history"), orderBy("timestamp", "desc"), limit(1));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    lastScan = querySnapshot.docs[0].data();
+                }
+            } catch (e) {
+                console.error("Error loading last scan", e);
+            }
+        }
+
+        if (!lastScan) {
             container.innerHTML = `
                 <div data-i18n="home.no_scans" style="text-align: left; color: #6B7280; font-size: 14px; padding: 12px 0;">
                     Aún no has escaneado ningún producto. ¡Anímate a probarlo!
@@ -83,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const lastScan = userDoc.scans[userDoc.scans.length - 1];
         const isSafe = !lastScan.gluten && !lastScan.isWarning;
         let iconClass = "icon-unsafe";
         let iconPh = "ph-fill ph-x-circle";

@@ -1,5 +1,5 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { doc, getDoc, updateDoc, collection, query, orderBy, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import { auth, db } from "./firebase-config.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,12 +21,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadUserData() {
         if (!currentUid) return;
+        
+        // Cargar preferencias del usuario
         const docRef = doc(db, "users", currentUid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             userObj = docSnap.data();
-            renderHistory();
+        } else {
+            userObj = {};
         }
+
+        // Cargar historial ilimitado desde subcoleccion
+        userObj.scans = [];
+        try {
+            const q = query(collection(db, "users", currentUid, "history"), orderBy("timestamp", "desc"));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                data.docId = doc.id; // Guardamos el ID del documento para borrar
+                userObj.scans.push(data);
+            });
+        } catch (e) {
+            console.error("Error al cargar historial:", e);
+        }
+
+        renderHistory();
     }
     
     function renderHistory() {
@@ -143,8 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmYesBtn.addEventListener('click', async () => {
             if (currentUid) {
                 try {
-                    const docRef = doc(db, "users", currentUid);
-                    await updateDoc(docRef, { scans: [] });
+                    // Borrar todos los documentos de la subcoleccion
+                    if (userObj.scans && userObj.scans.length > 0) {
+                        for (const scan of userObj.scans) {
+                            if (scan.docId) {
+                                await deleteDoc(doc(db, "users", currentUid, "history", scan.docId));
+                            }
+                        }
+                    }
                     userObj.scans = [];
                     renderHistory();
                 } catch (error) {
