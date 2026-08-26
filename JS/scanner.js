@@ -1,5 +1,5 @@
 import { db, auth } from "./firebase-config.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const video = document.getElementById('camera-stream');
 const captureCanvas = document.getElementById('capture-canvas');
@@ -197,8 +197,39 @@ async function analyzeWithOpenFoodFacts(barcode) {
     const analysisTags = p.ingredients_analysis_tags || [];
     const displayName = p.brands ? `${p.product_name || ''} - ${p.brands}` : (p.product_name || '');
 
-    let mappedIngredients = (p.ingredients || []).map(i => ({ name: i.text || i.id || '' })).filter(i => i.name.trim() !== '');
-    if (mappedIngredients.length === 0 && ingredientsText) mappedIngredients.push({ name: ingredientsText });
+    let offLang = 'es';
+    if (typeof window.currentGlobalLang !== 'undefined') {
+        if (window.currentGlobalLang === 'English') offLang = 'en';
+        else if (window.currentGlobalLang === 'Français') offLang = 'fr';
+        else if (window.currentGlobalLang === 'Deutsch') offLang = 'de';
+        else if (window.currentGlobalLang === 'Italiano') offLang = 'it';
+    }
+
+    let localizedText = p[`ingredients_text_${offLang}`];
+    let defaultText = p.ingredients_text || '';
+    let mappedIngredients = [];
+
+    // Prioritize text in user's language
+    let textToParse = localizedText || defaultText;
+    
+    if (textToParse) {
+        // Split by comma or dot to create a nice list
+        let parts = textToParse.split(/[,\.]/);
+        mappedIngredients = parts.map(i => ({ name: i.trim() })).filter(i => i.name.length > 1);
+    } 
+    
+    if (mappedIngredients.length === 0 && p.ingredients && p.ingredients.length > 0) {
+        // Fallback to OFF's ingredient array if text is completely missing
+        mappedIngredients = p.ingredients.map(i => ({ name: i.text || i.id || '' })).filter(i => i.name.trim() !== '');
+    }
+
+    if (mappedIngredients.length === 0 && !labels.includes('en:gluten-free') && !labels.includes('es:sin-gluten')) {
+        renderResult({
+            isWarning: true, gluten: null, reason: getT('result.missing_ingredients'), ingredients: [],
+            imageUrl: p.image_url || p.image_front_url || null, barcode: barcode, productName: displayName
+        });
+        return;
+    }
 
     if (labels.includes('en:gluten-free') || labels.includes('es:sin-gluten') || analysisTags.includes('en:gluten-free')) {
         renderResult({
@@ -267,23 +298,45 @@ function renderResult(scan) {
         saveToHistory(scan);
     }
 
-    if (scan.imageUrl) document.getElementById('scanner-result-img').src = scan.imageUrl;
-    else if (currentScanMode === 'EAN' && !document.getElementById('scanner-result-img').src.startsWith('data:')) {
-        document.getElementById('scanner-result-img').src = '../Images/Logos/Glutn_Logo-ShortIcon.PNG';
+    const imgEl = document.getElementById('scanner-result-img');
+    const ingredientsBox = document.querySelector('.ingredients-box');
+    
+    // Reset styles
+    imgEl.style.objectFit = 'cover';
+    imgEl.style.padding = '0px';
+    if (ingredientsBox) ingredientsBox.style.display = 'block';
+
+    if (scan.imageUrl) {
+        imgEl.src = scan.imageUrl;
+    } else {
+        imgEl.src = '../Images/Logos/Glutn_Logo-ShortIcon.PNG';
+        if (currentScanMode === 'EAN' || scan.isNotFound) {
+            imgEl.style.objectFit = 'contain';
+            imgEl.style.padding = '20px';
+        }
     }
 
     const badge = document.getElementById('scanner-result-badge');
     const aiBox = document.getElementById('ai-recommendation-box');
+    const notFoundBox = document.getElementById('not-found-box');
     const offEditBox = document.getElementById('off-edit-box');
     
     aiBox.style.display = 'none';
+    if (notFoundBox) notFoundBox.style.display = 'none';
     if (offEditBox) offEditBox.style.display = 'none';
 
     if (scan.isNotFound === true) {
         badge.className = 'verdict-banner';
-        badge.innerHTML = `<i class="ph-bold ph-question"></i> <span data-i18n="result.not_found">Producto no encontrado</span>`;
+        badge.innerHTML = `<i class="ph-bold ph-question"></i> <span data-i18n="scanner.not_found_title">Producto Desconocido</span>`;
         badge.style.backgroundColor = '#6B7280';
-        aiBox.style.display = 'block';
+        
+        if (notFoundBox) notFoundBox.style.display = 'block';
+        if (ingredientsBox) ingredientsBox.style.display = 'none';
+        
+        if (scan.barcode && offEditBox) {
+            offEditBox.style.display = 'block';
+            document.getElementById('off-edit-btn').onclick = () => window.open(`https://world.openfoodfacts.org/cgi/product.pl?type=edit&code=${scan.barcode}`, '_blank');
+        }
     } else if (scan.isWarning) {
         badge.className = 'verdict-banner warning';
         badge.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="result.caution">Precaución</span>`;
@@ -296,41 +349,93 @@ function renderResult(scan) {
         badge.className = 'verdict-banner safe';
         badge.innerHTML = `<i class="ph-bold ph-check-circle"></i> <span data-i18n="result.safe">Apto</span>`;
     } else {
-        badge.className = 'verdict-banner danger';
+        badge.className = 'verdict-banner unsafe';
         badge.innerHTML = `<i class="ph-bold ph-x-circle"></i> <span data-i18n="result.not_safe">Contiene Gluten</span>`;
     }
 
-    document.getElementById('scanner-result-reason').innerHTML = scan.ingredientWithGluten ? `${scan.reason} <br><strong>Ingrediente detectado: <span style="color:#ef4444">${scan.ingredientWithGluten}</span></strong>` : scan.reason;
+    
+    
 
-    const ul = document.getElementById('scanner-result-ingredients');
+        const ul = document.getElementById('scanner-result-ingredients');
     ul.innerHTML = '';
-    if (scan.ingredients && scan.ingredients.length > 0) {
+    
+    const glutenKeywords = ['gluten', 'trigo', 'cebada', 'centeno', 'avena', 'espelta', 'kamut', 'wheat', 'barley', 'rye', 'oats', 'spelt'];
+    
+    if (scan.ingredients && scan.ingredients.length > 0 && !scan.isNotFound) {
         scan.ingredients.forEach(ing => {
             const li = document.createElement('li'); li.innerText = ing.name;
-            if (scan.ingredientWithGluten && ing.name.toLowerCase().includes(scan.ingredientWithGluten.toLowerCase())) {
-                li.style.color = '#ef4444'; li.style.fontWeight = 'bold';
+            
+            let isGluten = false;
+            const lowerName = ing.name.toLowerCase();
+            
+            // Check against our comprehensive keyword list
+            if (glutenKeywords.some(kw => lowerName.includes(kw))) {
+                isGluten = true;
+            }
+            // Also check the specific AI-detected ingredient if any
+            if (scan.ingredientWithGluten && scan.ingredientWithGluten !== 'Gluten / Cereales' && lowerName.includes(scan.ingredientWithGluten.toLowerCase())) {
+                isGluten = true;
+            }
+            
+            if (isGluten) {
+                // If it's a short ingredient name, just turn the whole thing red
+                if (ing.name.length < 50) {
+                    li.style.color = '#ef4444'; 
+                    li.style.fontWeight = 'bold';
+                } else {
+                    // If it's a long text block, wrap keywords in span
+                    let highlightedText = ing.name;
+                    glutenKeywords.forEach(kw => {
+                        const regex = new RegExp(`(${kw})`, 'gi');
+                        highlightedText = highlightedText.replace(regex, '<span style="color:#ef4444; font-weight:bold">$1</span>');
+                    });
+                    if (scan.ingredientWithGluten && scan.ingredientWithGluten !== 'Gluten / Cereales') {
+                        const regex = new RegExp(`(${scan.ingredientWithGluten})`, 'gi');
+                        highlightedText = highlightedText.replace(regex, '<span style="color:#ef4444; font-weight:bold">$1</span>');
+                    }
+                    li.innerHTML = highlightedText;
+                }
             }
             ul.appendChild(li);
         });
-    } else ul.innerHTML = `<li>${getT('scanner.no_ingredients')}</li>`;
+    } else if (!scan.isNotFound) {
+        ul.innerHTML = `<li>${getT('scanner.no_ingredients')}</li>`;
+    }
 
     if (typeof window.applyTranslations === 'function') window.applyTranslations(localStorage.getItem('glutn_lang') || 'es');
     resultScreen.classList.add('active');
     
-    const aiBtn = document.getElementById('ai-switch-btn');
-    const newAiBtn = aiBtn.cloneNode(true);
-    aiBtn.parentNode.replaceChild(newAiBtn, aiBtn);
-    newAiBtn.addEventListener('click', () => {
-        resultScreen.classList.remove('active');
-        updateScannerUI('IA', true);
-    });
+    // Bind AI buttons
+    const bindAiBtn = (id) => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            newBtn.addEventListener('click', () => {
+                resultScreen.classList.remove('active');
+                updateScannerUI('IA', true);
+            });
+        }
+    };
+    bindAiBtn('ai-switch-btn');
+    bindAiBtn('ai-switch-btn-notfound');
 }
 
 async function saveToHistory(scanResult) {
     if (!auth.currentUser) return;
     scanResult.id = Date.now();
-    try { await addDoc(collection(db, "users", auth.currentUser.uid, "history"), { ...scanResult, timestamp: serverTimestamp() }); } 
+    try { 
+        const docRef = doc(db, "users", auth.currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const scans = data.scans || [];
+            scans.push(scanResult);
+            await updateDoc(docRef, { scans: scans });
+        }
+    } 
     catch (e) { console.error("Error guardando en historial: ", e); }
+
 }
 
 function showCustomDialog(options) {

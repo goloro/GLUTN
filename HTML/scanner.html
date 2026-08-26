@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="es">
 
@@ -32,13 +32,13 @@
 
 
 
-    <!-- CSS Compartido y EspecÃ­fico -->
+    <!-- CSS Compartido y EspecÃƒÆ’Ã‚Â­fico -->
 
-    <link rel="stylesheet" href="../CSS/home.css?v=19">
+    <link rel="stylesheet" href="../CSS/home.css?v=27">
 
-    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=19">
+    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=27">
 
-        <link rel="stylesheet" href="../CSS/scanner.css?v=19">
+        <link rel="stylesheet" href="../CSS/scanner.css?v=27">
 </head>
 <body
 
@@ -46,7 +46,7 @@
  class="scanner-body">
     <!-- DEV VERSION BADGE -->
     <div style="position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; z-index: 9999; font-size: 12px; pointer-events: none;">
-        DEV v19.0
+        DEV v27.0
     </div>
 
     <!-- Area de la Camara (Placeholder visual) -->
@@ -62,9 +62,9 @@
             
             <!-- Reticulas del Escaner -->
             <!-- 1. Reticula IA (Documento/Ingredientes) -->
-            <!-- RetÃ­culas del EscÃ¡ner -->
+            <!-- RetÃƒÆ’Ã‚Â­culas del EscÃƒÆ’Ã‚Â¡ner -->
 
-            <!-- 1. RetÃ­cula IA (Documento/Ingredientes) -->
+            <!-- 1. RetÃƒÆ’Ã‚Â­cula IA (Documento/Ingredientes) -->
 
             <div id="reticle-ia" class="scanner-reticle">
 
@@ -86,7 +86,7 @@
 
 
 
-            <!-- 2. RetÃ­cula EAN (CÃ³digo de Barras) -->
+            <!-- 2. RetÃƒÆ’Ã‚Â­cula EAN (CÃƒÆ’Ã‚Â³digo de Barras) -->
 
             <div id="reticle-ean" class="scanner-reticle reticle-hidden">
 
@@ -94,7 +94,7 @@
 
                     <svg width="280" height="200" viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-                        <!-- Marco exterior con bordes redondeados (mÃ¡s sutil) -->
+                        <!-- Marco exterior con bordes redondeados (mÃƒÆ’Ã‚Â¡s sutil) -->
 
                         <rect x="10" y="10" width="260" height="180" rx="20" stroke="rgba(255, 255, 255, 0.4)" stroke-width="2"/>
 
@@ -110,7 +110,7 @@
 
                     </svg>
 
-                    <!-- LÃ¡ser animado -->
+                    <!-- LÃƒÆ’Ã‚Â¡ser animado -->
 
                     <div class="laser-line"></div>
 
@@ -128,7 +128,7 @@
 
     <div class="bottom-sheet">
 
-        <!-- BotÃ³n para alternar modos -->
+        <!-- BotÃƒÆ’Ã‚Â³n para alternar modos -->
 
         <button id="mode-switch-btn" class="mode-switch-btn">
 
@@ -158,7 +158,7 @@
 
         <div class="spinner-container">
 
-            <!-- CÃ­rculo brillante animado -->
+            <!-- CÃƒÆ’Ã‚Â­rculo brillante animado -->
 
             <div class="glowing-circle"></div>
 
@@ -166,7 +166,7 @@
 
         <h2 class="loading-title" data-i18n="scanner.analyzing">Analizando ingredientes...</h2>
 
-        <p class="loading-subtitle" data-i18n="scanner.wait">Espera un momento, GLUTN estÃ¡ leyendo la etiqueta.</p>
+        <p class="loading-subtitle" data-i18n="scanner.wait">Espera un momento, GLUTN estÃƒÆ’Ã‚Â¡ leyendo la etiqueta.</p>
 
         
 
@@ -234,7 +234,7 @@
 
                 <div id="scanner-result-badge" class="verdict-banner">
 
-                    <!-- Contenido dinÃ¡mico (Seguro/No Apto) -->
+                    <!-- Contenido dinÃƒÆ’Ã‚Â¡mico (Seguro/No Apto) -->
 
                 </div>
 
@@ -242,15 +242,9 @@
 
 
 
-            <!-- ExplicaciÃ³n -->
+            <!-- ExplicaciÃƒÆ’Ã‚Â³n -->
 
-            <div class="reason-section">
-
-                <h3 data-i18n="scanner.why">Por quÃ©:</h3>
-
-                <p id="scanner-result-reason"></p>
-
-            </div>
+            
 
 
 
@@ -268,7 +262,7 @@
 
 
 
-            <!-- Bloque de Advertencia / RecomendaciÃ³n IA (Oculto por defecto) -->
+            <!-- Bloque de Advertencia / RecomendaciÃƒÆ’Ã‚Â³n IA (Oculto por defecto) -->
 
             <div class="ai-recommendation-box" id="ai-recommendation-box" >
 
@@ -276,7 +270,7 @@
 
                     <i class="ph-bold ph-warning"></i>
 
-                    <span data-i18n="scanner.warning">InformaciÃ³n Dudosa</span>
+                    <span data-i18n="scanner.warning">InformaciÃƒÆ’Ã‚Â³n Dudosa</span>
 
                 </div>
 
@@ -294,6 +288,19 @@
 
 
 
+                        <!-- Bloque de Producto No Encontrado -->
+            <div class="ai-recommendation-box" id="not-found-box" style="display: none; background-color: #F3F4F6; border-color: #D1D5DB;">
+                <div class="ai-warning-header" style="color: #4B5563;">
+                    <i class="ph-bold ph-magnifying-glass-minus"></i>
+                    <span data-i18n="scanner.not_found_title">Producto Desconocido</span>
+                </div>
+                <p class="ai-warning-text" style="color: #6B7280;" data-i18n="scanner.not_found_desc">Este producto no estÃ¡ en la base de datos. Puedes escanear los ingredientes con IA para comprobar si es seguro.</p>
+                <button class="ai-switch-btn" id="ai-switch-btn-notfound" style="background-color: #4B5563; border-color: #4B5563;">
+                    <i class="ph-bold ph-camera"></i>
+                    <span data-i18n="scanner.analyze_ai">Analizar Etiqueta con IA</span>
+                </button>
+            </div>
+
             <!-- Bloque para editar en OpenFoodFacts -->
 
             <div class="off-edit-box" id="off-edit-box" style="display: none; margin-top: 1rem;">
@@ -306,13 +313,13 @@
 
                 </button>
 
-                <p data-i18n="result.contribute_desc" style="font-size: 0.8rem; text-align: center; color: #64748B; margin-top: 0.5rem; line-height: 1.2;">Al pulsar se abrirá la web para que añadas la etiqueta 'Sin Gluten' y ayudes a la comunidad.</p>
+                <p data-i18n="result.contribute_desc" style="font-size: 0.8rem; text-align: center; color: #64748B; margin-top: 0.5rem; line-height: 1.2;">Al pulsar se abrirÃƒÂ¡ la web para que aÃƒÂ±adas la etiqueta 'Sin Gluten' y ayudes a la comunidad.</p>
 
             </div>
 
 
 
-            <!-- BotÃ³n Volver a Inicio -->
+            <!-- BotÃƒÆ’Ã‚Â³n Volver a Inicio -->
 
             <div class="result-actions" style="margin-top: 1rem;">
 
@@ -332,7 +339,7 @@
 
 
 
-    <!-- NavegaciÃ³n Inferior (Igual que home, pero cambia el activo) -->
+    <!-- NavegaciÃƒÆ’Ã‚Â³n Inferior (Igual que home, pero cambia el activo) -->
 
     <div class="nav-bar">
 
@@ -372,26 +379,29 @@
 
 
 
-    <!-- Script para traducciones y lÃ³gica de escÃ¡ner -->
+    <!-- Script para traducciones y lÃƒÆ’Ã‚Â³gica de escÃƒÆ’Ã‚Â¡ner -->
 
-    <!-- Dependencias de ZXing para cÃ³digos de barras -->
+    <!-- Dependencias de ZXing para cÃƒÆ’Ã‚Â³digos de barras -->
 
-    <!-- ZXing Library (versión estable fijada en 0.20.0 para evitar cuelgues) -->
+    <!-- ZXing Library (versiÃƒÂ³n estable fijada en 0.20.0 para evitar cuelgues) -->
     <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
 
-    <!-- Firebase SDK (MÃ³dulo) -->
+    <!-- Firebase SDK (MÃƒÆ’Ã‚Â³dulo) -->
 
     <script type="module" src="../JS/firebase-config.js"></script>
 
 
 
-    <script src="../JS/i18n.js?v=19"></script>
+    <script src="../JS/i18n.js?v=27"></script>
 
-    <script type="module" src="../JS/scanner.js?v=19"></script>
+    <script type="module" src="../JS/scanner.js?v=27"></script>
 
 </body>
 
 </html>
+
+
+
 
 
 

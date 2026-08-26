@@ -433,6 +433,20 @@ const Translations = {
         [Languages.DE]: "Nicht als \"Glutenfrei\" zertifiziert und könnte Spuren oder Kreuzkontamination enthalten.",
         [Languages.IT]: "Non certificato come \"Senza Glutine\" e potrebbe contenere tracce o contaminazione incrociata."
     },
+        "scanner.no_ingredients": {
+        [Languages.ES]: "No hay ingredientes registrados en la base de datos.",
+        [Languages.EN]: "No ingredients registered in the database.",
+        [Languages.FR]: "Aucun ingrédient enregistré dans la base de données.",
+        [Languages.DE]: "Keine Zutaten in der Datenbank registriert.",
+        [Languages.IT]: "Nessun ingrediente registrato nel database."
+    },
+    "result.missing_ingredients": {
+        [Languages.ES]: "Este producto está en la base de datos, pero nadie ha registrado sus ingredientes aún. Analiza la etiqueta con IA o aporta los ingredientes a OpenFoodFacts.",
+        [Languages.EN]: "This product is in the database, but no one has registered its ingredients yet. Analyze the label with AI or contribute the ingredients to OpenFoodFacts.",
+        [Languages.FR]: "Ce produit est dans la base de données, mais personne n'a encore enregistré ses ingrédients. Analysez l'étiquette avec l'IA ou contribuez les ingrédients à OpenFoodFacts.",
+        [Languages.DE]: "Dieses Produkt ist in der Datenbank, aber noch niemand hat seine Zutaten registriert. Analysieren Sie das Etikett mit KI oder tragen Sie die Zutaten zu OpenFoodFacts bei.",
+        [Languages.IT]: "Questo prodotto è nel database, ma nessuno ha ancora registrato i suoi ingredienti. Analizza l'etichetta con l'IA o contribuisci con gli ingredienti a OpenFoodFacts."
+    },
     "result.not_found": {
         [Languages.ES]: "Producto no encontrado.",
         [Languages.EN]: "Product not found.",
@@ -965,3 +979,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentLangText.innerText = lang;
     }
 });
+
+window.getTranslation = function(key) {
+    const lang = window.currentGlobalLang || Languages.ES;
+    if (Translations[key] && Translations[key][lang]) {
+        return Translations[key][lang];
+    }
+    return key;
+};
