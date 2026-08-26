@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const lastScan = userDoc.scans[userDoc.scans.length - 1];
+        const isSafe = !lastScan.gluten && !lastScan.isWarning;
         let iconClass = "icon-unsafe";
         let iconPh = "ph-fill ph-x-circle";
         let statusClass = "unsafe-text";
@@ -103,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="${iconClass}"><i class="${iconPh}"></i></div>
                 <div class="info">
                     <h3>${lastScan.productName || 'Producto desconocido'}</h3>
-                    <span class="status ${statusClass}" data-i18n="${isSafe ? 'status.safe' : 'scanner.unsafe'}">${lastScan.statusText || (isSafe ? '100% Seguro' : 'No Apto')}</span>
+                    <span class="status ${statusClass}" data-i18n="${lastScan.isWarning ? 'result.warning' : (isSafe ? 'status.safe' : 'scanner.unsafe')}">${lastScan.isWarning ? 'Precaución' : (isSafe ? '100% Seguro' : 'No Apto')}</span>
                 </div>
                 <div class="time" data-i18n="time.just_now">${lastScan.date || 'Hace un momento'}</div>
             </div>

@@ -393,3 +393,22 @@ body {
 .disclaimer-btn:active {
     background-color: #0c8b60;
 }
+.icon-warning {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FEF3C7; /* Amarillo muy clarito */
+    color: #F59E0B; /* Naranja/Ámbar */
+    flex-shrink: 0;
+}
+
+.icon-warning i {
+    font-size: 18px;
+}
+
+.warning-text {
+    color: #F59E0B !important;
+}
