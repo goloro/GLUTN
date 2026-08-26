@@ -629,3 +629,11 @@ body.scanner-body .nav-bar-item:not(.active) {
 .custom-modal-actions .btn-confirm:hover {
     background-color: #0c8b60;
 }
+
+/* Cuando el resultado est visible, la nav-bar vuelve a ser como en las otras pestaas */
+body.scanner-body.showing-result .nav-bar {
+    background-color: var(--nav-bg);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}

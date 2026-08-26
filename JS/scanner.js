@@ -430,6 +430,7 @@ function renderResult(scan) {
 
     if (typeof window.applyTranslations === 'function') window.applyTranslations(localStorage.getItem('glutn_lang') || 'es');
     resultScreen.classList.add('active');
+    document.body.classList.add('showing-result');
     
     // Bind AI buttons
     const bindAiBtn = (id) => {
