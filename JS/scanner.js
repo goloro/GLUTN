@@ -197,6 +197,32 @@ async function analyzeWithOpenFoodFacts(barcode) {
     const analysisTags = p.ingredients_analysis_tags || [];
     const displayName = p.brands ? `${p.product_name || ''} - ${p.brands}` : (p.product_name || '');
 
+    const isGlutenFreeLabel = labels.some(l => {
+        const tag = l.toLowerCase();
+        return tag.includes('gluten-free') || 
+               tag.includes('no-gluten') || 
+               tag.includes('without-gluten') || 
+               tag.includes('free-from-gluten') ||
+               tag.includes('sin-gluten') || 
+               tag.includes('libre-de-gluten') ||
+               tag.includes('sans-gluten') || 
+               tag.includes('glutenfrei') || 
+               tag.includes('ohne-gluten') ||
+               tag.includes('senza-glutine') || 
+               tag.includes('sem-gluten') || 
+               tag.includes('glutenvrij') ||
+               tag.includes('bez-glutenu') || 
+               tag.includes('glutenfri') || 
+               tag.includes('gluteeniton') ||
+               tag.includes('glutensiz') || 
+               tag.includes('无麸质') || 
+               tag.includes('無麩質') || 
+               tag.includes('グルテンフリー') ||
+               tag.includes('خالي من الجلوتين') ||
+               // Fallback: if it contains 'gluten' and any negation word in the same tag
+               (tag.includes('gluten') && (tag.includes('no') || tag.includes('sin') || tag.includes('sans') || tag.includes('senza') || tag.includes('sem') || tag.includes('bez') || tag.includes('ohne') || tag.includes('free') || tag.includes('frei')));
+    }) || analysisTags.includes('en:gluten-free');
+
     let offLang = 'es';
     if (typeof window.currentGlobalLang !== 'undefined') {
         if (window.currentGlobalLang === 'English') offLang = 'en';
@@ -223,7 +249,7 @@ async function analyzeWithOpenFoodFacts(barcode) {
         mappedIngredients = p.ingredients.map(i => ({ name: i.text || i.id || '' })).filter(i => i.name.trim() !== '');
     }
 
-    if (mappedIngredients.length === 0 && !labels.includes('en:gluten-free') && !labels.includes('es:sin-gluten')) {
+    if (mappedIngredients.length === 0 && !isGlutenFreeLabel) {
         renderResult({
             isWarning: true, gluten: null, reason: getT('result.missing_ingredients'), ingredients: [],
             imageUrl: p.image_url || p.image_front_url || null, barcode: barcode, productName: displayName
@@ -231,7 +257,7 @@ async function analyzeWithOpenFoodFacts(barcode) {
         return;
     }
 
-    if (labels.includes('en:gluten-free') || labels.includes('es:sin-gluten') || analysisTags.includes('en:gluten-free')) {
+    if (isGlutenFreeLabel) {
         renderResult({
             isWarning: false, gluten: false, reason: getT('result.safe_certified'), ingredients: mappedIngredients,
             imageUrl: p.image_url || p.image_front_url || null, barcode: barcode, productName: displayName
