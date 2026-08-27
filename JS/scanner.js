@@ -17,7 +17,14 @@ const resultScreen = document.getElementById('result-screen');
 let iaStream = null;
 let currentScanMode = new URLSearchParams(window.location.search).get('mode') || 'EAN';
 let lastScannedBarcode = null;
-let zxingReader = new ZXing.BrowserMultiFormatReader();
+const hints = new Map();
+hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+    ZXing.BarcodeFormat.EAN_13,
+    ZXing.BarcodeFormat.EAN_8,
+    ZXing.BarcodeFormat.UPC_A,
+    ZXing.BarcodeFormat.UPC_E
+]);
+let zxingReader = new ZXing.BrowserMultiFormatReader(hints);
 let isEANScanning = false;
 let isProcessing = false;
 

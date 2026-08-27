@@ -261,6 +261,7 @@ body.scanner-body .nav-bar-item:not(.active) {
     flex-direction: column;
     align-items: center;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .result-overlay.active {
@@ -289,7 +290,6 @@ body.scanner-body .nav-bar-item:not(.active) {
     padding: 24px 24px 120px 24px; /* Fixed padding overwrite */
     display: flex;
     flex-direction: column;
-    flex: 1; /* Ocupa el resto de la pantalla */
 }
 
 /* Tarjeta de imagen y veredicto */
