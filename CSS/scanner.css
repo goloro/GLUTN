@@ -284,6 +284,7 @@ body.scanner-body .nav-bar-item:not(.active) {
 }
 
 .result-content-wrapper {
+    padding-bottom: 120px; /* SPACE FOR NAVBAR */
     width: 100%;
     max-width: 600px;
     padding: 24px;

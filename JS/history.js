@@ -105,9 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('detail-title').innerText = scan.productName || 'Producto';
         document.getElementById('detail-time').innerText = scan.date || 'Reciente';
         
-        const isSafe = !scan.gluten;
         const badge = document.getElementById('detail-badge');
-        if (isSafe) {
+        if (scan.isNotFound) {
+            badge.innerHTML = `<i class="ph-fill ph-question"></i> <span>DESCONOCIDO</span>`;
+            badge.style.backgroundColor = '#6B7280';
+            badge.style.color = '#FFFFFF';
+        } else if (scan.isWarning) {
+            badge.innerHTML = `<i class="ph-fill ph-warning"></i> <span>PRECAUCIÓN</span>`;
+            badge.style.backgroundColor = '#F59E0B';
+            badge.style.color = '#FFFFFF';
+        } else if (!scan.gluten) {
             badge.innerHTML = `<i class="ph-fill ph-check-circle"></i> <span data-i18n="scanner.safe">SEGURO</span>`;
             badge.style.backgroundColor = '#0FA874';
             badge.style.color = '#FFFFFF';
@@ -117,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             badge.style.color = '#FFFFFF';
         }
 
-        document.getElementById('detail-reason-text').innerText = scan.reason || (isSafe ? "Todos los ingredientes son libres de gluten." : "Contiene ingredientes prohibidos.");
+        document.getElementById('detail-reason-text').innerText = scan.reason || (!scan.gluten ? "Todos los ingredientes son libres de gluten." : "Contiene ingredientes prohibidos.");
 
         const ul = document.getElementById('detail-ingredients-list');
         ul.innerHTML = '';

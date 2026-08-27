@@ -1,4 +1,4 @@
-import { db, auth } from "./firebase-config.js";
+﻿import { db, auth } from "./firebase-config.js";
 import { doc, getDoc, updateDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const video = document.getElementById('camera-stream');
@@ -215,10 +215,10 @@ async function analyzeWithOpenFoodFacts(barcode) {
                tag.includes('glutenfri') || 
                tag.includes('gluteeniton') ||
                tag.includes('glutensiz') || 
-               tag.includes('无麸质') || 
-               tag.includes('無麩質') || 
-               tag.includes('グルテンフリー') ||
-               tag.includes('خالي من الجلوتين') ||
+               tag.includes('æ— éº¸è´¨') || 
+               tag.includes('ç„¡éº©è³ª') || 
+               tag.includes('ã‚°ãƒ«ãƒ†ãƒ³ãƒ•ãƒªãƒ¼') ||
+               tag.includes('Ø®Ø§Ù„ÙŠ Ù…Ù† Ø§Ù„Ø¬Ù„ÙˆØªÙŠÙ†') ||
                // Fallback: if it contains 'gluten' and any negation word in the same tag
                (tag.includes('gluten') && (tag.includes('no') || tag.includes('sin') || tag.includes('sans') || tag.includes('senza') || tag.includes('sem') || tag.includes('bez') || tag.includes('ohne') || tag.includes('free') || tag.includes('frei')));
     }) || analysisTags.includes('en:gluten-free');
@@ -226,7 +226,7 @@ async function analyzeWithOpenFoodFacts(barcode) {
     let offLang = 'es';
     if (typeof window.currentGlobalLang !== 'undefined') {
         if (window.currentGlobalLang === 'English') offLang = 'en';
-        else if (window.currentGlobalLang === 'Français') offLang = 'fr';
+        else if (window.currentGlobalLang === 'FranÃ§ais') offLang = 'fr';
         else if (window.currentGlobalLang === 'Deutsch') offLang = 'de';
         else if (window.currentGlobalLang === 'Italiano') offLang = 'it';
     }
@@ -265,7 +265,15 @@ async function analyzeWithOpenFoodFacts(barcode) {
         return;
     }
 
-    if (allergens.includes('en:gluten') || allergens.includes('en:wheat') || allergens.includes('en:barley') || allergens.includes('en:oats') || allergens.includes('en:rye')) {
+    const hasGlutenAllergens = allergens.includes('en:gluten') || allergens.includes('en:wheat') || allergens.includes('en:barley') || allergens.includes('en:oats') || allergens.includes('en:rye');
+    if (hasGlutenAllergens) {
+        const glutenKeywords = ['gluten', 'trigo', 'cebada', 'centeno', 'avena', 'espelta', 'kamut', 'wheat', 'barley', 'rye', 'oats', 'spelt'];
+        const hasGlutenInList = mappedIngredients.some(i => glutenKeywords.some(kw => i.name.toLowerCase().includes(kw)));
+        
+        if (!hasGlutenInList) {
+            mappedIngredients.push({ name: 'Contiene gluten (detectado en base de datos, no detallado en ingredientes)' });
+        }
+
         renderResult({
             isWarning: false, gluten: true, reason: getT('result.unsafe_allergens'), ingredientWithGluten: 'Gluten / Cereales',
             ingredients: mappedIngredients, imageUrl: p.image_url || p.image_front_url || null, barcode: barcode, productName: displayName
@@ -276,7 +284,7 @@ async function analyzeWithOpenFoodFacts(barcode) {
     const hasGlutenTraces = traces.includes('en:gluten') || traces.includes('en:wheat') || traces.includes('en:barley') || traces.includes('en:oats') || traces.includes('en:rye');
     let reasonText = hasGlutenTraces ? getT('result.warning_traces') : getT('result.warning_not_certified');
     
-    // Si tiene trazas y no están en la lista de ingredientes, las inyectamos para que el usuario las vea
+    // Si tiene trazas y no estÃ¡n en la lista de ingredientes, las inyectamos para que el usuario las vea
     if (hasGlutenTraces) {
         const hasTracesInList = mappedIngredients.some(i => i.name.toLowerCase().includes('trazas') || i.name.toLowerCase().includes('traces'));
         if (!hasTracesInList) {
@@ -291,7 +299,7 @@ async function analyzeWithOpenFoodFacts(barcode) {
 }
 
 async function analyzeWithGemini(base64Data) {
-    let userLang = (JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {}).language || 'Español';
+    let userLang = (JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {}).language || 'EspaÃ±ol';
     const promptText = `Eres un experto nutricionista. Traduce ingredientes al ${userLang}.
     Si no hay etiqueta, devuelve {"error":"no_label_detected"}.
     Si hay, extrae ingredientes y mira si hay gluten (trigo, cebada, centeno, avena). Devuelve JSON:
@@ -314,7 +322,7 @@ async function analyzeWithGemini(base64Data) {
 
         if (lastScannedBarcode) scanResult.barcode = lastScannedBarcode;
         if (scanResult.error === 'no_label_detected') {
-            showCustomDialog({ type: 'error', title: 'No se detectó etiqueta', message: 'Por favor, asegúrate de enfocar bien.' });
+            showCustomDialog({ type: 'error', title: 'No se detectÃ³ etiqueta', message: 'Por favor, asegÃºrate de enfocar bien.' });
             loadingScreen.classList.remove('active');
             return;
         }
@@ -361,12 +369,13 @@ function renderResult(scan) {
     if (notFoundBox) notFoundBox.style.display = 'none';
     if (offEditBox) offEditBox.style.display = 'none';
 
+    const resultCard = document.querySelector('.result-card');
+    if (resultCard) resultCard.style.display = 'block';
+
     if (scan.isNotFound === true) {
-        badge.className = 'verdict-banner';
-        badge.innerHTML = `<i class="ph-bold ph-question"></i> <span data-i18n="scanner.not_found_title">Producto Desconocido</span>`;
-        badge.style.backgroundColor = '#6B7280';
+        if (resultCard) resultCard.style.display = 'none'; // Hide the ugly placeholder
         
-        if (notFoundBox) notFoundBox.style.display = 'block';
+        if (notFoundBox) notFoundBox.style.display = 'flex';
         if (ingredientsBox) ingredientsBox.style.display = 'none';
         
         if (scan.barcode && offEditBox) {
@@ -375,7 +384,7 @@ function renderResult(scan) {
         }
     } else if (scan.isWarning) {
         badge.className = 'verdict-banner warning';
-        badge.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="result.caution">Precaución</span>`;
+        badge.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="result.caution">PrecauciÃ³n</span>`;
         aiBox.style.display = 'block';
         if (scan.barcode && offEditBox) {
             offEditBox.style.display = 'block';
@@ -494,3 +503,4 @@ function showCustomDialog(options) {
         modal.classList.add('active');
     });
 }
+
