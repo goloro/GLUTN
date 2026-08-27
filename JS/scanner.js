@@ -481,17 +481,10 @@ async function saveToHistory(scanResult) {
     if (!auth.currentUser) return;
     scanResult.id = Date.now();
     try { 
-        const docRef = doc(db, "users", auth.currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            const scans = data.scans || [];
-            scans.push(scanResult);
-            await updateDoc(docRef, { scans: scans });
-        }
+        const historyRef = collection(db, "users", auth.currentUser.uid, "history");
+        await addDoc(historyRef, { ...scanResult, timestamp: serverTimestamp() });
     } 
     catch (e) { console.error("Error guardando en historial: ", e); }
-
 }
 
 function showCustomDialog(options) {
