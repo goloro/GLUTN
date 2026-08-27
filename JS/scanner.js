@@ -384,7 +384,7 @@ function renderResult(scan) {
         }
     } else if (scan.isWarning) {
         badge.className = 'verdict-banner warning';
-        badge.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="result.caution">PrecauciÃ³n</span>`;
+        badge.innerHTML = `<i class="ph-bold ph-warning"></i> <span data-i18n="result.caution">Precaución</span>`;
         aiBox.style.display = 'block';
         if (scan.barcode && offEditBox) {
             offEditBox.style.display = 'block';
@@ -401,7 +401,17 @@ function renderResult(scan) {
     
     
 
-        const ul = document.getElementById('scanner-result-ingredients');
+        const reasonEl = document.getElementById('scanner-result-reason');
+    if (reasonEl) {
+        if (scan.reason && !scan.isNotFound) {
+            reasonEl.innerText = scan.reason;
+            reasonEl.style.display = 'block';
+        } else {
+            reasonEl.style.display = 'none';
+        }
+    }
+
+    const ul = document.getElementById('scanner-result-ingredients');
     ul.innerHTML = '';
     
     const glutenKeywords = ['gluten', 'trigo', 'cebada', 'centeno', 'avena', 'espelta', 'kamut', 'wheat', 'barley', 'rye', 'oats', 'spelt'];

@@ -34,11 +34,11 @@
 
     <!-- CSS Compartido y EspecÃƒÆ’Ã‚Â­fico -->
 
-    <link rel="stylesheet" href="../CSS/home.css?v=40">
+    <link rel="stylesheet" href="../CSS/home.css?v=42">
 
-    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=40">
+    <link rel="stylesheet" href="../CSS/Responsive/home_responsive.css?v=42">
 
-        <link rel="stylesheet" href="../CSS/scanner.css?v=40">
+        <link rel="stylesheet" href="../CSS/scanner.css?v=42">
 </head>
 <body
 
@@ -46,7 +46,7 @@
  class="scanner-body">
     <!-- DEV VERSION BADGE -->
     <div style="position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; z-index: 9999; font-size: 12px; pointer-events: none;">
-        DEV v40.0
+        DEV v42.0
     </div>
 
     <!-- Area de la Camara (Placeholder visual) -->
@@ -289,14 +289,14 @@
 
 
                         <!-- Bloque de Producto No Encontrado -->
-            <div class="ai-recommendation-box" id="not-found-box" style="display: none; background-color: #F3F4F6; border-color: #D1D5DB;">
-                <div class="ai-warning-header" style="color: #4B5563;">
-                    <i class="ph-bold ph-magnifying-glass-minus"></i>
-                    <span data-i18n="scanner.not_found_title">Producto Desconocido</span>
+            <div id="not-found-box" style="display: none; flex-direction: column; align-items: center; text-align: center; background-color: #FFFFFF; border-radius: 20px; padding: 40px 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); width: 100%; max-width: 340px; margin: 20px auto;">
+                <div style="width: 80px; height: 80px; background-color: #F3F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="ph-fill ph-magnifying-glass" style="font-size: 40px; color: #9CA3AF;"></i>
                 </div>
-                <p class="ai-warning-text" style="color: #6B7280;" data-i18n="scanner.not_found_desc">Este producto no estÃ¡ en la base de datos. Puedes escanear los ingredientes con IA para comprobar si es seguro.</p>
-                <button class="ai-switch-btn" id="ai-switch-btn-notfound" style="background-color: #4B5563; border-color: #4B5563;">
-                    <i class="ph-bold ph-camera"></i>
+                <h3 data-i18n="scanner.not_found_title" style="font-size: 22px; font-weight: 700; color: #1F2937; margin-bottom: 12px; font-family: 'Inter', sans-serif;">Producto Desconocido</h3>
+                <p data-i18n="scanner.not_found_desc" style="font-size: 15px; color: #6B7280; line-height: 1.5; margin-bottom: 28px; font-family: 'Inter', sans-serif;">Este código de barras no está en nuestra base de datos. Puedes analizar los ingredientes usando Inteligencia Artificial.</p>
+                <button class="ai-switch-btn" id="ai-switch-btn-notfound" style="width: 100%; background-color: #2563EB; color: white; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">
+                    <i class="ph-bold ph-camera" style="font-size: 20px;"></i>
                     <span data-i18n="scanner.analyze_ai">Analizar Etiqueta con IA</span>
                 </button>
             </div>
@@ -388,9 +388,9 @@
 
 
 
-    <script src="../JS/i18n.js?v=40"></script>
+    <script src="../JS/i18n.js?v=42"></script>
 
-    <script type="module" src="../JS/scanner.js?v=40"></script>
+    <script type="module" src="../JS/scanner.js?v=42"></script>
 
 </body>
 

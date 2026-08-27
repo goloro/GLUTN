@@ -284,10 +284,9 @@ body.scanner-body .nav-bar-item:not(.active) {
 }
 
 .result-content-wrapper {
-    padding-bottom: 120px; /* SPACE FOR NAVBAR */
     width: 100%;
     max-width: 600px;
-    padding: 24px;
+    padding: 24px 24px 120px 24px; /* Fixed padding overwrite */
     display: flex;
     flex-direction: column;
     flex: 1; /* Ocupa el resto de la pantalla */
@@ -461,7 +460,7 @@ body.scanner-body .nav-bar-item:not(.active) {
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: transform 0.2s ease, background-color 0.2s ease;
 }
 

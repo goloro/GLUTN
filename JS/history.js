@@ -67,11 +67,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (clearContainer) clearContainer.style.display = 'flex';
 
         // Recorrer historial al revés para mostrar el más reciente primero
-        [...userObj.scans].reverse().forEach((scan, index) => {
-            const isSafe = !scan.gluten;
-            const iconClass = isSafe ? "icon-safe" : "icon-unsafe";
-            const iconPh = isSafe ? "ph-fill ph-check-circle" : "ph-fill ph-x-circle";
-            const statusClass = isSafe ? "" : "unsafe-text";
+        userObj.scans.forEach((scan, index) => {
+            let iconClass = "icon-unsafe";
+            let iconPh = "ph-fill ph-x-circle";
+            let statusClass = "unsafe-text";
+            let statusTextKey = "scanner.unsafe";
+            let statusTextDefault = "No Apto";
+
+            if (scan.isNotFound) {
+                iconClass = "icon-unknown";
+                iconPh = "ph-fill ph-question";
+                statusClass = "unknown-text";
+                statusTextKey = "scanner.not_found_title";
+                statusTextDefault = "Desconocido";
+            } else if (scan.isWarning) {
+                iconClass = "icon-warning";
+                iconPh = "ph-fill ph-warning";
+                statusClass = "warning-text";
+                statusTextKey = "result.warning";
+                statusTextDefault = "Precaución";
+            } else if (!scan.gluten) {
+                iconClass = "icon-safe";
+                iconPh = "ph-fill ph-check-circle";
+                statusClass = "";
+                statusTextKey = "status.safe";
+                statusTextDefault = "100% Seguro";
+            }
             
             const itemDiv = document.createElement('div');
             itemDiv.className = 'scan-item history-item';
@@ -85,8 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="${iconClass}"><i class="${iconPh}"></i></div>
                 <div class="info">
                     <h3>${scan.productName || 'Producto desconocido'}</h3>
-                    <span class="status ${statusClass}" data-i18n="${isSafe ? 'status.safe' : 'scanner.unsafe'}">
-                        ${scan.statusText || (isSafe ? '100% Seguro' : 'No Apto')}
+                    <span class="status ${statusClass}" data-i18n="${statusTextKey}">
+                        ${statusTextDefault}
                     </span>
                 </div>
                 <div class="time">${scan.date || 'Hace un momento'}</div>
