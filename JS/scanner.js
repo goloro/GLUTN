@@ -407,7 +407,16 @@ function renderResult(scan) {
     
     
 
-        const reasonEl = document.getElementById('scanner-result-reason');
+        const nameEl = document.getElementById('scanner-result-name');
+    if (nameEl) {
+        if (scan.productName && !scan.isNotFound) {
+            nameEl.innerText = scan.productName;
+            nameEl.style.display = 'block';
+        } else {
+            nameEl.style.display = 'none';
+        }
+    }
+    const reasonEl = document.getElementById('scanner-result-reason');
     if (reasonEl) {
         if (scan.reason && !scan.isNotFound) {
             reasonEl.innerText = scan.reason;
