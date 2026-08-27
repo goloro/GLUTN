@@ -322,10 +322,11 @@ async function analyzeWithGemini(base64Data) {
 
         if (lastScannedBarcode) scanResult.barcode = lastScannedBarcode;
         if (scanResult.error === 'no_label_detected') {
-            showCustomDialog({ type: 'error', title: 'No se detectÃ³ etiqueta', message: 'Por favor, asegÃºrate de enfocar bien.' });
+            showCustomDialog({ type: 'error', title: 'No se detectó etiqueta', message: 'Por favor, asegúrate de enfocar bien.' });
             loadingScreen.classList.remove('active');
             return;
         }
+        scanResult.imageUrl = `data:image/jpeg;base64,${base64Data}`;
         renderResult(scanResult);
     } catch (error) {
         showCustomDialog({ type: 'error', title: 'Error', message: 'No pudimos procesar la imagen.' });
@@ -353,11 +354,9 @@ function renderResult(scan) {
     if (scan.imageUrl) {
         imgEl.src = scan.imageUrl;
     } else {
-        imgEl.src = '../Images/Logos/Glutn_Logo-ShortIcon.PNG';
-        if (currentScanMode === 'EAN' || scan.isNotFound) {
-            imgEl.style.objectFit = 'contain';
-            imgEl.style.padding = '20px';
-        }
+        imgEl.src = '../Images/DefaultProduct.jfif';
+        imgEl.style.objectFit = 'cover';
+        imgEl.style.padding = '0px';
     }
 
     const badge = document.getElementById('scanner-result-badge');
