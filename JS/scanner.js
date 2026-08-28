@@ -272,17 +272,29 @@ async function analyzeWithOpenFoodFacts(barcode) {
         return;
     }
 
-    const hasGlutenAllergens = allergens.includes('en:gluten') || allergens.includes('en:wheat') || allergens.includes('en:barley') || allergens.includes('en:oats') || allergens.includes('en:rye');
+    const glutenKeywords = ['gluten', 'trigo', 'cebada', 'centeno', 'avena', 'espelta', 'kamut', 'wheat', 'barley', 'rye', 'oats', 'spelt'];
+    let detectedKeyword = null;
+    
+    const hasGlutenInList = mappedIngredients.some(i => {
+        const lower = i.name.toLowerCase();
+        for (const kw of glutenKeywords) {
+            if (lower.includes(kw)) {
+                detectedKeyword = kw;
+                return true;
+            }
+        }
+        return false;
+    });
+
+    const hasGlutenAllergens = allergens.includes('en:gluten') || allergens.includes('en:wheat') || allergens.includes('en:barley') || allergens.includes('en:oats') || allergens.includes('en:rye') || hasGlutenInList;
+    
     if (hasGlutenAllergens) {
-        const glutenKeywords = ['gluten', 'trigo', 'cebada', 'centeno', 'avena', 'espelta', 'kamut', 'wheat', 'barley', 'rye', 'oats', 'spelt'];
-        const hasGlutenInList = mappedIngredients.some(i => glutenKeywords.some(kw => i.name.toLowerCase().includes(kw)));
-        
         if (!hasGlutenInList) {
             mappedIngredients.push({ name: 'Contiene gluten (detectado en base de datos, no detallado en ingredientes)' });
         }
 
         renderResult({
-            isWarning: false, gluten: true, reason: getT('result.unsafe_allergens'), ingredientWithGluten: 'Gluten / Cereales',
+            isWarning: false, gluten: true, reason: getT('result.unsafe_allergens'), ingredientWithGluten: detectedKeyword || 'Gluten / Cereales',
             ingredients: mappedIngredients, imageUrl: p.image_url || p.image_front_url || null, barcode: barcode, productName: displayName
         });
         return;
