@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#FFFFFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="../manifest.json">
+    <title>GLUTN - Política de Privacidad</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../CSS/home.css">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        .legal-header {
+            display: grid;
+            grid-template-columns: 40px 1fr 40px;
+            align-items: center;
+            padding: 24px;
+            background-color: transparent;
+        }
+
+        .back-btn {
+            font-size: 24px;
+            color: var(--text-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .header-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .legal-content {
+            padding: 0 24px 40px 24px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .legal-content h2 {
+            font-size: 18px;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .legal-content p {
+            font-size: 14px;
+            color: #716960;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body style="padding-bottom: 0;">
+    <header class="legal-header">
+        <a href="#" id="back-btn" class="back-btn"><i class="ph ph-caret-left"></i></a>
+        <h1 class="header-title" data-i18n="auth.privacy">Política de Privacidad</h1>
+        <div></div> <!-- Spacer para grid -->
+    </header>
+
+    <script>
+        document.getElementById('back-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const from = urlParams.get('from');
+            if (from === 'settings') {
+                window.location.href = 'settings.html';
+            } else {
+                window.location.href = '../index.html';
+            }
+        });
+    </script>
+
+    <main class="legal-content">
+        <p>Última actualización: Agosto 2026</p>
+
+        <h2>1. Información que recopilamos</h2>
+        <p>En GLUTN solo recopilamos la información estrictamente necesaria para brindarte un buen servicio. Esto incluye tu dirección de correo electrónico al crear una cuenta y el historial de tus escaneos, que se guardan en tu perfil personal.</p>
+
+        <h2>2. Uso de la Información</h2>
+        <p>Utilizamos tu historial de escaneos de forma privada para que puedas consultarlo en cualquier momento desde tu dispositivo. No vendemos, alquilamos ni compartimos tu información personal con terceros.</p>
+
+        <h2>3. Base de datos OpenFoodFacts</h2>
+        <p>Para analizar los ingredientes y alertarte sobre la presencia de gluten, utilizamos la base de datos abierta y colaborativa de OpenFoodFacts. Las fotografías de los productos que envíes a su base de datos se rigen bajo sus propias políticas.</p>
+
+        <h2>4. Proveedores de Terceros</h2>
+        <p>Tus datos (como tu correo electrónico y tu historial) están protegidos utilizando la infraestructura de <strong>Google Firebase</strong>. Además, utilizamos el servicio <strong>FormSubmit</strong> de manera exclusiva para procesar y enviarnos los correos que nos mandas a través de la sección de Ayuda y Contacto, sin que almacenen tus datos permanentemente.</p>
+        
+        <h2>5. Eliminación de la cuenta</h2>
+        <p>Tienes el derecho a solicitar la eliminación completa de tu cuenta y todo tu historial de escaneos en cualquier momento a través de la sección de Ayuda y Contacto, o borrando los datos de la aplicación desde Ajustes.</p>
+    </main>
+
+    <!-- Funcionalidad Global (Blocker & Idiomas) -->
+    <script src="../JS/i18n.js"></script>
+</body>
+</html>
+
+

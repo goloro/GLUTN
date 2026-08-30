@@ -159,6 +159,7 @@ body.scanner-body {
 
 /* Ajustes específicos para el nav-bar en la página del escáner */
 body.scanner-body .nav-bar {
+    z-index: 300; /* Force above result-screen */
     background-color: transparent; /* El fondo lo pone el bottom-sheet */
     box-shadow: none; /* Quitamos la sombra superior del nav-bar porque la tiene el bottom-sheet */
     border-top-left-radius: 0;
@@ -260,6 +261,7 @@ body.scanner-body .nav-bar-item:not(.active) {
     flex-direction: column;
     align-items: center;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .result-overlay.active {
@@ -285,10 +287,9 @@ body.scanner-body .nav-bar-item:not(.active) {
 .result-content-wrapper {
     width: 100%;
     max-width: 600px;
-    padding: 24px;
+    padding: 24px 24px 120px 24px; /* Fixed padding overwrite */
     display: flex;
     flex-direction: column;
-    flex: 1; /* Ocupa el resto de la pantalla */
 }
 
 /* Tarjeta de imagen y veredicto */
@@ -459,7 +460,7 @@ body.scanner-body .nav-bar-item:not(.active) {
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
@@ -627,4 +628,132 @@ body.scanner-body .nav-bar-item:not(.active) {
 
 .custom-modal-actions .btn-confirm:hover {
     background-color: #0c8b60;
+}
+
+/* Cuando el resultado est visible, la nav-bar vuelve a ser como en las otras pestaas */
+body.scanner-body.showing-result .nav-bar {
+    background-color: var(--nav-bg);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+/* --- Extracted from HTML inline styles --- */
+
+#scanner-result-img {
+    background-color: #e5e5e5;
+    object-fit: cover;
+}
+
+#scanner-result-reason {
+    text-align: center;
+    color: #4B5563;
+    font-size: 15px;
+    margin: 12px 16px 20px 16px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+#not-found-box {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 40px 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    width: 100%;
+    max-width: 340px;
+    margin: 20px auto;
+}
+
+#not-found-box .icon-circle {
+    width: 80px;
+    height: 80px;
+    background-color: #F3F4F6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#not-found-box .icon-circle i {
+    font-size: 40px;
+    color: #9CA3AF;
+}
+
+#not-found-box h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1F2937;
+    margin-bottom: 12px;
+    font-family: 'Inter', sans-serif;
+}
+
+#not-found-box p {
+    font-size: 15px;
+    color: #6B7280;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    font-family: 'Inter', sans-serif;
+}
+
+#ai-switch-btn-notfound {
+    width: 100%;
+    background-color: #2563EB;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+}
+
+#ai-switch-btn-notfound i {
+    font-size: 20px;
+}
+
+#off-edit-box {
+    margin-top: 1rem;
+}
+
+#off-edit-btn {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+#off-edit-box p {
+    font-size: 0.8rem;
+    text-align: center;
+    color: #64748B;
+    margin-top: 0.5rem;
+    line-height: 1.2;
+}
+
+.result-actions {
+    margin-top: 1rem;
+}
+
+.new-scan-btn {
+    background-color: #0FA874;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 14px 16px;
+}
+
+.new-scan-btn i {
+    font-size: 20px;
 }

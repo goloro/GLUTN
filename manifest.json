@@ -1,0 +1,22 @@
+{
+  "name": "GLUTN",
+  "short_name": "GLUTN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "description": "Tu asistente para escanear y detectar gluten en alimentos.",
+  "icons": [
+    {
+      "src": "Images/Logos/Glutn_Logo-ShortIcon.PNG",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "Images/Logos/Glutn_Logo-ShortIcon.PNG",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

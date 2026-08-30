@@ -1,80 +1,142 @@
-// Lógica para el botón de idiomas en la pantalla de inicio
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { doc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Referencias a elementos del DOM
-    const langBtn = document.getElementById('lang-btn');
-    const langDropdown = document.getElementById('lang-dropdown');
-    const currentLangText = document.getElementById('current-lang');
-    const langOptions = document.querySelectorAll('.lang-option');
-
-    if (!langBtn || !langDropdown) return; // Salir si no estamos en index.html
-
-    // Cargar el idioma guardado al iniciar la página
-    let userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-    if (userObj.language) {
-        selectLang(userObj.language);
-    }
     
-    // Cargar el último escaneo
-    loadLastScan(userObj);
+    // Variables globales para la página
+    let currentUserDoc = null;
+    let currentUid = null;
 
-    // Toggle del menú al hacer click en el botón
-    langBtn.addEventListener('click', function(e) {
-        langDropdown.classList.toggle('show');
-        e.stopPropagation(); // Evitar que el evento llegue a window
+    // Escuchar estado de autenticación
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUid = user.uid;
+            
+            // Traer documento de usuario desde Firestore
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                currentUserDoc = docSnap.data();
+
+                // 1. Aplicar idioma guardado si existe
+                if (currentUserDoc.language) {
+                    if (localStorage.getItem('glutn_lang') !== currentUserDoc.language) {
+                        localStorage.setItem('glutn_lang', currentUserDoc.language);
+                    }
+                    if (typeof window.applyTranslations === 'function') {
+                        window.applyTranslations(currentUserDoc.language);
+                    }
+                }
+
+                // 2. Mostrar modal de disclaimer si no lo ha visto
+                checkDisclaimer(currentUserDoc);
+
+                // 3. Cargar el último escaneo
+                loadLastScan(currentUserDoc);
+            } else {
+                loadLastScan({});
+            }
+        } else {
+            // No logueado
+            loadLastScan({});
+        }
     });
 
-    // Añadir eventos a las opciones
-    langOptions.forEach(option => {
-        option.addEventListener('click', function(e) {
-            const lang = this.getAttribute('data-lang');
-            selectLang(lang);
-            e.stopPropagation();
-        });
-    });
+    function checkDisclaimer(userDoc) {
+        const disclaimerModal = document.getElementById('disclaimer-modal');
+        const disclaimerAcceptBtn = document.getElementById('disclaimer-accept-btn');
+        
+        if (disclaimerModal && disclaimerAcceptBtn) {
+            if (!userDoc.hasSeenDisclaimer) {
+                setTimeout(() => {
+                    disclaimerModal.classList.add('active');
+                }, 300);
+            }
 
-    // Función para renderizar el último escaneo
-    function loadLastScan(user) {
+            disclaimerAcceptBtn.addEventListener('click', async () => {
+                disclaimerModal.classList.remove('active');
+                
+                // Actualizar Firestore
+                if (currentUid) {
+                    const docRef = doc(db, "users", currentUid);
+                    await updateDoc(docRef, { hasSeenDisclaimer: true });
+                }
+            });
+        }
+    }
+
+    async function loadLastScan(userDoc) {
         const container = document.getElementById('last-scan-container');
         if (!container) return;
 
-        // Si no hay historial o está vacío
-        if (!user.scans || user.scans.length === 0) {
+        let lastScan = null;
+        if (currentUid) {
+            try {
+                const q = query(collection(db, "users", currentUid, "history"), orderBy("timestamp", "desc"), limit(1));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    lastScan = querySnapshot.docs[0].data();
+                }
+            } catch (e) {
+                console.error("Error loading last scan", e);
+            }
+        }
+
+        if (!lastScan) {
             container.innerHTML = `
                 <div data-i18n="home.no_scans" style="text-align: left; color: #6B7280; font-size: 14px; padding: 12px 0;">
                     Aún no has escaneado ningún producto. ¡Anímate a probarlo!
                 </div>
             `;
-            if (typeof applyTranslations === 'function') {
-                applyTranslations(user.language || 'Español');
+            if (typeof window.applyTranslations === 'function') {
+                window.applyTranslations(userDoc.language || 'Español');
             }
             return;
         }
 
-        // Coger el último escaneo (asumiendo que el último añadido es el último del array)
-        const lastScan = user.scans[user.scans.length - 1];
-        
-        // Determinar estilo en base a si es seguro o no
-        const isSafe = !lastScan.gluten;
-        const iconClass = isSafe ? "icon-safe" : "icon-unsafe";
-        const iconPh = isSafe ? "ph-fill ph-check-circle" : "ph-fill ph-x-circle";
-        const statusClass = isSafe ? "" : "unsafe-text"; 
+        let iconClass = "icon-unsafe";
+        let iconPh = "ph-fill ph-x-circle";
+        let statusClass = "unsafe-text";
+        let statusTextKey = "scanner.unsafe";
+        let statusTextDefault = "No Apto";
+
+        if (lastScan.isNotFound) {
+            iconClass = "icon-unknown";
+            iconPh = "ph-fill ph-question";
+            statusClass = "unknown-text";
+            statusTextKey = "scanner.not_found_title";
+            statusTextDefault = "Desconocido";
+        } else if (lastScan.isWarning) {
+            iconClass = "icon-warning";
+            iconPh = "ph-fill ph-warning";
+            statusClass = "warning-text";
+            statusTextKey = "result.warning";
+            statusTextDefault = "Precaución";
+        } else if (!lastScan.gluten) {
+            iconClass = "icon-safe";
+            iconPh = "ph-fill ph-check-circle";
+            statusClass = "";
+            statusTextKey = "status.safe";
+            statusTextDefault = "100% Seguro";
+        } 
 
         container.innerHTML = `
             <div class="scan-item" id="last-scan-item" style="cursor: pointer;">
                 <div class="${iconClass}"><i class="${iconPh}"></i></div>
                 <div class="info">
                     <h3>${lastScan.productName || 'Producto desconocido'}</h3>
-                    <span class="status ${statusClass}" data-i18n="${isSafe ? 'status.safe' : 'scanner.unsafe'}">${lastScan.statusText || (isSafe ? '100% Seguro' : 'No Apto')}</span>
+                    <span class="status ${statusClass}" data-i18n="${statusTextKey}">${statusTextDefault}</span>
                 </div>
                 <div class="time" data-i18n="time.just_now">${lastScan.date || 'Hace un momento'}</div>
             </div>
         `;
 
-        document.getElementById('last-scan-item').addEventListener('click', () => openDetail(lastScan));
+        document.getElementById('last-scan-item').addEventListener('click', () => openDetail(lastScan, userDoc));
     }
 
-    function openDetail(scan) {
+    function openDetail(scan, userDoc) {
         document.getElementById('detail-title').innerText = scan.productName || 'Producto';
         document.getElementById('detail-time').innerText = scan.date || 'Reciente';
         
@@ -90,10 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
             badge.style.color = '#FFFFFF';
         }
 
-        // Explicación
         document.getElementById('detail-reason-text').innerText = scan.reason || (isSafe ? "Todos los ingredientes son libres de gluten." : "Contiene ingredientes prohibidos.");
 
-        // Lista de Ingredientes
         const ul = document.getElementById('detail-ingredients-list');
         ul.innerHTML = '';
         if (scan.ingredients && scan.ingredients.length > 0) {
@@ -109,85 +169,26 @@ document.addEventListener('DOMContentLoaded', function() {
             ul.innerHTML = '<li>Sin información detallada de ingredientes</li>';
         }
 
-        if (typeof applyTranslations === 'function') {
-            applyTranslations(userObj.language || 'Español');
+        if (typeof window.applyTranslations === 'function') {
+            window.applyTranslations(userDoc.language || 'Español');
         }
 
         document.getElementById('history-detail-screen').classList.add('active');
     }
 
-    // Función principal para seleccionar el idioma
-    function selectLang(lang) {
-        if (!currentLangText) return;
-        
-        // Cambiar el texto del botón
-        currentLangText.innerText = lang;
-        // Cerrar el desplegable
-        langDropdown.classList.remove('show');
-        
-        // Ocultar la opción del idioma actual y mostrar las demás
-        langOptions.forEach(opt => {
-            if (opt.getAttribute('data-lang') === lang) {
-                opt.style.display = 'none';
-            } else {
-                opt.style.display = 'block';
-            }
-        });
-
-        // Guardar en el JSON de usuario en LocalStorage
-        userObj = JSON.parse(localStorage.getItem('GLUTN_UserInfo')) || {};
-        userObj.language = lang;
-        localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
-
-        // Aplicar la traducción a la UI si la función existe (i18n.js cargado)
-        if (typeof applyTranslations === 'function') {
-            applyTranslations(lang);
-        }
-    }
-
-    // === 3. MANEJO DE TARJETAS DE ESCANEO ===
+    // === MANEJO DE TARJETAS DE ESCANEO ===
     const scanEanCard = document.getElementById('scan-ean-card');
     const scanIaCard = document.getElementById('scan-ia-card');
 
     if (scanEanCard) {
         scanEanCard.addEventListener('click', () => {
-            localStorage.setItem('scan_mode', 'EAN');
-            window.location.href = 'HTML/scanner.html';
+            window.location.href = 'scanner.html?mode=EAN';
         });
     }
 
     if (scanIaCard) {
         scanIaCard.addEventListener('click', () => {
-            localStorage.setItem('scan_mode', 'IA');
-            window.location.href = 'HTML/scanner.html';
-        });
-    }
-
-    // Cerrar el menú si el usuario clica fuera de él
-    window.addEventListener('click', function(event) {
-        if (!event.target.closest('.language-selector')) {
-            if (langDropdown.classList.contains('show')) {
-                langDropdown.classList.remove('show');
-            }
-        }
-    });
-
-    // === 4. DISCLAIMER MODAL ===
-    const disclaimerModal = document.getElementById('disclaimer-modal');
-    const disclaimerAcceptBtn = document.getElementById('disclaimer-accept-btn');
-    
-    if (disclaimerModal && disclaimerAcceptBtn) {
-        // Mostrar modal si es la primera vez
-        if (!userObj.hasSeenDisclaimer) {
-            setTimeout(() => {
-                disclaimerModal.classList.add('active');
-            }, 300);
-        }
-
-        disclaimerAcceptBtn.addEventListener('click', () => {
-            disclaimerModal.classList.remove('active');
-            userObj.hasSeenDisclaimer = true;
-            localStorage.setItem('GLUTN_UserInfo', JSON.stringify(userObj));
+            window.location.href = 'scanner.html?mode=IA';
         });
     }
 });

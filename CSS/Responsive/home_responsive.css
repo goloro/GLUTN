@@ -45,10 +45,7 @@
 /* Pantallas pequeñas (menor altura) para evitar scroll en la Home */
 @media (max-height: 750px) {
     /* Reducir márgenes y paddings globales para comprimir la UI */
-    #main-logo {
-        height: 70px;
-        margin: -16px 0;
-    }
+    
     .home-header {
         padding: 12px 0;
     }
@@ -88,10 +85,7 @@
 
 @media (max-height: 650px) {
     /* Pantallas extra pequeñas (e.g. iPhone SE antiguo) */
-    #main-logo {
-        height: 60px;
-        margin: -10px 0;
-    }
+    
     .home-header {
         padding: 8px 0;
     }
